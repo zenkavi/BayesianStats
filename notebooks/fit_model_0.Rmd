@@ -42,4 +42,23 @@ aFit = as.shinystan(fit)
 launch_shinystan(aFit)
 ```
 
+Re run model with `generated quantities` block
 
+```{r}
+fit = stan('../stanModels/model_0.stan', iter=200, chains=4,
+           data = list(Y=Y))
+```
+
+```{r}
+print(fit, probs=c(.25,.5,.75))
+```
+
+New model where height  `Y` is a function of weight `X`
+
+```{r}
+N = 100
+X = rnorm(N, 60, 10)
+beta = .3
+sigma = .3
+Y = beta * log(X) + rnorm(N, 0, sigma)
+```

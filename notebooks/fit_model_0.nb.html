@@ -1959,9 +1959,183 @@ launch_shinystan(aFit)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+<p>Re run model with <code>generated quantities</code> block</p>
 <!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZml0ID0gc3RhbignLi4vc3Rhbk1vZGVscy9tb2RlbF8wLnN0YW4nLCBpdGVyPTIwMCwgY2hhaW5zPTQsXG4gICAgICAgICAgIGRhdGEgPSBsaXN0KFk9WSkpXG5gYGAifQ== -->
+<pre class="r"><code>fit = stan(&#39;../stanModels/model_0.stan&#39;, iter=200, chains=4,
+           data = list(Y=Y))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiaW5jb21wbGV0ZSBmaW5hbCBsaW5lIGZvdW5kIG9uICcvVXNlcnMvemV5bmVwZW5rYXZpL0Ryb3Bib3gvUmFuZ2VsTGFiL0JheWVzaWFuU3RhdHMvc3Rhbk1vZGVscy9tb2RlbF8wLnN0YW4naGFzaCBtaXNtYXRjaCBzbyByZWNvbXBpbGluZzsgbWFrZSBzdXJlIFN0YW4gY29kZSBlbmRzIHdpdGggYSBibGFuayBsaW5lXG4ifQ== -->
+<pre><code>incomplete final line found on &#39;/Users/zeynepenkavi/Dropbox/RangelLab/BayesianStats/stanModels/model_0.stan&#39;hash mismatch so recompiling; make sure Stan code ends with a blank line</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoic3RhcnRpbmcgd29ya2VyIHBpZD0xNzYwNyBvbiBsb2NhbGhvc3Q6MTExNjcgYXQgMTU6MTk6MzYuODI3XG5zdGFydGluZyB3b3JrZXIgcGlkPTE3NjIxIG9uIGxvY2FsaG9zdDoxMTE2NyBhdCAxNToxOTozNy4yMDNcbnN0YXJ0aW5nIHdvcmtlciBwaWQ9MTc2MzYgb24gbG9jYWxob3N0OjExMTY3IGF0IDE1OjE5OjM3LjYzOFxuc3RhcnRpbmcgd29ya2VyIHBpZD0xNzY1MSBvbiBsb2NhbGhvc3Q6MTExNjcgYXQgMTU6MTk6MzguMDA4XG5cblNBTVBMSU5HIEZPUiBNT0RFTCAnbW9kZWxfMCcgTk9XIChDSEFJTiAxKS5cbkNoYWluIDE6IFxuQ2hhaW4gMTogR3JhZGllbnQgZXZhbHVhdGlvbiB0b29rIDEuNWUtMDUgc2Vjb25kc1xuQ2hhaW4gMTogMTAwMCB0cmFuc2l0aW9ucyB1c2luZyAxMCBsZWFwZnJvZyBzdGVwcyBwZXIgdHJhbnNpdGlvbiB3b3VsZCB0YWtlIDAuMTUgc2Vjb25kcy5cbkNoYWluIDE6IEFkanVzdCB5b3VyIGV4cGVjdGF0aW9ucyBhY2NvcmRpbmdseSFcbkNoYWluIDE6IFxuQ2hhaW4gMTogXG5DaGFpbiAxOiBXQVJOSU5HOiBUaGVyZSBhcmVuJ3QgZW5vdWdoIHdhcm11cCBpdGVyYXRpb25zIHRvIGZpdCB0aGVcbkNoYWluIDE6ICAgICAgICAgIHRocmVlIHN0YWdlcyBvZiBhZGFwdGF0aW9uIGFzIGN1cnJlbnRseSBjb25maWd1cmVkLlxuQ2hhaW4gMTogICAgICAgICAgUmVkdWNpbmcgZWFjaCBhZGFwdGF0aW9uIHN0YWdlIHRvIDE1JS83NSUvMTAlIG9mXG5DaGFpbiAxOiAgICAgICAgICB0aGUgZ2l2ZW4gbnVtYmVyIG9mIHdhcm11cCBpdGVyYXRpb25zOlxuQ2hhaW4gMTogICAgICAgICAgICBpbml0X2J1ZmZlciA9IDE1XG5DaGFpbiAxOiAgICAgICAgICAgIGFkYXB0X3dpbmRvdyA9IDc1XG5DaGFpbiAxOiAgICAgICAgICAgIHRlcm1fYnVmZmVyID0gMTBcbkNoYWluIDE6IFxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgIDEgLyAyMDAgWyAgMCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgMjAgLyAyMDAgWyAxMCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgNDAgLyAyMDAgWyAyMCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgNjAgLyAyMDAgWyAzMCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgODAgLyAyMDAgWyA0MCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxMDAgLyAyMDAgWyA1MCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxMDEgLyAyMDAgWyA1MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAxOiBJdGVyYXRpb246IDEyMCAvIDIwMCBbIDYwJV0gIChTYW1wbGluZylcbkNoYWluIDE6IEl0ZXJhdGlvbjogMTQwIC8gMjAwIFsgNzAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxNjAgLyAyMDAgWyA4MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAxOiBJdGVyYXRpb246IDE4MCAvIDIwMCBbIDkwJV0gIChTYW1wbGluZylcbkNoYWluIDE6IEl0ZXJhdGlvbjogMjAwIC8gMjAwIFsxMDAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMTogXG5DaGFpbiAxOiAgRWxhcHNlZCBUaW1lOiAwLjAwMjUxNSBzZWNvbmRzIChXYXJtLXVwKVxuQ2hhaW4gMTogICAgICAgICAgICAgICAgMC4wMDIyMyBzZWNvbmRzIChTYW1wbGluZylcbkNoYWluIDE6ICAgICAgICAgICAgICAgIDAuMDA0NzQ1IHNlY29uZHMgKFRvdGFsKVxuQ2hhaW4gMTogXG5cblNBTVBMSU5HIEZPUiBNT0RFTCAnbW9kZWxfMCcgTk9XIChDSEFJTiAyKS5cbkNoYWluIDI6IFxuQ2hhaW4gMjogR3JhZGllbnQgZXZhbHVhdGlvbiB0b29rIDIuNGUtMDUgc2Vjb25kc1xuQ2hhaW4gMjogMTAwMCB0cmFuc2l0aW9ucyB1c2luZyAxMCBsZWFwZnJvZyBzdGVwcyBwZXIgdHJhbnNpdGlvbiB3b3VsZCB0YWtlIDAuMjQgc2Vjb25kcy5cbkNoYWluIDI6IEFkanVzdCB5b3VyIGV4cGVjdGF0aW9ucyBhY2NvcmRpbmdseSFcbkNoYWluIDI6IFxuQ2hhaW4gMjogXG5DaGFpbiAyOiBXQVJOSU5HOiBUaGVyZSBhcmVuJ3QgZW5vdWdoIHdhcm11cCBpdGVyYXRpb25zIHRvIGZpdCB0aGVcbkNoYWluIDI6ICAgICAgICAgIHRocmVlIHN0YWdlcyBvZiBhZGFwdGF0aW9uIGFzIGN1cnJlbnRseSBjb25maWd1cmVkLlxuQ2hhaW4gMjogICAgICAgICAgUmVkdWNpbmcgZWFjaCBhZGFwdGF0aW9uIHN0YWdlIHRvIDE1JS83NSUvMTAlIG9mXG5DaGFpbiAyOiAgICAgICAgICB0aGUgZ2l2ZW4gbnVtYmVyIG9mIHdhcm11cCBpdGVyYXRpb25zOlxuQ2hhaW4gMjogICAgICAgICAgICBpbml0X2J1ZmZlciA9IDE1XG5DaGFpbiAyOiAgICAgICAgICAgIGFkYXB0X3dpbmRvdyA9IDc1XG5DaGFpbiAyOiAgICAgICAgICAgIHRlcm1fYnVmZmVyID0gMTBcbkNoYWluIDI6IFxuQ2hhaW4gMjogSXRlcmF0aW9uOiAgIDEgLyAyMDAgWyAgMCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAgMjAgLyAyMDAgWyAxMCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAgNDAgLyAyMDAgWyAyMCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAgNjAgLyAyMDAgWyAzMCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAgODAgLyAyMDAgWyA0MCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAxMDAgLyAyMDAgWyA1MCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAxMDEgLyAyMDAgWyA1MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAyOiBJdGVyYXRpb246IDEyMCAvIDIwMCBbIDYwJV0gIChTYW1wbGluZylcbkNoYWluIDI6IEl0ZXJhdGlvbjogMTQwIC8gMjAwIFsgNzAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAxNjAgLyAyMDAgWyA4MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAyOiBJdGVyYXRpb246IDE4MCAvIDIwMCBbIDkwJV0gIChTYW1wbGluZylcbkNoYWluIDI6IEl0ZXJhdGlvbjogMjAwIC8gMjAwIFsxMDAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMjogXG5DaGFpbiAyOiAgRWxhcHNlZCBUaW1lOiAwLjAwMjQ3MiBzZWNvbmRzIChXYXJtLXVwKVxuQ2hhaW4gMjogICAgICAgICAgICAgICAgMC4wMDIwODEgc2Vjb25kcyAoU2FtcGxpbmcpXG5DaGFpbiAyOiAgICAgICAgICAgICAgICAwLjAwNDU1MyBzZWNvbmRzIChUb3RhbClcbkNoYWluIDI6IFxuXG5TQU1QTElORyBGT1IgTU9ERUwgJ21vZGVsXzAnIE5PVyAoQ0hBSU4gMykuXG5DaGFpbiAzOiBcbkNoYWluIDM6IEdyYWRpZW50IGV2YWx1YXRpb24gdG9vayAyLjRlLTA1IHNlY29uZHNcbkNoYWluIDM6IDEwMDAgdHJhbnNpdGlvbnMgdXNpbmcgMTAgbGVhcGZyb2cgc3RlcHMgcGVyIHRyYW5zaXRpb24gd291bGQgdGFrZSAwLjI0IHNlY29uZHMuXG5DaGFpbiAzOiBBZGp1c3QgeW91ciBleHBlY3RhdGlvbnMgYWNjb3JkaW5nbHkhXG5DaGFpbiAzOiBcbkNoYWluIDM6IFxuQ2hhaW4gMzogV0FSTklORzogVGhlcmUgYXJlbid0IGVub3VnaCB3YXJtdXAgaXRlcmF0aW9ucyB0byBmaXQgdGhlXG5DaGFpbiAzOiAgICAgICAgICB0aHJlZSBzdGFnZXMgb2YgYWRhcHRhdGlvbiBhcyBjdXJyZW50bHkgY29uZmlndXJlZC5cbkNoYWluIDM6ICAgICAgICAgIFJlZHVjaW5nIGVhY2ggYWRhcHRhdGlvbiBzdGFnZSB0byAxNSUvNzUlLzEwJSBvZlxuQ2hhaW4gMzogICAgICAgICAgdGhlIGdpdmVuIG51bWJlciBvZiB3YXJtdXAgaXRlcmF0aW9uczpcbkNoYWluIDM6ICAgICAgICAgICAgaW5pdF9idWZmZXIgPSAxNVxuQ2hhaW4gMzogICAgICAgICAgICBhZGFwdF93aW5kb3cgPSA3NVxuQ2hhaW4gMzogICAgICAgICAgICB0ZXJtX2J1ZmZlciA9IDEwXG5DaGFpbiAzOiBcbkNoYWluIDM6IEl0ZXJhdGlvbjogICAxIC8gMjAwIFsgIDAlXSAgKFdhcm11cClcbkNoYWluIDM6IEl0ZXJhdGlvbjogIDIwIC8gMjAwIFsgMTAlXSAgKFdhcm11cClcbkNoYWluIDM6IEl0ZXJhdGlvbjogIDQwIC8gMjAwIFsgMjAlXSAgKFdhcm11cClcbkNoYWluIDM6IEl0ZXJhdGlvbjogIDYwIC8gMjAwIFsgMzAlXSAgKFdhcm11cClcbkNoYWluIDM6IEl0ZXJhdGlvbjogIDgwIC8gMjAwIFsgNDAlXSAgKFdhcm11cClcbkNoYWluIDM6IEl0ZXJhdGlvbjogMTAwIC8gMjAwIFsgNTAlXSAgKFdhcm11cClcbkNoYWluIDM6IEl0ZXJhdGlvbjogMTAxIC8gMjAwIFsgNTAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAxMjAgLyAyMDAgWyA2MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAzOiBJdGVyYXRpb246IDE0MCAvIDIwMCBbIDcwJV0gIChTYW1wbGluZylcbkNoYWluIDM6IEl0ZXJhdGlvbjogMTYwIC8gMjAwIFsgODAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAxODAgLyAyMDAgWyA5MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAzOiBJdGVyYXRpb246IDIwMCAvIDIwMCBbMTAwJV0gIChTYW1wbGluZylcbkNoYWluIDM6IFxuQ2hhaW4gMzogIEVsYXBzZWQgVGltZTogMC4wMDI5NzUgc2Vjb25kcyAoV2FybS11cClcbkNoYWluIDM6ICAgICAgICAgICAgICAgIDAuMDAxOTUgc2Vjb25kcyAoU2FtcGxpbmcpXG5DaGFpbiAzOiAgICAgICAgICAgICAgICAwLjAwNDkyNSBzZWNvbmRzIChUb3RhbClcbkNoYWluIDM6IFxuXG5TQU1QTElORyBGT1IgTU9ERUwgJ21vZGVsXzAnIE5PVyAoQ0hBSU4gNCkuXG5DaGFpbiA0OiBcbkNoYWluIDQ6IEdyYWRpZW50IGV2YWx1YXRpb24gdG9vayAyLjJlLTA1IHNlY29uZHNcbkNoYWluIDQ6IDEwMDAgdHJhbnNpdGlvbnMgdXNpbmcgMTAgbGVhcGZyb2cgc3RlcHMgcGVyIHRyYW5zaXRpb24gd291bGQgdGFrZSAwLjIyIHNlY29uZHMuXG5DaGFpbiA0OiBBZGp1c3QgeW91ciBleHBlY3RhdGlvbnMgYWNjb3JkaW5nbHkhXG5DaGFpbiA0OiBcbkNoYWluIDQ6IFxuQ2hhaW4gNDogV0FSTklORzogVGhlcmUgYXJlbid0IGVub3VnaCB3YXJtdXAgaXRlcmF0aW9ucyB0byBmaXQgdGhlXG5DaGFpbiA0OiAgICAgICAgICB0aHJlZSBzdGFnZXMgb2YgYWRhcHRhdGlvbiBhcyBjdXJyZW50bHkgY29uZmlndXJlZC5cbkNoYWluIDQ6ICAgICAgICAgIFJlZHVjaW5nIGVhY2ggYWRhcHRhdGlvbiBzdGFnZSB0byAxNSUvNzUlLzEwJSBvZlxuQ2hhaW4gNDogICAgICAgICAgdGhlIGdpdmVuIG51bWJlciBvZiB3YXJtdXAgaXRlcmF0aW9uczpcbkNoYWluIDQ6ICAgICAgICAgICAgaW5pdF9idWZmZXIgPSAxNVxuQ2hhaW4gNDogICAgICAgICAgICBhZGFwdF93aW5kb3cgPSA3NVxuQ2hhaW4gNDogICAgICAgICAgICB0ZXJtX2J1ZmZlciA9IDEwXG5DaGFpbiA0OiBcbkNoYWluIDQ6IEl0ZXJhdGlvbjogICAxIC8gMjAwIFsgIDAlXSAgKFdhcm11cClcbkNoYWluIDQ6IEl0ZXJhdGlvbjogIDIwIC8gMjAwIFsgMTAlXSAgKFdhcm11cClcbkNoYWluIDQ6IEl0ZXJhdGlvbjogIDQwIC8gMjAwIFsgMjAlXSAgKFdhcm11cClcbkNoYWluIDQ6IEl0ZXJhdGlvbjogIDYwIC8gMjAwIFsgMzAlXSAgKFdhcm11cClcbkNoYWluIDQ6IEl0ZXJhdGlvbjogIDgwIC8gMjAwIFsgNDAlXSAgKFdhcm11cClcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTAwIC8gMjAwIFsgNTAlXSAgKFdhcm11cClcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTAxIC8gMjAwIFsgNTAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gNDogSXRlcmF0aW9uOiAxMjAgLyAyMDAgWyA2MCVdICAoU2FtcGxpbmcpXG5DaGFpbiA0OiBJdGVyYXRpb246IDE0MCAvIDIwMCBbIDcwJV0gIChTYW1wbGluZylcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTYwIC8gMjAwIFsgODAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gNDogSXRlcmF0aW9uOiAxODAgLyAyMDAgWyA5MCVdICAoU2FtcGxpbmcpXG5DaGFpbiA0OiBJdGVyYXRpb246IDIwMCAvIDIwMCBbMTAwJV0gIChTYW1wbGluZylcbkNoYWluIDQ6IFxuQ2hhaW4gNDogIEVsYXBzZWQgVGltZTogMC4wMDMwODIgc2Vjb25kcyAoV2FybS11cClcbkNoYWluIDQ6ICAgICAgICAgICAgICAgIDAuMDAyMDEyIHNlY29uZHMgKFNhbXBsaW5nKVxuQ2hhaW4gNDogICAgICAgICAgICAgICAgMC4wMDUwOTQgc2Vjb25kcyAoVG90YWwpXG5DaGFpbiA0OiBcbiJ9 -->
+<pre><code>starting worker pid=17607 on localhost:11167 at 15:19:36.827
+starting worker pid=17621 on localhost:11167 at 15:19:37.203
+starting worker pid=17636 on localhost:11167 at 15:19:37.638
+starting worker pid=17651 on localhost:11167 at 15:19:38.008
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiU3RhbiBtb2RlbF8wIgpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sKLS0tCgpDcmVhdGUgZmFrZSBkYXRhCgpgYGB7cn0KWSA9IHJub3JtKDEwLCAxLjUsIC4yKQpgYGAKCkNvbXBpbGUgYW5kIHJ1biB0aGUgTUNNQwoKYGBge3J9CmZpdCA9IHN0YW4oJy4uL3N0YW5Nb2RlbHMvbW9kZWxfMC5zdGFuJywgaXRlcj0yMDAsIGNoYWlucz00LAogICAgICAgICAgIGRhdGEgPSBsaXN0KFk9WSkpCmBgYAoKSW50ZXJwcmV0aW5nIHJlc3VsdHMKCmBgYHtyfQpwcmludChmaXQsIHByb2JzPWMoLjI1LCAuNSwgLjc1KSkKYGBgCgpFeHRyYWN0IGFuZCBwbG90IHBvc3RlcmlvcgoKYGBge3J9CmRhdGEuZnJhbWUobXUgPWV4dHJhY3QoZml0LCAnbXUnKVtbMV1dKSAlPiUKICBnZ3Bsb3QoYWVzKHg9bXUpKSsKICBnZW9tX2hpc3RvZ3JhbSgpCmBgYAoKSW50ZXJhY3RpdmUgZXhwbG9yYXRpb24gaW4gYHNoaW55c3RhbmAKCmBgYHtyfQpyZXF1aXJlKHNoaW55c3RhbikKYGBgCgoKYGBge3J9CmFGaXQgPSBhcy5zaGlueXN0YW4oZml0KQpsYXVuY2hfc2hpbnlzdGFuKGFGaXQpCmBgYAoKCg==</div>
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 1).
+Chain 1: 
+Chain 1: Gradient evaluation took 1.5e-05 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.15 seconds.
+Chain 1: Adjust your expectations accordingly!
+Chain 1: 
+Chain 1: 
+Chain 1: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 1:          three stages of adaptation as currently configured.
+Chain 1:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 1:          the given number of warmup iterations:
+Chain 1:            init_buffer = 15
+Chain 1:            adapt_window = 75
+Chain 1:            term_buffer = 10
+Chain 1: 
+Chain 1: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 1: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 1: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 1: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 1: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 1: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 1: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 1: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 1: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 1: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 1: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 1: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 1: 
+Chain 1:  Elapsed Time: 0.002515 seconds (Warm-up)
+Chain 1:                0.00223 seconds (Sampling)
+Chain 1:                0.004745 seconds (Total)
+Chain 1: 
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 2).
+Chain 2: 
+Chain 2: Gradient evaluation took 2.4e-05 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.24 seconds.
+Chain 2: Adjust your expectations accordingly!
+Chain 2: 
+Chain 2: 
+Chain 2: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 2:          three stages of adaptation as currently configured.
+Chain 2:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 2:          the given number of warmup iterations:
+Chain 2:            init_buffer = 15
+Chain 2:            adapt_window = 75
+Chain 2:            term_buffer = 10
+Chain 2: 
+Chain 2: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 2: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 2: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 2: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 2: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 2: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 2: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 2: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 2: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 2: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 2: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 2: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 2: 
+Chain 2:  Elapsed Time: 0.002472 seconds (Warm-up)
+Chain 2:                0.002081 seconds (Sampling)
+Chain 2:                0.004553 seconds (Total)
+Chain 2: 
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 3).
+Chain 3: 
+Chain 3: Gradient evaluation took 2.4e-05 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.24 seconds.
+Chain 3: Adjust your expectations accordingly!
+Chain 3: 
+Chain 3: 
+Chain 3: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 3:          three stages of adaptation as currently configured.
+Chain 3:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 3:          the given number of warmup iterations:
+Chain 3:            init_buffer = 15
+Chain 3:            adapt_window = 75
+Chain 3:            term_buffer = 10
+Chain 3: 
+Chain 3: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 3: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 3: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 3: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 3: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 3: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 3: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 3: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 3: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 3: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 3: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 3: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 3: 
+Chain 3:  Elapsed Time: 0.002975 seconds (Warm-up)
+Chain 3:                0.00195 seconds (Sampling)
+Chain 3:                0.004925 seconds (Total)
+Chain 3: 
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 4).
+Chain 4: 
+Chain 4: Gradient evaluation took 2.2e-05 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.22 seconds.
+Chain 4: Adjust your expectations accordingly!
+Chain 4: 
+Chain 4: 
+Chain 4: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 4:          three stages of adaptation as currently configured.
+Chain 4:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 4:          the given number of warmup iterations:
+Chain 4:            init_buffer = 15
+Chain 4:            adapt_window = 75
+Chain 4:            term_buffer = 10
+Chain 4: 
+Chain 4: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 4: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 4: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 4: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 4: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 4: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 4: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 4: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 4: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 4: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 4: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 4: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 4: 
+Chain 4:  Elapsed Time: 0.003082 seconds (Warm-up)
+Chain 4:                0.002012 seconds (Sampling)
+Chain 4:                0.005094 seconds (Total)
+Chain 4: </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQnVsayBFZmZlY3RpdmUgU2FtcGxlcyBTaXplIChFU1MpIGlzIHRvbyBsb3csIGluZGljYXRpbmcgcG9zdGVyaW9yIG1lYW5zIGFuZCBtZWRpYW5zIG1heSBiZSB1bnJlbGlhYmxlLlxuUnVubmluZyB0aGUgY2hhaW5zIGZvciBtb3JlIGl0ZXJhdGlvbnMgbWF5IGhlbHAuIFNlZVxuaHR0cDovL21jLXN0YW4ub3JnL21pc2Mvd2FybmluZ3MuaHRtbCNidWxrLWVzc1RhaWwgRWZmZWN0aXZlIFNhbXBsZXMgU2l6ZSAoRVNTKSBpcyB0b28gbG93LCBpbmRpY2F0aW5nIHBvc3RlcmlvciB2YXJpYW5jZXMgYW5kIHRhaWwgcXVhbnRpbGVzIG1heSBiZSB1bnJlbGlhYmxlLlxuUnVubmluZyB0aGUgY2hhaW5zIGZvciBtb3JlIGl0ZXJhdGlvbnMgbWF5IGhlbHAuIFNlZVxuaHR0cDovL21jLXN0YW4ub3JnL21pc2Mvd2FybmluZ3MuaHRtbCN0YWlsLWVzc1xuIn0= -->
+<pre><code>Bulk Effective Samples Size (ESS) is too low, indicating posterior means and medians may be unreliable.
+Running the chains for more iterations may help. See
+http://mc-stan.org/misc/warnings.html#bulk-essTail Effective Samples Size (ESS) is too low, indicating posterior variances and tail quantiles may be unreliable.
+Running the chains for more iterations may help. See
+http://mc-stan.org/misc/warnings.html#tail-ess</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJpbnQoZml0LCBwcm9icz1jKC4yNSwuNSwuNzUpKVxuYGBgIn0= -->
+<pre class="r"><code>print(fit, probs=c(.25,.5,.75))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>New model where height <code>Y</code> is a function of weight <code>X</code></p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuTiA9IDEwMFxuWCA9IHJub3JtKE4sIDYwLCAxMClcbmJldGEgPSAuM1xuc2lnbWEgPSAuM1xuWSA9IGJldGEgKiBsb2coWCkgKyBybm9ybShOLCAwLCBzaWdtYSlcbmBgYCJ9 -->
+<pre class="r"><code>N = 100
+X = rnorm(N, 60, 10)
+beta = .3
+sigma = .3
+Y = beta * log(X) + rnorm(N, 0, sigma)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiU3RhbiBtb2RlbF8wIgpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sKLS0tCgpDcmVhdGUgZmFrZSBkYXRhCgpgYGB7cn0KWSA9IHJub3JtKDEwLCAxLjUsIC4yKQpgYGAKCkNvbXBpbGUgYW5kIHJ1biB0aGUgTUNNQwoKYGBge3J9CmZpdCA9IHN0YW4oJy4uL3N0YW5Nb2RlbHMvbW9kZWxfMC5zdGFuJywgaXRlcj0yMDAsIGNoYWlucz00LAogICAgICAgICAgIGRhdGEgPSBsaXN0KFk9WSkpCmBgYAoKSW50ZXJwcmV0aW5nIHJlc3VsdHMKCmBgYHtyfQpwcmludChmaXQsIHByb2JzPWMoLjI1LCAuNSwgLjc1KSkKYGBgCgpFeHRyYWN0IGFuZCBwbG90IHBvc3RlcmlvcgoKYGBge3J9CmRhdGEuZnJhbWUobXUgPWV4dHJhY3QoZml0LCAnbXUnKVtbMV1dKSAlPiUKICBnZ3Bsb3QoYWVzKHg9bXUpKSsKICBnZW9tX2hpc3RvZ3JhbSgpCmBgYAoKSW50ZXJhY3RpdmUgZXhwbG9yYXRpb24gaW4gYHNoaW55c3RhbmAKCmBgYHtyfQpyZXF1aXJlKHNoaW55c3RhbikKYGBgCgoKYGBge3J9CmFGaXQgPSBhcy5zaGlueXN0YW4oZml0KQpsYXVuY2hfc2hpbnlzdGFuKGFGaXQpCmBgYAoKUmUgcnVuIG1vZGVsIHdpdGggYGdlbmVyYXRlZCBxdWFudGl0aWVzYCBibG9jawoKYGBge3J9CmZpdCA9IHN0YW4oJy4uL3N0YW5Nb2RlbHMvbW9kZWxfMC5zdGFuJywgaXRlcj0yMDAsIGNoYWlucz00LAogICAgICAgICAgIGRhdGEgPSBsaXN0KFk9WSkpCmBgYAoKYGBge3J9CnByaW50KGZpdCwgcHJvYnM9YyguMjUsLjUsLjc1KSkKYGBgCgpOZXcgbW9kZWwgd2hlcmUgaGVpZ2h0ICBgWWAgaXMgYSBmdW5jdGlvbiBvZiB3ZWlnaHQgYFhgCgpgYGB7cn0KTiA9IDEwMApYID0gcm5vcm0oTiwgNjAsIDEwKQpiZXRhID0gLjMKc2lnbWEgPSAuMwpZID0gYmV0YSAqIGxvZyhYKSArIHJub3JtKE4sIDAsIHNpZ21hKQpgYGA=</div>
 
 
 
