@@ -1,0 +1,45 @@
+---
+title: "Stan model_0"
+output: html_notebook
+---
+
+Create fake data
+
+```{r}
+Y = rnorm(10, 1.5, .2)
+```
+
+Compile and run the MCMC
+
+```{r}
+fit = stan('../stanModels/model_0.stan', iter=200, chains=4,
+           data = list(Y=Y))
+```
+
+Interpreting results
+
+```{r}
+print(fit, probs=c(.25, .5, .75))
+```
+
+Extract and plot posterior
+
+```{r}
+data.frame(mu =extract(fit, 'mu')[[1]]) %>%
+  ggplot(aes(x=mu))+
+  geom_histogram()
+```
+
+Interactive exploration in `shinystan`
+
+```{r}
+require(shinystan)
+```
+
+
+```{r}
+aFit = as.shinystan(fit)
+launch_shinystan(aFit)
+```
+
+
