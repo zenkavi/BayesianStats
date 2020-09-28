@@ -33,13 +33,13 @@ data.frame(mu =extract(fit, 'mu')[[1]]) %>%
 Interactive exploration in `shinystan`
 
 ```{r}
-require(shinystan)
+# require(shinystan)
 ```
 
 
 ```{r}
-aFit = as.shinystan(fit)
-launch_shinystan(aFit)
+# aFit = as.shinystan(fit)
+# launch_shinystan(aFit)
 ```
 
 Re run model with `generated quantities` block
@@ -61,4 +61,48 @@ X = rnorm(N, 60, 10)
 beta = .3
 sigma = .3
 Y = beta * log(X) + rnorm(N, 0, sigma)
+fit = stan('../stanModels/model_0.1.stan', iter = 200, chains = 4,
+           data = list(Y=Y, X=X, N=N))
 ```
+
+```{r}
+print(fit, probs=c(.25,.5,.75))
+```
+
+Fit new model with `transformed parameters` block
+
+```{r}
+Y = rnorm(10, 1.5, .2)
+fit = stan('../stanModels/model_0.2.stan', iter = 200, chains = 4, data= list(Y=Y))
+```
+
+```{r}
+print(fit, probs=c(.25,.5,.75))
+```
+
+Creating posterior predictive check variable within `{}` to avoid memory overhead.
+
+```{r}
+Y = rnorm(10, 1.5, .2)
+fit = stan('../stanModels/model_0.3.stan', iter = 200, chains = 4, data= list(Y=Y))
+```
+
+Note lack of `lSimData` variable in the output
+
+```{r}
+print(fit, probs=c(.25,.5,.75))
+```
+
+Creating custom probability distributions.
+
+```{r}
+N = 4
+X = c(-1.5, 2.3, 0.1, -0.4)
+fit = stan('../stanModels/model_0.4.stan', iter = 200, chains = 4, data= list(N=N, X=X))
+```
+
+```{r}
+print(fit, probs=c(.25,.5,.75))
+```
+
+
