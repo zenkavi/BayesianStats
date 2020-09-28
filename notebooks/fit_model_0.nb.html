@@ -2739,9 +2739,1793 @@ convergence, Rhat=1).</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+<p>Using WAIC and LOO-CV</p>
+<p>Generate data from a t-distribution and compare two models that describe a true and false data generating processes.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuTiA9IDEwMDAwXG5YID0gcnQoTiwgNSlcbmBgYCJ9 -->
+<pre class="r"><code>N = 10000
+X = rt(N, 5)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucmVxdWlyZShsb28pXG5gYGAifQ== -->
+<pre class="r"><code>require(loo)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Compare models using <code>WAIC</code></p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZml0MSA9IHN0YW4oJy4uL3N0YW5Nb2RlbHMvbW9kZWxfMC41LnN0YW4nLCBpdGVyPTIwMCwgY2hhaW5zPTQsIGRhdGE9bGlzdChOPU4sIFg9WCkpXG5sb2dMaWtlbGlob29kMSA9IGV4dHJhY3RfbG9nX2xpayhmaXQxLCAnbG9nTGlrZWxpaG9vZCcpXG5XQUlDMSA9IHdhaWMobG9nTGlrZWxpaG9vZDEpXG5gYGAifQ== -->
+<pre class="r"><code>fit1 = stan(&#39;../stanModels/model_0.5.stan&#39;, iter=200, chains=4, data=list(N=N, X=X))
+logLikelihood1 = extract_log_lik(fit1, &#39;logLikelihood&#39;)
+WAIC1 = waic(logLikelihood1)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuV0FJQzFcblxuYGBgIn0= -->
+<pre class="r"><code>WAIC1
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5Db21wdXRlZCBmcm9tIDQwMCBieSAxMDAwMCBsb2ctbGlrZWxpaG9vZCBtYXRyaXhcbiJ9 -->
+<pre><code>
+Computed from 400 by 10000 log-likelihood matrix</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImRhdGEuZnJhbWUiXSwibnJvdyI6MywibmNvbCI6Mn0sInJkZiI6Ikg0c0lBQUFBQUFBQUEzVlFiVStETUJEdUNsVWhVWmY0Qi9nRE5DSnpveDlObklsZmZVbjJ6VlJBSmJKQ29Ndjg5WE5YNkNtUzJhVHBQYy8xN25udUhtNVhzYi95Q1NFT2NRa2xEb09Rc09lbnV6QWh4S1VBSnBEd3pQc0ZueTRnQU5LWjJncVRPQW1qdVVnaXZrQWNtRFBqNGdmSHNaakhmRFpxeU5KU3RpMEUwd0hwM3JUM2h0dU5SRmdVQzU0Z0NJTExYM0MxRVB5NjcwMi8vMi8zVjF2SmRZN2FGSTB1VzEyc3BjNHRwby9MVVpuWFZGcytMRVY3WGw3VzJjdFdGcWtsanVvaGNydjRzRVUvazFyeXR3YTZIakI2WE5XNnFCVG9VYk43TmlxZU5DUGlmS09Ndnl4TVB6YnFNNHlNUUpmdTc2bDluVUZNZTBrSGpURWNJVmZ2aGNKbHNGSys1cVVGWjdDSGJnMjhiZ3FsY1JKZ1c2NHJMZkdmbjFZbE10MXNaTGNIOUpSeDNYSUNBQUE9In0= -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["Estimate"],"name":[1],"type":["S3: AsIs"],"align":["right"]},{"label":["SE"],"name":[2],"type":["S3: AsIs"],"align":["right"]}],"data":[{"1":"-16981.7","2":"139.8","_rn_":"elpd_waic"},{"1":"4.9","2":"0.8","_rn_":"p_waic"},{"1":"33963.4","2":"279.5","_rn_":"waic"}],"options":{"columns":{"min":{},"max":[10],"total":[2]},"rows":{"min":[10],"max":[10],"total":[3]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG4yICgwLjAlKSBwX3dhaWMgZXN0aW1hdGVzIGdyZWF0ZXIgdGhhbiAwLjQuIFdlIHJlY29tbWVuZCB0cnlpbmcgbG9vIGluc3RlYWQuIFxuIn0= -->
+<pre><code>
+2 (0.0%) p_waic estimates greater than 0.4. We recommend trying loo instead. </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZml0MiA9IHN0YW4oJy4uL3N0YW5Nb2RlbHMvbW9kZWxfMC42LnN0YW4nLCBpdGVyPTIwMCwgY2hhaW5zPTQsIGRhdGE9bGlzdChOPU4sIFg9WCkpXG5sb2dMaWtlbGlob29kMiA9IGV4dHJhY3RfbG9nX2xpayhmaXQyLCAnbG9nTGlrZWxpaG9vZCcpXG5XQUlDMiA9IHdhaWMobG9nTGlrZWxpaG9vZDIpXG5gYGAifQ== -->
+<pre class="r"><code>fit2 = stan(&#39;../stanModels/model_0.6.stan&#39;, iter=200, chains=4, data=list(N=N, X=X))
+logLikelihood2 = extract_log_lik(fit2, &#39;logLikelihood&#39;)
+WAIC2 = waic(logLikelihood2)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuV0FJQzJcblxuYGBgIn0= -->
+<pre class="r"><code>WAIC2
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5Db21wdXRlZCBmcm9tIDQwMCBieSAxMDAwMCBsb2ctbGlrZWxpaG9vZCBtYXRyaXhcbiJ9 -->
+<pre><code>
+Computed from 400 by 10000 log-likelihood matrix</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImRhdGEuZnJhbWUiXSwibnJvdyI6MywibmNvbCI6Mn0sInJkZiI6Ikg0c0lBQUFBQUFBQUEzVlFZVStETUJEdFdxcENvaTd4RC9BSGFHUTRCeDlObklsZnB5YjdaaXFnRXJ0Q29Ndjg5ZE1yY0F1UzJhVHB2WGU5ZSs5dWRiK092TFZIQ0dIRUlaUXdEaUhoTDg4UFFVeUlRd0ZNSU9IYTl4cytYVUVBSkp2MkZUWnhGb1MzMFNJUk04UytQZEVBUjdQRlBCYlJxQ0ZQbFd3YUNLWUQwcmxySGkyM0g0bHdQN2tSOFFINDF5SkVFTWFKbUhlOTZjLy83ZjVxYTduSlVadWkwV1ZqaW8wMGVZL3AwM0pVNXRibFRneEwwWjZicXlwNzNja2k3WW1UYW9pY05qNXUwY3Vra2VLOWhxNUhqSjZXbFNsS0RYclU3cDZQaWlmMWlMamNhdXN2QzlMUHJmNEtRaXZRcHJ0NzNyOXNFTk5Pa3FFeGppUGsrcVBRdUF5dTVGdXVlbkFCZTJqWElLcTYwQVluQWJZUnBqUVMvM2xwcVpCcFp5UDdYM0xUTHp0eUFnQUEifQ== -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["Estimate"],"name":[1],"type":["S3: AsIs"],"align":["right"]},{"label":["SE"],"name":[2],"type":["S3: AsIs"],"align":["right"]}],"data":[{"1":"-16379.2","2":"94.8","_rn_":"elpd_waic"},{"1":"3.2","2":"0.1","_rn_":"p_waic"},{"1":"32758.3","2":"189.5","_rn_":"waic"}],"options":{"columns":{"min":{},"max":[10],"total":[2]},"rows":{"min":[10],"max":[10],"total":[3]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Difference in <code>elpd</code> is much greater than the standard error; i.e. there is a significant difference in performance between the two models.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubG9vX2NvbXBhcmUoV0FJQzEsIFdBSUMyKVxuYGBgIn0= -->
+<pre class="r"><code>loo_compare(WAIC1, WAIC2)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Compare models using <code>LOO-CV</code></p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuTE9PMSA9IGxvbyhsb2dMaWtlbGlob29kMSlcbmBgYCJ9 -->
+<pre class="r"><code>LOO1 = loo(logLikelihood1)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiUmVsYXRpdmUgZWZmZWN0aXZlIHNhbXBsZSBzaXplcyAoJ3JfZWZmJyBhcmd1bWVudCkgbm90IHNwZWNpZmllZC5cbkZvciBtb2RlbHMgZml0IHdpdGggTUNNQywgdGhlIHJlcG9ydGVkIFBTSVMgZWZmZWN0aXZlIHNhbXBsZSBzaXplcyBhbmQgXG5NQ1NFIGVzdGltYXRlcyB3aWxsIGJlIG92ZXItb3B0aW1pc3RpYy5cbiJ9 -->
+<pre><code>Relative effective sample sizes (&#39;r_eff&#39; argument) not specified.
+For models fit with MCMC, the reported PSIS effective sample sizes and 
+MCSE estimates will be over-optimistic.</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuTE9PMVxuYGBgIn0= -->
+<pre class="r"><code>LOO1</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5Db21wdXRlZCBmcm9tIDQwMCBieSAxMDAwMCBsb2ctbGlrZWxpaG9vZCBtYXRyaXhcbiJ9 -->
+<pre><code>
+Computed from 400 by 10000 log-likelihood matrix</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImRhdGEuZnJhbWUiXSwibnJvdyI6MywibmNvbCI6Mn0sInJkZiI6Ikg0c0lBQUFBQUFBQUEzVlFYVXZETUJUTjBrWmRRUjM0Qi9vSEdxelJyWDBVbk9Dckg3QTNpVzNVWXBlVUprTi8vZlNtUzJvdExoQnl6N201NTl4NzcyOVdMRnBGQ0tFQWhRaWpnRUNJeU5QamJaSWhGR0lBRTBoTTdmc0ZuODRnQURLWXVRcWJPRXJTZVo2bGRPRnhiTThselh2TVdENW45R29rU0lxYWF3M0JiRUNHMS9yT2N0dVJDVWxaVGpNUDR2ajhGMXdzY3ErTnYvZkwvZldXZkMyOE4vYU5McldwMXR3SWgvSERjbFEyYmRVbkhaYjJPeEIxVXo3WFNubjlaZ2dncklvOUhVWWxONXkrdGlENlQ1K0hxakdWa21DSDdlckpxSGpTam9qVGpiVHRsVW54dnBFZlNXb051dlR1SHJzM0dNUjRaeG40eG9pVE9oRHlyWktpbjRHL2lOcUJFMWhEdHdYYXRKVTBmaEpnTlRYS2NQOHZLbFR0bVc0MnRQMEJHSkxnWm5FQ0FBQT0ifQ== -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["Estimate"],"name":[1],"type":["S3: AsIs"],"align":["right"]},{"label":["SE"],"name":[2],"type":["S3: AsIs"],"align":["right"]}],"data":[{"1":"-16981.7","2":"139.8","_rn_":"elpd_loo"},{"1":"4.9","2":"0.8","_rn_":"p_loo"},{"1":"33963.5","2":"279.5","_rn_":"looic"}],"options":{"columns":{"min":{},"max":[10],"total":[2]},"rows":{"min":[10],"max":[10],"total":[3]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiLS0tLS0tXG5Nb250ZSBDYXJsbyBTRSBvZiBlbHBkX2xvbyBpcyAwLjEuXG5cbkFsbCBQYXJldG8gayBlc3RpbWF0ZXMgYXJlIGdvb2QgKGsgPCAwLjUpLlxuU2VlIGhlbHAoJ3BhcmV0by1rLWRpYWdub3N0aWMnKSBmb3IgZGV0YWlscy5cbiJ9 -->
+<pre><code>------
+Monte Carlo SE of elpd_loo is 0.1.
+
+All Pareto k estimates are good (k &lt; 0.5).
+See help(&#39;pareto-k-diagnostic&#39;) for details.</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuTE9PMiA9IGxvbyhsb2dMaWtlbGlob29kMilcbmBgYCJ9 -->
+<pre class="r"><code>LOO2 = loo(logLikelihood2)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiUmVsYXRpdmUgZWZmZWN0aXZlIHNhbXBsZSBzaXplcyAoJ3JfZWZmJyBhcmd1bWVudCkgbm90IHNwZWNpZmllZC5cbkZvciBtb2RlbHMgZml0IHdpdGggTUNNQywgdGhlIHJlcG9ydGVkIFBTSVMgZWZmZWN0aXZlIHNhbXBsZSBzaXplcyBhbmQgXG5NQ1NFIGVzdGltYXRlcyB3aWxsIGJlIG92ZXItb3B0aW1pc3RpYy5cbiJ9 -->
+<pre><code>Relative effective sample sizes (&#39;r_eff&#39; argument) not specified.
+For models fit with MCMC, the reported PSIS effective sample sizes and 
+MCSE estimates will be over-optimistic.</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuTE9PMlxuYGBgIn0= -->
+<pre class="r"><code>LOO2</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5Db21wdXRlZCBmcm9tIDQwMCBieSAxMDAwMCBsb2ctbGlrZWxpaG9vZCBtYXRyaXhcbiJ9 -->
+<pre><code>
+Computed from 400 by 10000 log-likelihood matrix</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImRhdGEuZnJhbWUiXSwibnJvdyI6MywibmNvbCI6Mn0sInJkZiI6Ikg0c0lBQUFBQUFBQUEzVlFYVStETUJUdENsVkhvaTd4RC9BSGFHUnNEaDVObkltdmZpUjdNeFdxTnJLV1FCZjk5WE8zUUFrMnJrblRlODd0UGVmZSszaTNTWUpOZ0JEeWtJOHc4Z2lFaUx3ODMwY3BRajRHTUlIRTFMdy84T2tLQWlDOVdWOWhFbWRSZkpPc01qcTNPRFFuR2VGa3ZscW1kT0VJa3J4a1RRUEJiRVQ2dDgyRDRmYU9DUW16QlUwSEVGN1QySUk0emVpeTA4YS94K1grZWt1MjVkWWIyMGJYalJaYnBubVA4ZFBhS1p2VzZwdU9TNGNkOExJcVhrdWxySDQxQmhDSy9FaUhRY0Uwbys4MWlQN1Q1Nm1xdEZBUzdMQlpQWEdLSjdWRFhPNmthYStJOHMrZC9JcGlZOUNtdTN2ZXY5NG94cDJsWnhzanZkUUpseDlDOG1FRzlzYkxIbHpBR3RvdDBLb1dVdHRKZ0cyb1ZwclpmMEd1U3N1MHM2SDlBZnN0RXhSeEFnQUEifQ== -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["Estimate"],"name":[1],"type":["S3: AsIs"],"align":["right"]},{"label":["SE"],"name":[2],"type":["S3: AsIs"],"align":["right"]}],"data":[{"1":"-16379.2","2":"94.8","_rn_":"elpd_loo"},{"1":"3.2","2":"0.1","_rn_":"p_loo"},{"1":"32758.4","2":"189.5","_rn_":"looic"}],"options":{"columns":{"min":{},"max":[10],"total":[2]},"rows":{"min":[10],"max":[10],"total":[3]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiLS0tLS0tXG5Nb250ZSBDYXJsbyBTRSBvZiBlbHBkX2xvbyBpcyAwLjEuXG5cbkFsbCBQYXJldG8gayBlc3RpbWF0ZXMgYXJlIGdvb2QgKGsgPCAwLjUpLlxuU2VlIGhlbHAoJ3BhcmV0by1rLWRpYWdub3N0aWMnKSBmb3IgZGV0YWlscy5cbiJ9 -->
+<pre><code>------
+Monte Carlo SE of elpd_loo is 0.1.
+
+All Pareto k estimates are good (k &lt; 0.5).
+See help(&#39;pareto-k-diagnostic&#39;) for details.</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubG9vX2NvbXBhcmUoTE9PMSwgTE9PMilcbmBgYCJ9 -->
+<pre class="r"><code>loo_compare(LOO1, LOO2)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Explicit cross validation</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucmVxdWlyZShjYXJldClcbmBgYCJ9 -->
+<pre class="r"><code>require(caret)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxua0ZvbGQgPSBmdW5jdGlvbihhTW9kZWwsIHRlc3RJbmRpY2VzLCBYKXtcbiAgbnVtRm9sZHMgPSBsZW5ndGgodGVzdEluZGljZXMpXG4gIFxuICBsUG9pbnRMb2dMaWtlbGlob29kVG90YWwgPSB2ZWN0b3IoKVxuICBcbiAgZm9yKGkgaW4gMTpudW1Gb2xkcyl7XG4gICAgWFRlc3QgPSBYW3Rlc3RJbmRpY2VzW1tpXV1dXG4gICAgWFRyYWluID0gWFstdGVzdEluZGljZXNbW2ldXV1cbiAgICBmaXQgPSBzYW1wbGluZyhhTW9kZWwsIGl0ZXI9MjAwLCBjaGFpbnM9NCwgZGF0YT1saXN0KE5UZXN0PTIwMDAsIE5UcmFpbj04MDAwLCBYVHJhaW49WFRyYWluLCBYVGVzdD1YVGVzdCkpXG4gICAgbG9nTGlrZWxpaG9vZDEgPSBleHRyYWN0X2xvZ19saWsoZml0LCAnbG9nTGlrZWxpaG9vZCcpXG4gICAgbFBvaW50TG9nTGlrZWxpaG9vZDEgPSBjb2xNZWFucyhsb2dMaWtlbGlob29kMSlcbiAgICBsUG9pbnRMb2dMaWtlbGlob29kVG90YWwgPSBjKGxQb2ludExvZ0xpa2VsaWhvb2RUb3RhbCwgbFBvaW50TG9nTGlrZWxpaG9vZDEpXG4gIH1cbiAgXG4gIHJldHVybihsUG9pbnRMb2dMaWtlbGlob29kVG90YWwpXG59XG5gYGAifQ== -->
+<pre class="r"><code>kFold = function(aModel, testIndices, X){
+  numFolds = length(testIndices)
+  
+  lPointLogLikelihoodTotal = vector()
+  
+  for(i in 1:numFolds){
+    XTest = X[testIndices[[i]]]
+    XTrain = X[-testIndices[[i]]]
+    fit = sampling(aModel, iter=200, chains=4, data=list(NTest=2000, NTrain=8000, XTrain=XTrain, XTest=XTest))
+    logLikelihood1 = extract_log_lik(fit, &#39;logLikelihood&#39;)
+    lPointLogLikelihood1 = colMeans(logLikelihood1)
+    lPointLogLikelihoodTotal = c(lPointLogLikelihoodTotal, lPointLogLikelihood1)
+  }
+  
+  return(lPointLogLikelihoodTotal)
+}</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuTW9kZWwxID0gc3Rhbl9tb2RlbCgnLi4vc3Rhbk1vZGVscy8vbW9kZWxfMC43LnN0YW4nKVxuTW9kZWwyID0gc3Rhbl9tb2RlbCgnLi4vc3Rhbk1vZGVscy8vbW9kZWxfMC44LnN0YW4nKVxuYGBgIn0= -->
+<pre class="r"><code>Model1 = stan_model(&#39;../stanModels//model_0.7.stan&#39;)
+Model2 = stan_model(&#39;../stanModels//model_0.8.stan&#39;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubEVMUEQxID0ga0ZvbGQoTW9kZWwxLCB0ZXN0SW5kaWNlcywgWClcbmBgYCJ9 -->
+<pre class="r"><code>lELPD1 = kFold(Model1, testIndices, X)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoic3RhcnRpbmcgd29ya2VyIHBpZD01MjcyNCBvbiBsb2NhbGhvc3Q6MTE1OTQgYXQgMTU6NDY6MDMuNjY0XG5zdGFydGluZyB3b3JrZXIgcGlkPTUyNzM4IG9uIGxvY2FsaG9zdDoxMTU5NCBhdCAxNTo0NjowNC4wOTVcbnN0YXJ0aW5nIHdvcmtlciBwaWQ9NTI3NTMgb24gbG9jYWxob3N0OjExNTk0IGF0IDE1OjQ2OjA0LjQ2N1xuc3RhcnRpbmcgd29ya2VyIHBpZD01Mjc2NyBvbiBsb2NhbGhvc3Q6MTE1OTQgYXQgMTU6NDY6MDQuOTAzXG5cblNBTVBMSU5HIEZPUiBNT0RFTCAnbW9kZWxfMCcgTk9XIChDSEFJTiAxKS5cbkNoYWluIDE6IFxuQ2hhaW4gMTogR3JhZGllbnQgZXZhbHVhdGlvbiB0b29rIDQuN2UtMDUgc2Vjb25kc1xuQ2hhaW4gMTogMTAwMCB0cmFuc2l0aW9ucyB1c2luZyAxMCBsZWFwZnJvZyBzdGVwcyBwZXIgdHJhbnNpdGlvbiB3b3VsZCB0YWtlIDAuNDcgc2Vjb25kcy5cbkNoYWluIDE6IEFkanVzdCB5b3VyIGV4cGVjdGF0aW9ucyBhY2NvcmRpbmdseSFcbkNoYWluIDE6IFxuQ2hhaW4gMTogXG5DaGFpbiAxOiBXQVJOSU5HOiBUaGVyZSBhcmVuJ3QgZW5vdWdoIHdhcm11cCBpdGVyYXRpb25zIHRvIGZpdCB0aGVcbkNoYWluIDE6ICAgICAgICAgIHRocmVlIHN0YWdlcyBvZiBhZGFwdGF0aW9uIGFzIGN1cnJlbnRseSBjb25maWd1cmVkLlxuQ2hhaW4gMTogICAgICAgICAgUmVkdWNpbmcgZWFjaCBhZGFwdGF0aW9uIHN0YWdlIHRvIDE1JS83NSUvMTAlIG9mXG5DaGFpbiAxOiAgICAgICAgICB0aGUgZ2l2ZW4gbnVtYmVyIG9mIHdhcm11cCBpdGVyYXRpb25zOlxuQ2hhaW4gMTogICAgICAgICAgICBpbml0X2J1ZmZlciA9IDE1XG5DaGFpbiAxOiAgICAgICAgICAgIGFkYXB0X3dpbmRvdyA9IDc1XG5DaGFpbiAxOiAgICAgICAgICAgIHRlcm1fYnVmZmVyID0gMTBcbkNoYWluIDE6IFxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgIDEgLyAyMDAgWyAgMCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgMjAgLyAyMDAgWyAxMCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgNDAgLyAyMDAgWyAyMCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgNjAgLyAyMDAgWyAzMCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgODAgLyAyMDAgWyA0MCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxMDAgLyAyMDAgWyA1MCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxMDEgLyAyMDAgWyA1MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAxOiBJdGVyYXRpb246IDEyMCAvIDIwMCBbIDYwJV0gIChTYW1wbGluZylcbkNoYWluIDE6IEl0ZXJhdGlvbjogMTQwIC8gMjAwIFsgNzAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxNjAgLyAyMDAgWyA4MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAxOiBJdGVyYXRpb246IDE4MCAvIDIwMCBbIDkwJV0gIChTYW1wbGluZylcbkNoYWluIDE6IEl0ZXJhdGlvbjogMjAwIC8gMjAwIFsxMDAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMTogXG5DaGFpbiAxOiAgRWxhcHNlZCBUaW1lOiAwLjAyODAxOCBzZWNvbmRzIChXYXJtLXVwKVxuQ2hhaW4gMTogICAgICAgICAgICAgICAgMC4wMjY0NDQgc2Vjb25kcyAoU2FtcGxpbmcpXG5DaGFpbiAxOiAgICAgICAgICAgICAgICAwLjA1NDQ2MiBzZWNvbmRzIChUb3RhbClcbkNoYWluIDE6IFxuXG5TQU1QTElORyBGT1IgTU9ERUwgJ21vZGVsXzAnIE5PVyAoQ0hBSU4gMikuXG5DaGFpbiAyOiBcbkNoYWluIDI6IEdyYWRpZW50IGV2YWx1YXRpb24gdG9vayA0LjdlLTA1IHNlY29uZHNcbkNoYWluIDI6IDEwMDAgdHJhbnNpdGlvbnMgdXNpbmcgMTAgbGVhcGZyb2cgc3RlcHMgcGVyIHRyYW5zaXRpb24gd291bGQgdGFrZSAwLjQ3IHNlY29uZHMuXG5DaGFpbiAyOiBBZGp1c3QgeW91ciBleHBlY3RhdGlvbnMgYWNjb3JkaW5nbHkhXG5DaGFpbiAyOiBcbkNoYWluIDI6IFxuQ2hhaW4gMjogV0FSTklORzogVGhlcmUgYXJlbid0IGVub3VnaCB3YXJtdXAgaXRlcmF0aW9ucyB0byBmaXQgdGhlXG5DaGFpbiAyOiAgICAgICAgICB0aHJlZSBzdGFnZXMgb2YgYWRhcHRhdGlvbiBhcyBjdXJyZW50bHkgY29uZmlndXJlZC5cbkNoYWluIDI6ICAgICAgICAgIFJlZHVjaW5nIGVhY2ggYWRhcHRhdGlvbiBzdGFnZSB0byAxNSUvNzUlLzEwJSBvZlxuQ2hhaW4gMjogICAgICAgICAgdGhlIGdpdmVuIG51bWJlciBvZiB3YXJtdXAgaXRlcmF0aW9uczpcbkNoYWluIDI6ICAgICAgICAgICAgaW5pdF9idWZmZXIgPSAxNVxuQ2hhaW4gMjogICAgICAgICAgICBhZGFwdF93aW5kb3cgPSA3NVxuQ2hhaW4gMjogICAgICAgICAgICB0ZXJtX2J1ZmZlciA9IDEwXG5DaGFpbiAyOiBcbkNoYWluIDI6IEl0ZXJhdGlvbjogICAxIC8gMjAwIFsgIDAlXSAgKFdhcm11cClcbkNoYWluIDI6IEl0ZXJhdGlvbjogIDIwIC8gMjAwIFsgMTAlXSAgKFdhcm11cClcbkNoYWluIDI6IEl0ZXJhdGlvbjogIDQwIC8gMjAwIFsgMjAlXSAgKFdhcm11cClcbkNoYWluIDI6IEl0ZXJhdGlvbjogIDYwIC8gMjAwIFsgMzAlXSAgKFdhcm11cClcbkNoYWluIDI6IEl0ZXJhdGlvbjogIDgwIC8gMjAwIFsgNDAlXSAgKFdhcm11cClcbkNoYWluIDI6IEl0ZXJhdGlvbjogMTAwIC8gMjAwIFsgNTAlXSAgKFdhcm11cClcbkNoYWluIDI6IEl0ZXJhdGlvbjogMTAxIC8gMjAwIFsgNTAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAxMjAgLyAyMDAgWyA2MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAyOiBJdGVyYXRpb246IDE0MCAvIDIwMCBbIDcwJV0gIChTYW1wbGluZylcbkNoYWluIDI6IEl0ZXJhdGlvbjogMTYwIC8gMjAwIFsgODAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAxODAgLyAyMDAgWyA5MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAyOiBJdGVyYXRpb246IDIwMCAvIDIwMCBbMTAwJV0gIChTYW1wbGluZylcbkNoYWluIDI6IFxuQ2hhaW4gMjogIEVsYXBzZWQgVGltZTogMC4wMjk4NzYgc2Vjb25kcyAoV2FybS11cClcbkNoYWluIDI6ICAgICAgICAgICAgICAgIDAuMDI3MzU1IHNlY29uZHMgKFNhbXBsaW5nKVxuQ2hhaW4gMjogICAgICAgICAgICAgICAgMC4wNTcyMzEgc2Vjb25kcyAoVG90YWwpXG5DaGFpbiAyOiBcblxuU0FNUExJTkcgRk9SIE1PREVMICdtb2RlbF8wJyBOT1cgKENIQUlOIDMpLlxuQ2hhaW4gMzogXG5DaGFpbiAzOiBHcmFkaWVudCBldmFsdWF0aW9uIHRvb2sgNC40ZS0wNSBzZWNvbmRzXG5DaGFpbiAzOiAxMDAwIHRyYW5zaXRpb25zIHVzaW5nIDEwIGxlYXBmcm9nIHN0ZXBzIHBlciB0cmFuc2l0aW9uIHdvdWxkIHRha2UgMC40NCBzZWNvbmRzLlxuQ2hhaW4gMzogQWRqdXN0IHlvdXIgZXhwZWN0YXRpb25zIGFjY29yZGluZ2x5IVxuQ2hhaW4gMzogXG5DaGFpbiAzOiBcbkNoYWluIDM6IFdBUk5JTkc6IFRoZXJlIGFyZW4ndCBlbm91Z2ggd2FybXVwIGl0ZXJhdGlvbnMgdG8gZml0IHRoZVxuQ2hhaW4gMzogICAgICAgICAgdGhyZWUgc3RhZ2VzIG9mIGFkYXB0YXRpb24gYXMgY3VycmVudGx5IGNvbmZpZ3VyZWQuXG5DaGFpbiAzOiAgICAgICAgICBSZWR1Y2luZyBlYWNoIGFkYXB0YXRpb24gc3RhZ2UgdG8gMTUlLzc1JS8xMCUgb2ZcbkNoYWluIDM6ICAgICAgICAgIHRoZSBnaXZlbiBudW1iZXIgb2Ygd2FybXVwIGl0ZXJhdGlvbnM6XG5DaGFpbiAzOiAgICAgICAgICAgIGluaXRfYnVmZmVyID0gMTVcbkNoYWluIDM6ICAgICAgICAgICAgYWRhcHRfd2luZG93ID0gNzVcbkNoYWluIDM6ICAgICAgICAgICAgdGVybV9idWZmZXIgPSAxMFxuQ2hhaW4gMzogXG5DaGFpbiAzOiBJdGVyYXRpb246ICAgMSAvIDIwMCBbICAwJV0gIChXYXJtdXApXG5DaGFpbiAzOiBJdGVyYXRpb246ICAyMCAvIDIwMCBbIDEwJV0gIChXYXJtdXApXG5DaGFpbiAzOiBJdGVyYXRpb246ICA0MCAvIDIwMCBbIDIwJV0gIChXYXJtdXApXG5DaGFpbiAzOiBJdGVyYXRpb246ICA2MCAvIDIwMCBbIDMwJV0gIChXYXJtdXApXG5DaGFpbiAzOiBJdGVyYXRpb246ICA4MCAvIDIwMCBbIDQwJV0gIChXYXJtdXApXG5DaGFpbiAzOiBJdGVyYXRpb246IDEwMCAvIDIwMCBbIDUwJV0gIChXYXJtdXApXG5DaGFpbiAzOiBJdGVyYXRpb246IDEwMSAvIDIwMCBbIDUwJV0gIChTYW1wbGluZylcbkNoYWluIDM6IEl0ZXJhdGlvbjogMTIwIC8gMjAwIFsgNjAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAxNDAgLyAyMDAgWyA3MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAzOiBJdGVyYXRpb246IDE2MCAvIDIwMCBbIDgwJV0gIChTYW1wbGluZylcbkNoYWluIDM6IEl0ZXJhdGlvbjogMTgwIC8gMjAwIFsgOTAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAyMDAgLyAyMDAgWzEwMCVdICAoU2FtcGxpbmcpXG5DaGFpbiAzOiBcbkNoYWluIDM6ICBFbGFwc2VkIFRpbWU6IDAuMDMxNDgxIHNlY29uZHMgKFdhcm0tdXApXG5DaGFpbiAzOiAgICAgICAgICAgICAgICAwLjAyNzY2IHNlY29uZHMgKFNhbXBsaW5nKVxuQ2hhaW4gMzogICAgICAgICAgICAgICAgMC4wNTkxNDEgc2Vjb25kcyAoVG90YWwpXG5DaGFpbiAzOiBcblxuU0FNUExJTkcgRk9SIE1PREVMICdtb2RlbF8wJyBOT1cgKENIQUlOIDQpLlxuQ2hhaW4gNDogXG5DaGFpbiA0OiBHcmFkaWVudCBldmFsdWF0aW9uIHRvb2sgNC41ZS0wNSBzZWNvbmRzXG5DaGFpbiA0OiAxMDAwIHRyYW5zaXRpb25zIHVzaW5nIDEwIGxlYXBmcm9nIHN0ZXBzIHBlciB0cmFuc2l0aW9uIHdvdWxkIHRha2UgMC40NSBzZWNvbmRzLlxuQ2hhaW4gNDogQWRqdXN0IHlvdXIgZXhwZWN0YXRpb25zIGFjY29yZGluZ2x5IVxuQ2hhaW4gNDogXG5DaGFpbiA0OiBcbkNoYWluIDQ6IFdBUk5JTkc6IFRoZXJlIGFyZW4ndCBlbm91Z2ggd2FybXVwIGl0ZXJhdGlvbnMgdG8gZml0IHRoZVxuQ2hhaW4gNDogICAgICAgICAgdGhyZWUgc3RhZ2VzIG9mIGFkYXB0YXRpb24gYXMgY3VycmVudGx5IGNvbmZpZ3VyZWQuXG5DaGFpbiA0OiAgICAgICAgICBSZWR1Y2luZyBlYWNoIGFkYXB0YXRpb24gc3RhZ2UgdG8gMTUlLzc1JS8xMCUgb2ZcbkNoYWluIDQ6ICAgICAgICAgIHRoZSBnaXZlbiBudW1iZXIgb2Ygd2FybXVwIGl0ZXJhdGlvbnM6XG5DaGFpbiA0OiAgICAgICAgICAgIGluaXRfYnVmZmVyID0gMTVcbkNoYWluIDQ6ICAgICAgICAgICAgYWRhcHRfd2luZG93ID0gNzVcbkNoYWluIDQ6ICAgICAgICAgICAgdGVybV9idWZmZXIgPSAxMFxuQ2hhaW4gNDogXG5DaGFpbiA0OiBJdGVyYXRpb246ICAgMSAvIDIwMCBbICAwJV0gIChXYXJtdXApXG5DaGFpbiA0OiBJdGVyYXRpb246ICAyMCAvIDIwMCBbIDEwJV0gIChXYXJtdXApXG5DaGFpbiA0OiBJdGVyYXRpb246ICA0MCAvIDIwMCBbIDIwJV0gIChXYXJtdXApXG5DaGFpbiA0OiBJdGVyYXRpb246ICA2MCAvIDIwMCBbIDMwJV0gIChXYXJtdXApXG5DaGFpbiA0OiBJdGVyYXRpb246ICA4MCAvIDIwMCBbIDQwJV0gIChXYXJtdXApXG5DaGFpbiA0OiBJdGVyYXRpb246IDEwMCAvIDIwMCBbIDUwJV0gIChXYXJtdXApXG5DaGFpbiA0OiBJdGVyYXRpb246IDEwMSAvIDIwMCBbIDUwJV0gIChTYW1wbGluZylcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTIwIC8gMjAwIFsgNjAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gNDogSXRlcmF0aW9uOiAxNDAgLyAyMDAgWyA3MCVdICAoU2FtcGxpbmcpXG5DaGFpbiA0OiBJdGVyYXRpb246IDE2MCAvIDIwMCBbIDgwJV0gIChTYW1wbGluZylcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTgwIC8gMjAwIFsgOTAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gNDogSXRlcmF0aW9uOiAyMDAgLyAyMDAgWzEwMCVdICAoU2FtcGxpbmcpXG5DaGFpbiA0OiBcbkNoYWluIDQ6ICBFbGFwc2VkIFRpbWU6IDAuMDI4NDI0IHNlY29uZHMgKFdhcm0tdXApXG5DaGFpbiA0OiAgICAgICAgICAgICAgICAwLjAyODk5NiBzZWNvbmRzIChTYW1wbGluZylcbkNoYWluIDQ6ICAgICAgICAgICAgICAgIDAuMDU3NDIgc2Vjb25kcyAoVG90YWwpXG5DaGFpbiA0OiBcbiJ9 -->
+<pre><code>starting worker pid=52724 on localhost:11594 at 15:46:03.664
+starting worker pid=52738 on localhost:11594 at 15:46:04.095
+starting worker pid=52753 on localhost:11594 at 15:46:04.467
+starting worker pid=52767 on localhost:11594 at 15:46:04.903
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 1).
+Chain 1: 
+Chain 1: Gradient evaluation took 4.7e-05 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.47 seconds.
+Chain 1: Adjust your expectations accordingly!
+Chain 1: 
+Chain 1: 
+Chain 1: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 1:          three stages of adaptation as currently configured.
+Chain 1:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 1:          the given number of warmup iterations:
+Chain 1:            init_buffer = 15
+Chain 1:            adapt_window = 75
+Chain 1:            term_buffer = 10
+Chain 1: 
+Chain 1: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 1: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 1: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 1: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 1: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 1: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 1: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 1: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 1: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 1: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 1: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 1: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 1: 
+Chain 1:  Elapsed Time: 0.028018 seconds (Warm-up)
+Chain 1:                0.026444 seconds (Sampling)
+Chain 1:                0.054462 seconds (Total)
+Chain 1: 
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 2).
+Chain 2: 
+Chain 2: Gradient evaluation took 4.7e-05 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.47 seconds.
+Chain 2: Adjust your expectations accordingly!
+Chain 2: 
+Chain 2: 
+Chain 2: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 2:          three stages of adaptation as currently configured.
+Chain 2:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 2:          the given number of warmup iterations:
+Chain 2:            init_buffer = 15
+Chain 2:            adapt_window = 75
+Chain 2:            term_buffer = 10
+Chain 2: 
+Chain 2: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 2: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 2: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 2: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 2: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 2: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 2: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 2: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 2: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 2: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 2: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 2: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 2: 
+Chain 2:  Elapsed Time: 0.029876 seconds (Warm-up)
+Chain 2:                0.027355 seconds (Sampling)
+Chain 2:                0.057231 seconds (Total)
+Chain 2: 
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 3).
+Chain 3: 
+Chain 3: Gradient evaluation took 4.4e-05 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.44 seconds.
+Chain 3: Adjust your expectations accordingly!
+Chain 3: 
+Chain 3: 
+Chain 3: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 3:          three stages of adaptation as currently configured.
+Chain 3:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 3:          the given number of warmup iterations:
+Chain 3:            init_buffer = 15
+Chain 3:            adapt_window = 75
+Chain 3:            term_buffer = 10
+Chain 3: 
+Chain 3: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 3: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 3: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 3: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 3: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 3: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 3: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 3: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 3: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 3: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 3: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 3: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 3: 
+Chain 3:  Elapsed Time: 0.031481 seconds (Warm-up)
+Chain 3:                0.02766 seconds (Sampling)
+Chain 3:                0.059141 seconds (Total)
+Chain 3: 
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 4).
+Chain 4: 
+Chain 4: Gradient evaluation took 4.5e-05 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.45 seconds.
+Chain 4: Adjust your expectations accordingly!
+Chain 4: 
+Chain 4: 
+Chain 4: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 4:          three stages of adaptation as currently configured.
+Chain 4:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 4:          the given number of warmup iterations:
+Chain 4:            init_buffer = 15
+Chain 4:            adapt_window = 75
+Chain 4:            term_buffer = 10
+Chain 4: 
+Chain 4: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 4: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 4: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 4: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 4: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 4: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 4: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 4: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 4: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 4: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 4: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 4: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 4: 
+Chain 4:  Elapsed Time: 0.028424 seconds (Warm-up)
+Chain 4:                0.028996 seconds (Sampling)
+Chain 4:                0.05742 seconds (Total)
+Chain 4: </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQnVsayBFZmZlY3RpdmUgU2FtcGxlcyBTaXplIChFU1MpIGlzIHRvbyBsb3csIGluZGljYXRpbmcgcG9zdGVyaW9yIG1lYW5zIGFuZCBtZWRpYW5zIG1heSBiZSB1bnJlbGlhYmxlLlxuUnVubmluZyB0aGUgY2hhaW5zIGZvciBtb3JlIGl0ZXJhdGlvbnMgbWF5IGhlbHAuIFNlZVxuaHR0cDovL21jLXN0YW4ub3JnL21pc2Mvd2FybmluZ3MuaHRtbCNidWxrLWVzc1RhaWwgRWZmZWN0aXZlIFNhbXBsZXMgU2l6ZSAoRVNTKSBpcyB0b28gbG93LCBpbmRpY2F0aW5nIHBvc3RlcmlvciB2YXJpYW5jZXMgYW5kIHRhaWwgcXVhbnRpbGVzIG1heSBiZSB1bnJlbGlhYmxlLlxuUnVubmluZyB0aGUgY2hhaW5zIGZvciBtb3JlIGl0ZXJhdGlvbnMgbWF5IGhlbHAuIFNlZVxuaHR0cDovL21jLXN0YW4ub3JnL21pc2Mvd2FybmluZ3MuaHRtbCN0YWlsLWVzc1xuIn0= -->
+<pre><code>Bulk Effective Samples Size (ESS) is too low, indicating posterior means and medians may be unreliable.
+Running the chains for more iterations may help. See
+http://mc-stan.org/misc/warnings.html#bulk-essTail Effective Samples Size (ESS) is too low, indicating posterior variances and tail quantiles may be unreliable.
+Running the chains for more iterations may help. See
+http://mc-stan.org/misc/warnings.html#tail-ess</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoic3RhcnRpbmcgd29ya2VyIHBpZD01Mjc4OCBvbiBsb2NhbGhvc3Q6MTE1OTQgYXQgMTU6NDY6MjYuMzA2XG5zdGFydGluZyB3b3JrZXIgcGlkPTUyODAyIG9uIGxvY2FsaG9zdDoxMTU5NCBhdCAxNTo0NjoyNi42NDZcbnN0YXJ0aW5nIHdvcmtlciBwaWQ9NTI4MTYgb24gbG9jYWxob3N0OjExNTk0IGF0IDE1OjQ2OjI3LjA1M1xuc3RhcnRpbmcgd29ya2VyIHBpZD01MjgzMCBvbiBsb2NhbGhvc3Q6MTE1OTQgYXQgMTU6NDY6MjcuNDM3XG5cblNBTVBMSU5HIEZPUiBNT0RFTCAnbW9kZWxfMCcgTk9XIChDSEFJTiAxKS5cbkNoYWluIDE6IFxuQ2hhaW4gMTogR3JhZGllbnQgZXZhbHVhdGlvbiB0b29rIDQuNmUtMDUgc2Vjb25kc1xuQ2hhaW4gMTogMTAwMCB0cmFuc2l0aW9ucyB1c2luZyAxMCBsZWFwZnJvZyBzdGVwcyBwZXIgdHJhbnNpdGlvbiB3b3VsZCB0YWtlIDAuNDYgc2Vjb25kcy5cbkNoYWluIDE6IEFkanVzdCB5b3VyIGV4cGVjdGF0aW9ucyBhY2NvcmRpbmdseSFcbkNoYWluIDE6IFxuQ2hhaW4gMTogXG5DaGFpbiAxOiBXQVJOSU5HOiBUaGVyZSBhcmVuJ3QgZW5vdWdoIHdhcm11cCBpdGVyYXRpb25zIHRvIGZpdCB0aGVcbkNoYWluIDE6ICAgICAgICAgIHRocmVlIHN0YWdlcyBvZiBhZGFwdGF0aW9uIGFzIGN1cnJlbnRseSBjb25maWd1cmVkLlxuQ2hhaW4gMTogICAgICAgICAgUmVkdWNpbmcgZWFjaCBhZGFwdGF0aW9uIHN0YWdlIHRvIDE1JS83NSUvMTAlIG9mXG5DaGFpbiAxOiAgICAgICAgICB0aGUgZ2l2ZW4gbnVtYmVyIG9mIHdhcm11cCBpdGVyYXRpb25zOlxuQ2hhaW4gMTogICAgICAgICAgICBpbml0X2J1ZmZlciA9IDE1XG5DaGFpbiAxOiAgICAgICAgICAgIGFkYXB0X3dpbmRvdyA9IDc1XG5DaGFpbiAxOiAgICAgICAgICAgIHRlcm1fYnVmZmVyID0gMTBcbkNoYWluIDE6IFxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgIDEgLyAyMDAgWyAgMCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgMjAgLyAyMDAgWyAxMCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgNDAgLyAyMDAgWyAyMCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgNjAgLyAyMDAgWyAzMCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgODAgLyAyMDAgWyA0MCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxMDAgLyAyMDAgWyA1MCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxMDEgLyAyMDAgWyA1MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAxOiBJdGVyYXRpb246IDEyMCAvIDIwMCBbIDYwJV0gIChTYW1wbGluZylcbkNoYWluIDE6IEl0ZXJhdGlvbjogMTQwIC8gMjAwIFsgNzAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxNjAgLyAyMDAgWyA4MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAxOiBJdGVyYXRpb246IDE4MCAvIDIwMCBbIDkwJV0gIChTYW1wbGluZylcbkNoYWluIDE6IEl0ZXJhdGlvbjogMjAwIC8gMjAwIFsxMDAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMTogXG5DaGFpbiAxOiAgRWxhcHNlZCBUaW1lOiAwLjAzMDc0MyBzZWNvbmRzIChXYXJtLXVwKVxuQ2hhaW4gMTogICAgICAgICAgICAgICAgMC4wMjkyNDcgc2Vjb25kcyAoU2FtcGxpbmcpXG5DaGFpbiAxOiAgICAgICAgICAgICAgICAwLjA1OTk5IHNlY29uZHMgKFRvdGFsKVxuQ2hhaW4gMTogXG5cblNBTVBMSU5HIEZPUiBNT0RFTCAnbW9kZWxfMCcgTk9XIChDSEFJTiAyKS5cbkNoYWluIDI6IFxuQ2hhaW4gMjogR3JhZGllbnQgZXZhbHVhdGlvbiB0b29rIDQuNmUtMDUgc2Vjb25kc1xuQ2hhaW4gMjogMTAwMCB0cmFuc2l0aW9ucyB1c2luZyAxMCBsZWFwZnJvZyBzdGVwcyBwZXIgdHJhbnNpdGlvbiB3b3VsZCB0YWtlIDAuNDYgc2Vjb25kcy5cbkNoYWluIDI6IEFkanVzdCB5b3VyIGV4cGVjdGF0aW9ucyBhY2NvcmRpbmdseSFcbkNoYWluIDI6IFxuQ2hhaW4gMjogXG5DaGFpbiAyOiBXQVJOSU5HOiBUaGVyZSBhcmVuJ3QgZW5vdWdoIHdhcm11cCBpdGVyYXRpb25zIHRvIGZpdCB0aGVcbkNoYWluIDI6ICAgICAgICAgIHRocmVlIHN0YWdlcyBvZiBhZGFwdGF0aW9uIGFzIGN1cnJlbnRseSBjb25maWd1cmVkLlxuQ2hhaW4gMjogICAgICAgICAgUmVkdWNpbmcgZWFjaCBhZGFwdGF0aW9uIHN0YWdlIHRvIDE1JS83NSUvMTAlIG9mXG5DaGFpbiAyOiAgICAgICAgICB0aGUgZ2l2ZW4gbnVtYmVyIG9mIHdhcm11cCBpdGVyYXRpb25zOlxuQ2hhaW4gMjogICAgICAgICAgICBpbml0X2J1ZmZlciA9IDE1XG5DaGFpbiAyOiAgICAgICAgICAgIGFkYXB0X3dpbmRvdyA9IDc1XG5DaGFpbiAyOiAgICAgICAgICAgIHRlcm1fYnVmZmVyID0gMTBcbkNoYWluIDI6IFxuQ2hhaW4gMjogSXRlcmF0aW9uOiAgIDEgLyAyMDAgWyAgMCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAgMjAgLyAyMDAgWyAxMCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAgNDAgLyAyMDAgWyAyMCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAgNjAgLyAyMDAgWyAzMCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAgODAgLyAyMDAgWyA0MCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAxMDAgLyAyMDAgWyA1MCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAxMDEgLyAyMDAgWyA1MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAyOiBJdGVyYXRpb246IDEyMCAvIDIwMCBbIDYwJV0gIChTYW1wbGluZylcbkNoYWluIDI6IEl0ZXJhdGlvbjogMTQwIC8gMjAwIFsgNzAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAxNjAgLyAyMDAgWyA4MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAyOiBJdGVyYXRpb246IDE4MCAvIDIwMCBbIDkwJV0gIChTYW1wbGluZylcbkNoYWluIDI6IEl0ZXJhdGlvbjogMjAwIC8gMjAwIFsxMDAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMjogXG5DaGFpbiAyOiAgRWxhcHNlZCBUaW1lOiAwLjAyOTQ5IHNlY29uZHMgKFdhcm0tdXApXG5DaGFpbiAyOiAgICAgICAgICAgICAgICAwLjAyNjU2NiBzZWNvbmRzIChTYW1wbGluZylcbkNoYWluIDI6ICAgICAgICAgICAgICAgIDAuMDU2MDU2IHNlY29uZHMgKFRvdGFsKVxuQ2hhaW4gMjogXG5cblNBTVBMSU5HIEZPUiBNT0RFTCAnbW9kZWxfMCcgTk9XIChDSEFJTiAzKS5cbkNoYWluIDM6IFxuQ2hhaW4gMzogR3JhZGllbnQgZXZhbHVhdGlvbiB0b29rIDQuNWUtMDUgc2Vjb25kc1xuQ2hhaW4gMzogMTAwMCB0cmFuc2l0aW9ucyB1c2luZyAxMCBsZWFwZnJvZyBzdGVwcyBwZXIgdHJhbnNpdGlvbiB3b3VsZCB0YWtlIDAuNDUgc2Vjb25kcy5cbkNoYWluIDM6IEFkanVzdCB5b3VyIGV4cGVjdGF0aW9ucyBhY2NvcmRpbmdseSFcbkNoYWluIDM6IFxuQ2hhaW4gMzogXG5DaGFpbiAzOiBXQVJOSU5HOiBUaGVyZSBhcmVuJ3QgZW5vdWdoIHdhcm11cCBpdGVyYXRpb25zIHRvIGZpdCB0aGVcbkNoYWluIDM6ICAgICAgICAgIHRocmVlIHN0YWdlcyBvZiBhZGFwdGF0aW9uIGFzIGN1cnJlbnRseSBjb25maWd1cmVkLlxuQ2hhaW4gMzogICAgICAgICAgUmVkdWNpbmcgZWFjaCBhZGFwdGF0aW9uIHN0YWdlIHRvIDE1JS83NSUvMTAlIG9mXG5DaGFpbiAzOiAgICAgICAgICB0aGUgZ2l2ZW4gbnVtYmVyIG9mIHdhcm11cCBpdGVyYXRpb25zOlxuQ2hhaW4gMzogICAgICAgICAgICBpbml0X2J1ZmZlciA9IDE1XG5DaGFpbiAzOiAgICAgICAgICAgIGFkYXB0X3dpbmRvdyA9IDc1XG5DaGFpbiAzOiAgICAgICAgICAgIHRlcm1fYnVmZmVyID0gMTBcbkNoYWluIDM6IFxuQ2hhaW4gMzogSXRlcmF0aW9uOiAgIDEgLyAyMDAgWyAgMCVdICAoV2FybXVwKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAgMjAgLyAyMDAgWyAxMCVdICAoV2FybXVwKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAgNDAgLyAyMDAgWyAyMCVdICAoV2FybXVwKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAgNjAgLyAyMDAgWyAzMCVdICAoV2FybXVwKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAgODAgLyAyMDAgWyA0MCVdICAoV2FybXVwKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAxMDAgLyAyMDAgWyA1MCVdICAoV2FybXVwKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAxMDEgLyAyMDAgWyA1MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAzOiBJdGVyYXRpb246IDEyMCAvIDIwMCBbIDYwJV0gIChTYW1wbGluZylcbkNoYWluIDM6IEl0ZXJhdGlvbjogMTQwIC8gMjAwIFsgNzAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAxNjAgLyAyMDAgWyA4MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAzOiBJdGVyYXRpb246IDE4MCAvIDIwMCBbIDkwJV0gIChTYW1wbGluZylcbkNoYWluIDM6IEl0ZXJhdGlvbjogMjAwIC8gMjAwIFsxMDAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMzogXG5DaGFpbiAzOiAgRWxhcHNlZCBUaW1lOiAwLjAzMTk2OCBzZWNvbmRzIChXYXJtLXVwKVxuQ2hhaW4gMzogICAgICAgICAgICAgICAgMC4wMjY1NjEgc2Vjb25kcyAoU2FtcGxpbmcpXG5DaGFpbiAzOiAgICAgICAgICAgICAgICAwLjA1ODUyOSBzZWNvbmRzIChUb3RhbClcbkNoYWluIDM6IFxuXG5TQU1QTElORyBGT1IgTU9ERUwgJ21vZGVsXzAnIE5PVyAoQ0hBSU4gNCkuXG5DaGFpbiA0OiBcbkNoYWluIDQ6IEdyYWRpZW50IGV2YWx1YXRpb24gdG9vayA0LjZlLTA1IHNlY29uZHNcbkNoYWluIDQ6IDEwMDAgdHJhbnNpdGlvbnMgdXNpbmcgMTAgbGVhcGZyb2cgc3RlcHMgcGVyIHRyYW5zaXRpb24gd291bGQgdGFrZSAwLjQ2IHNlY29uZHMuXG5DaGFpbiA0OiBBZGp1c3QgeW91ciBleHBlY3RhdGlvbnMgYWNjb3JkaW5nbHkhXG5DaGFpbiA0OiBcbkNoYWluIDQ6IFxuQ2hhaW4gNDogV0FSTklORzogVGhlcmUgYXJlbid0IGVub3VnaCB3YXJtdXAgaXRlcmF0aW9ucyB0byBmaXQgdGhlXG5DaGFpbiA0OiAgICAgICAgICB0aHJlZSBzdGFnZXMgb2YgYWRhcHRhdGlvbiBhcyBjdXJyZW50bHkgY29uZmlndXJlZC5cbkNoYWluIDQ6ICAgICAgICAgIFJlZHVjaW5nIGVhY2ggYWRhcHRhdGlvbiBzdGFnZSB0byAxNSUvNzUlLzEwJSBvZlxuQ2hhaW4gNDogICAgICAgICAgdGhlIGdpdmVuIG51bWJlciBvZiB3YXJtdXAgaXRlcmF0aW9uczpcbkNoYWluIDQ6ICAgICAgICAgICAgaW5pdF9idWZmZXIgPSAxNVxuQ2hhaW4gNDogICAgICAgICAgICBhZGFwdF93aW5kb3cgPSA3NVxuQ2hhaW4gNDogICAgICAgICAgICB0ZXJtX2J1ZmZlciA9IDEwXG5DaGFpbiA0OiBcbkNoYWluIDQ6IEl0ZXJhdGlvbjogICAxIC8gMjAwIFsgIDAlXSAgKFdhcm11cClcbkNoYWluIDQ6IEl0ZXJhdGlvbjogIDIwIC8gMjAwIFsgMTAlXSAgKFdhcm11cClcbkNoYWluIDQ6IEl0ZXJhdGlvbjogIDQwIC8gMjAwIFsgMjAlXSAgKFdhcm11cClcbkNoYWluIDQ6IEl0ZXJhdGlvbjogIDYwIC8gMjAwIFsgMzAlXSAgKFdhcm11cClcbkNoYWluIDQ6IEl0ZXJhdGlvbjogIDgwIC8gMjAwIFsgNDAlXSAgKFdhcm11cClcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTAwIC8gMjAwIFsgNTAlXSAgKFdhcm11cClcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTAxIC8gMjAwIFsgNTAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gNDogSXRlcmF0aW9uOiAxMjAgLyAyMDAgWyA2MCVdICAoU2FtcGxpbmcpXG5DaGFpbiA0OiBJdGVyYXRpb246IDE0MCAvIDIwMCBbIDcwJV0gIChTYW1wbGluZylcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTYwIC8gMjAwIFsgODAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gNDogSXRlcmF0aW9uOiAxODAgLyAyMDAgWyA5MCVdICAoU2FtcGxpbmcpXG5DaGFpbiA0OiBJdGVyYXRpb246IDIwMCAvIDIwMCBbMTAwJV0gIChTYW1wbGluZylcbkNoYWluIDQ6IFxuQ2hhaW4gNDogIEVsYXBzZWQgVGltZTogMC4wMzA5MTYgc2Vjb25kcyAoV2FybS11cClcbkNoYWluIDQ6ICAgICAgICAgICAgICAgIDAuMDI5ODQgc2Vjb25kcyAoU2FtcGxpbmcpXG5DaGFpbiA0OiAgICAgICAgICAgICAgICAwLjA2MDc1NiBzZWNvbmRzIChUb3RhbClcbkNoYWluIDQ6IFxuIn0= -->
+<pre><code>starting worker pid=52788 on localhost:11594 at 15:46:26.306
+starting worker pid=52802 on localhost:11594 at 15:46:26.646
+starting worker pid=52816 on localhost:11594 at 15:46:27.053
+starting worker pid=52830 on localhost:11594 at 15:46:27.437
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 1).
+Chain 1: 
+Chain 1: Gradient evaluation took 4.6e-05 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.46 seconds.
+Chain 1: Adjust your expectations accordingly!
+Chain 1: 
+Chain 1: 
+Chain 1: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 1:          three stages of adaptation as currently configured.
+Chain 1:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 1:          the given number of warmup iterations:
+Chain 1:            init_buffer = 15
+Chain 1:            adapt_window = 75
+Chain 1:            term_buffer = 10
+Chain 1: 
+Chain 1: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 1: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 1: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 1: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 1: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 1: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 1: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 1: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 1: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 1: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 1: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 1: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 1: 
+Chain 1:  Elapsed Time: 0.030743 seconds (Warm-up)
+Chain 1:                0.029247 seconds (Sampling)
+Chain 1:                0.05999 seconds (Total)
+Chain 1: 
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 2).
+Chain 2: 
+Chain 2: Gradient evaluation took 4.6e-05 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.46 seconds.
+Chain 2: Adjust your expectations accordingly!
+Chain 2: 
+Chain 2: 
+Chain 2: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 2:          three stages of adaptation as currently configured.
+Chain 2:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 2:          the given number of warmup iterations:
+Chain 2:            init_buffer = 15
+Chain 2:            adapt_window = 75
+Chain 2:            term_buffer = 10
+Chain 2: 
+Chain 2: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 2: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 2: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 2: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 2: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 2: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 2: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 2: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 2: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 2: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 2: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 2: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 2: 
+Chain 2:  Elapsed Time: 0.02949 seconds (Warm-up)
+Chain 2:                0.026566 seconds (Sampling)
+Chain 2:                0.056056 seconds (Total)
+Chain 2: 
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 3).
+Chain 3: 
+Chain 3: Gradient evaluation took 4.5e-05 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.45 seconds.
+Chain 3: Adjust your expectations accordingly!
+Chain 3: 
+Chain 3: 
+Chain 3: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 3:          three stages of adaptation as currently configured.
+Chain 3:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 3:          the given number of warmup iterations:
+Chain 3:            init_buffer = 15
+Chain 3:            adapt_window = 75
+Chain 3:            term_buffer = 10
+Chain 3: 
+Chain 3: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 3: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 3: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 3: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 3: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 3: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 3: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 3: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 3: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 3: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 3: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 3: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 3: 
+Chain 3:  Elapsed Time: 0.031968 seconds (Warm-up)
+Chain 3:                0.026561 seconds (Sampling)
+Chain 3:                0.058529 seconds (Total)
+Chain 3: 
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 4).
+Chain 4: 
+Chain 4: Gradient evaluation took 4.6e-05 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.46 seconds.
+Chain 4: Adjust your expectations accordingly!
+Chain 4: 
+Chain 4: 
+Chain 4: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 4:          three stages of adaptation as currently configured.
+Chain 4:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 4:          the given number of warmup iterations:
+Chain 4:            init_buffer = 15
+Chain 4:            adapt_window = 75
+Chain 4:            term_buffer = 10
+Chain 4: 
+Chain 4: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 4: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 4: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 4: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 4: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 4: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 4: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 4: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 4: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 4: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 4: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 4: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 4: 
+Chain 4:  Elapsed Time: 0.030916 seconds (Warm-up)
+Chain 4:                0.02984 seconds (Sampling)
+Chain 4:                0.060756 seconds (Total)
+Chain 4: </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQnVsayBFZmZlY3RpdmUgU2FtcGxlcyBTaXplIChFU1MpIGlzIHRvbyBsb3csIGluZGljYXRpbmcgcG9zdGVyaW9yIG1lYW5zIGFuZCBtZWRpYW5zIG1heSBiZSB1bnJlbGlhYmxlLlxuUnVubmluZyB0aGUgY2hhaW5zIGZvciBtb3JlIGl0ZXJhdGlvbnMgbWF5IGhlbHAuIFNlZVxuaHR0cDovL21jLXN0YW4ub3JnL21pc2Mvd2FybmluZ3MuaHRtbCNidWxrLWVzc1RhaWwgRWZmZWN0aXZlIFNhbXBsZXMgU2l6ZSAoRVNTKSBpcyB0b28gbG93LCBpbmRpY2F0aW5nIHBvc3RlcmlvciB2YXJpYW5jZXMgYW5kIHRhaWwgcXVhbnRpbGVzIG1heSBiZSB1bnJlbGlhYmxlLlxuUnVubmluZyB0aGUgY2hhaW5zIGZvciBtb3JlIGl0ZXJhdGlvbnMgbWF5IGhlbHAuIFNlZVxuaHR0cDovL21jLXN0YW4ub3JnL21pc2Mvd2FybmluZ3MuaHRtbCN0YWlsLWVzc1xuIn0= -->
+<pre><code>Bulk Effective Samples Size (ESS) is too low, indicating posterior means and medians may be unreliable.
+Running the chains for more iterations may help. See
+http://mc-stan.org/misc/warnings.html#bulk-essTail Effective Samples Size (ESS) is too low, indicating posterior variances and tail quantiles may be unreliable.
+Running the chains for more iterations may help. See
+http://mc-stan.org/misc/warnings.html#tail-ess</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoic3RhcnRpbmcgd29ya2VyIHBpZD01Mjg1MyBvbiBsb2NhbGhvc3Q6MTE1OTQgYXQgMTU6NDY6NDUuNjM4XG5zdGFydGluZyB3b3JrZXIgcGlkPTUyODY3IG9uIGxvY2FsaG9zdDoxMTU5NCBhdCAxNTo0Njo0NS45OTNcbnN0YXJ0aW5nIHdvcmtlciBwaWQ9NTI4ODEgb24gbG9jYWxob3N0OjExNTk0IGF0IDE1OjQ2OjQ2LjI4Mlxuc3RhcnRpbmcgd29ya2VyIHBpZD01Mjg5NSBvbiBsb2NhbGhvc3Q6MTE1OTQgYXQgMTU6NDY6NDYuNTc4XG5cblNBTVBMSU5HIEZPUiBNT0RFTCAnbW9kZWxfMCcgTk9XIChDSEFJTiAyKS5cbkNoYWluIDI6IFxuQ2hhaW4gMjogR3JhZGllbnQgZXZhbHVhdGlvbiB0b29rIDQuNmUtMDUgc2Vjb25kc1xuQ2hhaW4gMjogMTAwMCB0cmFuc2l0aW9ucyB1c2luZyAxMCBsZWFwZnJvZyBzdGVwcyBwZXIgdHJhbnNpdGlvbiB3b3VsZCB0YWtlIDAuNDYgc2Vjb25kcy5cbkNoYWluIDI6IEFkanVzdCB5b3VyIGV4cGVjdGF0aW9ucyBhY2NvcmRpbmdseSFcbkNoYWluIDI6IFxuQ2hhaW4gMjogXG5DaGFpbiAyOiBXQVJOSU5HOiBUaGVyZSBhcmVuJ3QgZW5vdWdoIHdhcm11cCBpdGVyYXRpb25zIHRvIGZpdCB0aGVcbkNoYWluIDI6ICAgICAgICAgIHRocmVlIHN0YWdlcyBvZiBhZGFwdGF0aW9uIGFzIGN1cnJlbnRseSBjb25maWd1cmVkLlxuQ2hhaW4gMjogICAgICAgICAgUmVkdWNpbmcgZWFjaCBhZGFwdGF0aW9uIHN0YWdlIHRvIDE1JS83NSUvMTAlIG9mXG5DaGFpbiAyOiAgICAgICAgICB0aGUgZ2l2ZW4gbnVtYmVyIG9mIHdhcm11cCBpdGVyYXRpb25zOlxuQ2hhaW4gMjogICAgICAgICAgICBpbml0X2J1ZmZlciA9IDE1XG5DaGFpbiAyOiAgICAgICAgICAgIGFkYXB0X3dpbmRvdyA9IDc1XG5DaGFpbiAyOiAgICAgICAgICAgIHRlcm1fYnVmZmVyID0gMTBcbkNoYWluIDI6IFxuQ2hhaW4gMjogSXRlcmF0aW9uOiAgIDEgLyAyMDAgWyAgMCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAgMjAgLyAyMDAgWyAxMCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAgNDAgLyAyMDAgWyAyMCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAgNjAgLyAyMDAgWyAzMCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAgODAgLyAyMDAgWyA0MCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAxMDAgLyAyMDAgWyA1MCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAxMDEgLyAyMDAgWyA1MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAyOiBJdGVyYXRpb246IDEyMCAvIDIwMCBbIDYwJV0gIChTYW1wbGluZylcbkNoYWluIDI6IEl0ZXJhdGlvbjogMTQwIC8gMjAwIFsgNzAlXSAgKFNhbXBsaW5nKVxuXG5TQU1QTElORyBGT1IgTU9ERUwgJ21vZGVsXzAnIE5PVyAoQ0hBSU4gMSkuXG5DaGFpbiAxOiBcbkNoYWluIDE6IEdyYWRpZW50IGV2YWx1YXRpb24gdG9vayA0LjRlLTA1IHNlY29uZHNcbkNoYWluIDE6IDEwMDAgdHJhbnNpdGlvbnMgdXNpbmcgMTAgbGVhcGZyb2cgc3RlcHMgcGVyIHRyYW5zaXRpb24gd291bGQgdGFrZSAwLjQ0IHNlY29uZHMuXG5DaGFpbiAxOiBBZGp1c3QgeW91ciBleHBlY3RhdGlvbnMgYWNjb3JkaW5nbHkhXG5DaGFpbiAxOiBcbkNoYWluIDE6IFxuQ2hhaW4gMTogV0FSTklORzogVGhlcmUgYXJlbid0IGVub3VnaCB3YXJtdXAgaXRlcmF0aW9ucyB0byBmaXQgdGhlXG5DaGFpbiAxOiAgICAgICAgICB0aHJlZSBzdGFnZXMgb2YgYWRhcHRhdGlvbiBhcyBjdXJyZW50bHkgY29uZmlndXJlZC5cbkNoYWluIDE6ICAgICAgICAgIFJlZHVjaW5nIGVhY2ggYWRhcHRhdGlvbiBzdGFnZSB0byAxNSUvNzUlLzEwJSBvZlxuQ2hhaW4gMTogICAgICAgICAgdGhlIGdpdmVuIG51bWJlciBvZiB3YXJtdXAgaXRlcmF0aW9uczpcbkNoYWluIDE6ICAgICAgICAgICAgaW5pdF9idWZmZXIgPSAxNVxuQ2hhaW4gMTogICAgICAgICAgICBhZGFwdF93aW5kb3cgPSA3NVxuQ2hhaW4gMTogICAgICAgICAgICB0ZXJtX2J1ZmZlciA9IDEwXG5DaGFpbiAxOiBcbkNoYWluIDI6IEl0ZXJhdGlvbjogMTYwIC8gMjAwIFsgODAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAxODAgLyAyMDAgWyA5MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAyOiBJdGVyYXRpb246IDIwMCAvIDIwMCBbMTAwJV0gIChTYW1wbGluZylcbkNoYWluIDI6IFxuQ2hhaW4gMjogIEVsYXBzZWQgVGltZTogMC4wMjk5MDQgc2Vjb25kcyAoV2FybS11cClcbkNoYWluIDI6ICAgICAgICAgICAgICAgIDAuMDI2NDcyIHNlY29uZHMgKFNhbXBsaW5nKVxuQ2hhaW4gMjogICAgICAgICAgICAgICAgMC4wNTYzNzYgc2Vjb25kcyAoVG90YWwpXG5DaGFpbiAyOiBcbkNoYWluIDE6IEl0ZXJhdGlvbjogICAxIC8gMjAwIFsgIDAlXSAgKFdhcm11cClcbkNoYWluIDE6IEl0ZXJhdGlvbjogIDIwIC8gMjAwIFsgMTAlXSAgKFdhcm11cClcbkNoYWluIDE6IEl0ZXJhdGlvbjogIDQwIC8gMjAwIFsgMjAlXSAgKFdhcm11cClcbkNoYWluIDE6IEl0ZXJhdGlvbjogIDYwIC8gMjAwIFsgMzAlXSAgKFdhcm11cClcbkNoYWluIDE6IEl0ZXJhdGlvbjogIDgwIC8gMjAwIFsgNDAlXSAgKFdhcm11cClcbkNoYWluIDE6IEl0ZXJhdGlvbjogMTAwIC8gMjAwIFsgNTAlXSAgKFdhcm11cClcbkNoYWluIDE6IEl0ZXJhdGlvbjogMTAxIC8gMjAwIFsgNTAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxMjAgLyAyMDAgWyA2MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAxOiBJdGVyYXRpb246IDE0MCAvIDIwMCBbIDcwJV0gIChTYW1wbGluZylcbkNoYWluIDE6IEl0ZXJhdGlvbjogMTYwIC8gMjAwIFsgODAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxODAgLyAyMDAgWyA5MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAxOiBJdGVyYXRpb246IDIwMCAvIDIwMCBbMTAwJV0gIChTYW1wbGluZylcbkNoYWluIDE6IFxuQ2hhaW4gMTogIEVsYXBzZWQgVGltZTogMC4wMjk0MTYgc2Vjb25kcyAoV2FybS11cClcbkNoYWluIDE6ICAgICAgICAgICAgICAgIDAuMDI4MDc5IHNlY29uZHMgKFNhbXBsaW5nKVxuQ2hhaW4gMTogICAgICAgICAgICAgICAgMC4wNTc0OTUgc2Vjb25kcyAoVG90YWwpXG5DaGFpbiAxOiBcblxuU0FNUExJTkcgRk9SIE1PREVMICdtb2RlbF8wJyBOT1cgKENIQUlOIDMpLlxuQ2hhaW4gMzogXG5DaGFpbiAzOiBHcmFkaWVudCBldmFsdWF0aW9uIHRvb2sgNC42ZS0wNSBzZWNvbmRzXG5DaGFpbiAzOiAxMDAwIHRyYW5zaXRpb25zIHVzaW5nIDEwIGxlYXBmcm9nIHN0ZXBzIHBlciB0cmFuc2l0aW9uIHdvdWxkIHRha2UgMC40NiBzZWNvbmRzLlxuQ2hhaW4gMzogQWRqdXN0IHlvdXIgZXhwZWN0YXRpb25zIGFjY29yZGluZ2x5IVxuQ2hhaW4gMzogXG5DaGFpbiAzOiBcbkNoYWluIDM6IFdBUk5JTkc6IFRoZXJlIGFyZW4ndCBlbm91Z2ggd2FybXVwIGl0ZXJhdGlvbnMgdG8gZml0IHRoZVxuQ2hhaW4gMzogICAgICAgICAgdGhyZWUgc3RhZ2VzIG9mIGFkYXB0YXRpb24gYXMgY3VycmVudGx5IGNvbmZpZ3VyZWQuXG5DaGFpbiAzOiAgICAgICAgICBSZWR1Y2luZyBlYWNoIGFkYXB0YXRpb24gc3RhZ2UgdG8gMTUlLzc1JS8xMCUgb2ZcbkNoYWluIDM6ICAgICAgICAgIHRoZSBnaXZlbiBudW1iZXIgb2Ygd2FybXVwIGl0ZXJhdGlvbnM6XG5DaGFpbiAzOiAgICAgICAgICAgIGluaXRfYnVmZmVyID0gMTVcbkNoYWluIDM6ICAgICAgICAgICAgYWRhcHRfd2luZG93ID0gNzVcbkNoYWluIDM6ICAgICAgICAgICAgdGVybV9idWZmZXIgPSAxMFxuQ2hhaW4gMzogXG5DaGFpbiAzOiBJdGVyYXRpb246ICAgMSAvIDIwMCBbICAwJV0gIChXYXJtdXApXG5DaGFpbiAzOiBJdGVyYXRpb246ICAyMCAvIDIwMCBbIDEwJV0gIChXYXJtdXApXG5DaGFpbiAzOiBJdGVyYXRpb246ICA0MCAvIDIwMCBbIDIwJV0gIChXYXJtdXApXG5DaGFpbiAzOiBJdGVyYXRpb246ICA2MCAvIDIwMCBbIDMwJV0gIChXYXJtdXApXG5DaGFpbiAzOiBJdGVyYXRpb246ICA4MCAvIDIwMCBbIDQwJV0gIChXYXJtdXApXG5DaGFpbiAzOiBJdGVyYXRpb246IDEwMCAvIDIwMCBbIDUwJV0gIChXYXJtdXApXG5DaGFpbiAzOiBJdGVyYXRpb246IDEwMSAvIDIwMCBbIDUwJV0gIChTYW1wbGluZylcbkNoYWluIDM6IEl0ZXJhdGlvbjogMTIwIC8gMjAwIFsgNjAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAxNDAgLyAyMDAgWyA3MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAzOiBJdGVyYXRpb246IDE2MCAvIDIwMCBbIDgwJV0gIChTYW1wbGluZylcbkNoYWluIDM6IEl0ZXJhdGlvbjogMTgwIC8gMjAwIFsgOTAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAyMDAgLyAyMDAgWzEwMCVdICAoU2FtcGxpbmcpXG5DaGFpbiAzOiBcbkNoYWluIDM6ICBFbGFwc2VkIFRpbWU6IDAuMDI5MzEzIHNlY29uZHMgKFdhcm0tdXApXG5DaGFpbiAzOiAgICAgICAgICAgICAgICAwLjAyNjk4IHNlY29uZHMgKFNhbXBsaW5nKVxuQ2hhaW4gMzogICAgICAgICAgICAgICAgMC4wNTYyOTMgc2Vjb25kcyAoVG90YWwpXG5DaGFpbiAzOiBcblxuU0FNUExJTkcgRk9SIE1PREVMICdtb2RlbF8wJyBOT1cgKENIQUlOIDQpLlxuQ2hhaW4gNDogXG5DaGFpbiA0OiBHcmFkaWVudCBldmFsdWF0aW9uIHRvb2sgNC41ZS0wNSBzZWNvbmRzXG5DaGFpbiA0OiAxMDAwIHRyYW5zaXRpb25zIHVzaW5nIDEwIGxlYXBmcm9nIHN0ZXBzIHBlciB0cmFuc2l0aW9uIHdvdWxkIHRha2UgMC40NSBzZWNvbmRzLlxuQ2hhaW4gNDogQWRqdXN0IHlvdXIgZXhwZWN0YXRpb25zIGFjY29yZGluZ2x5IVxuQ2hhaW4gNDogXG5DaGFpbiA0OiBcbkNoYWluIDQ6IFdBUk5JTkc6IFRoZXJlIGFyZW4ndCBlbm91Z2ggd2FybXVwIGl0ZXJhdGlvbnMgdG8gZml0IHRoZVxuQ2hhaW4gNDogICAgICAgICAgdGhyZWUgc3RhZ2VzIG9mIGFkYXB0YXRpb24gYXMgY3VycmVudGx5IGNvbmZpZ3VyZWQuXG5DaGFpbiA0OiAgICAgICAgICBSZWR1Y2luZyBlYWNoIGFkYXB0YXRpb24gc3RhZ2UgdG8gMTUlLzc1JS8xMCUgb2ZcbkNoYWluIDQ6ICAgICAgICAgIHRoZSBnaXZlbiBudW1iZXIgb2Ygd2FybXVwIGl0ZXJhdGlvbnM6XG5DaGFpbiA0OiAgICAgICAgICAgIGluaXRfYnVmZmVyID0gMTVcbkNoYWluIDQ6ICAgICAgICAgICAgYWRhcHRfd2luZG93ID0gNzVcbkNoYWluIDQ6ICAgICAgICAgICAgdGVybV9idWZmZXIgPSAxMFxuQ2hhaW4gNDogXG5DaGFpbiA0OiBJdGVyYXRpb246ICAgMSAvIDIwMCBbICAwJV0gIChXYXJtdXApXG5DaGFpbiA0OiBJdGVyYXRpb246ICAyMCAvIDIwMCBbIDEwJV0gIChXYXJtdXApXG5DaGFpbiA0OiBJdGVyYXRpb246ICA0MCAvIDIwMCBbIDIwJV0gIChXYXJtdXApXG5DaGFpbiA0OiBJdGVyYXRpb246ICA2MCAvIDIwMCBbIDMwJV0gIChXYXJtdXApXG5DaGFpbiA0OiBJdGVyYXRpb246ICA4MCAvIDIwMCBbIDQwJV0gIChXYXJtdXApXG5DaGFpbiA0OiBJdGVyYXRpb246IDEwMCAvIDIwMCBbIDUwJV0gIChXYXJtdXApXG5DaGFpbiA0OiBJdGVyYXRpb246IDEwMSAvIDIwMCBbIDUwJV0gIChTYW1wbGluZylcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTIwIC8gMjAwIFsgNjAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gNDogSXRlcmF0aW9uOiAxNDAgLyAyMDAgWyA3MCVdICAoU2FtcGxpbmcpXG5DaGFpbiA0OiBJdGVyYXRpb246IDE2MCAvIDIwMCBbIDgwJV0gIChTYW1wbGluZylcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTgwIC8gMjAwIFsgOTAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gNDogSXRlcmF0aW9uOiAyMDAgLyAyMDAgWzEwMCVdICAoU2FtcGxpbmcpXG5DaGFpbiA0OiBcbkNoYWluIDQ6ICBFbGFwc2VkIFRpbWU6IDAuMDI4OTI4IHNlY29uZHMgKFdhcm0tdXApXG5DaGFpbiA0OiAgICAgICAgICAgICAgICAwLjAyOTkzIHNlY29uZHMgKFNhbXBsaW5nKVxuQ2hhaW4gNDogICAgICAgICAgICAgICAgMC4wNTg4NTggc2Vjb25kcyAoVG90YWwpXG5DaGFpbiA0OiBcbiJ9 -->
+<pre><code>starting worker pid=52853 on localhost:11594 at 15:46:45.638
+starting worker pid=52867 on localhost:11594 at 15:46:45.993
+starting worker pid=52881 on localhost:11594 at 15:46:46.282
+starting worker pid=52895 on localhost:11594 at 15:46:46.578
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 2).
+Chain 2: 
+Chain 2: Gradient evaluation took 4.6e-05 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.46 seconds.
+Chain 2: Adjust your expectations accordingly!
+Chain 2: 
+Chain 2: 
+Chain 2: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 2:          three stages of adaptation as currently configured.
+Chain 2:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 2:          the given number of warmup iterations:
+Chain 2:            init_buffer = 15
+Chain 2:            adapt_window = 75
+Chain 2:            term_buffer = 10
+Chain 2: 
+Chain 2: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 2: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 2: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 2: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 2: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 2: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 2: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 2: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 2: Iteration: 140 / 200 [ 70%]  (Sampling)
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 1).
+Chain 1: 
+Chain 1: Gradient evaluation took 4.4e-05 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.44 seconds.
+Chain 1: Adjust your expectations accordingly!
+Chain 1: 
+Chain 1: 
+Chain 1: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 1:          three stages of adaptation as currently configured.
+Chain 1:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 1:          the given number of warmup iterations:
+Chain 1:            init_buffer = 15
+Chain 1:            adapt_window = 75
+Chain 1:            term_buffer = 10
+Chain 1: 
+Chain 2: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 2: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 2: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 2: 
+Chain 2:  Elapsed Time: 0.029904 seconds (Warm-up)
+Chain 2:                0.026472 seconds (Sampling)
+Chain 2:                0.056376 seconds (Total)
+Chain 2: 
+Chain 1: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 1: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 1: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 1: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 1: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 1: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 1: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 1: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 1: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 1: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 1: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 1: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 1: 
+Chain 1:  Elapsed Time: 0.029416 seconds (Warm-up)
+Chain 1:                0.028079 seconds (Sampling)
+Chain 1:                0.057495 seconds (Total)
+Chain 1: 
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 3).
+Chain 3: 
+Chain 3: Gradient evaluation took 4.6e-05 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.46 seconds.
+Chain 3: Adjust your expectations accordingly!
+Chain 3: 
+Chain 3: 
+Chain 3: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 3:          three stages of adaptation as currently configured.
+Chain 3:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 3:          the given number of warmup iterations:
+Chain 3:            init_buffer = 15
+Chain 3:            adapt_window = 75
+Chain 3:            term_buffer = 10
+Chain 3: 
+Chain 3: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 3: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 3: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 3: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 3: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 3: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 3: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 3: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 3: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 3: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 3: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 3: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 3: 
+Chain 3:  Elapsed Time: 0.029313 seconds (Warm-up)
+Chain 3:                0.02698 seconds (Sampling)
+Chain 3:                0.056293 seconds (Total)
+Chain 3: 
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 4).
+Chain 4: 
+Chain 4: Gradient evaluation took 4.5e-05 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.45 seconds.
+Chain 4: Adjust your expectations accordingly!
+Chain 4: 
+Chain 4: 
+Chain 4: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 4:          three stages of adaptation as currently configured.
+Chain 4:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 4:          the given number of warmup iterations:
+Chain 4:            init_buffer = 15
+Chain 4:            adapt_window = 75
+Chain 4:            term_buffer = 10
+Chain 4: 
+Chain 4: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 4: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 4: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 4: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 4: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 4: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 4: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 4: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 4: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 4: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 4: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 4: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 4: 
+Chain 4:  Elapsed Time: 0.028928 seconds (Warm-up)
+Chain 4:                0.02993 seconds (Sampling)
+Chain 4:                0.058858 seconds (Total)
+Chain 4: </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQnVsayBFZmZlY3RpdmUgU2FtcGxlcyBTaXplIChFU1MpIGlzIHRvbyBsb3csIGluZGljYXRpbmcgcG9zdGVyaW9yIG1lYW5zIGFuZCBtZWRpYW5zIG1heSBiZSB1bnJlbGlhYmxlLlxuUnVubmluZyB0aGUgY2hhaW5zIGZvciBtb3JlIGl0ZXJhdGlvbnMgbWF5IGhlbHAuIFNlZVxuaHR0cDovL21jLXN0YW4ub3JnL21pc2Mvd2FybmluZ3MuaHRtbCNidWxrLWVzc1RhaWwgRWZmZWN0aXZlIFNhbXBsZXMgU2l6ZSAoRVNTKSBpcyB0b28gbG93LCBpbmRpY2F0aW5nIHBvc3RlcmlvciB2YXJpYW5jZXMgYW5kIHRhaWwgcXVhbnRpbGVzIG1heSBiZSB1bnJlbGlhYmxlLlxuUnVubmluZyB0aGUgY2hhaW5zIGZvciBtb3JlIGl0ZXJhdGlvbnMgbWF5IGhlbHAuIFNlZVxuaHR0cDovL21jLXN0YW4ub3JnL21pc2Mvd2FybmluZ3MuaHRtbCN0YWlsLWVzc1xuIn0= -->
+<pre><code>Bulk Effective Samples Size (ESS) is too low, indicating posterior means and medians may be unreliable.
+Running the chains for more iterations may help. See
+http://mc-stan.org/misc/warnings.html#bulk-essTail Effective Samples Size (ESS) is too low, indicating posterior variances and tail quantiles may be unreliable.
+Running the chains for more iterations may help. See
+http://mc-stan.org/misc/warnings.html#tail-ess</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoic3RhcnRpbmcgd29ya2VyIHBpZD01MjkxOCBvbiBsb2NhbGhvc3Q6MTE1OTQgYXQgMTU6NDc6MDUuMzc5XG5zdGFydGluZyB3b3JrZXIgcGlkPTUyOTMyIG9uIGxvY2FsaG9zdDoxMTU5NCBhdCAxNTo0NzowNS42ODNcbnN0YXJ0aW5nIHdvcmtlciBwaWQ9NTI5NDYgb24gbG9jYWxob3N0OjExNTk0IGF0IDE1OjQ3OjA2LjA0NVxuc3RhcnRpbmcgd29ya2VyIHBpZD01Mjk2MCBvbiBsb2NhbGhvc3Q6MTE1OTQgYXQgMTU6NDc6MDYuMzU5XG5cblNBTVBMSU5HIEZPUiBNT0RFTCAnbW9kZWxfMCcgTk9XIChDSEFJTiAxKS5cbkNoYWluIDE6IFxuQ2hhaW4gMTogR3JhZGllbnQgZXZhbHVhdGlvbiB0b29rIDQuNWUtMDUgc2Vjb25kc1xuQ2hhaW4gMTogMTAwMCB0cmFuc2l0aW9ucyB1c2luZyAxMCBsZWFwZnJvZyBzdGVwcyBwZXIgdHJhbnNpdGlvbiB3b3VsZCB0YWtlIDAuNDUgc2Vjb25kcy5cbkNoYWluIDE6IEFkanVzdCB5b3VyIGV4cGVjdGF0aW9ucyBhY2NvcmRpbmdseSFcbkNoYWluIDE6IFxuQ2hhaW4gMTogXG5DaGFpbiAxOiBXQVJOSU5HOiBUaGVyZSBhcmVuJ3QgZW5vdWdoIHdhcm11cCBpdGVyYXRpb25zIHRvIGZpdCB0aGVcbkNoYWluIDE6ICAgICAgICAgIHRocmVlIHN0YWdlcyBvZiBhZGFwdGF0aW9uIGFzIGN1cnJlbnRseSBjb25maWd1cmVkLlxuQ2hhaW4gMTogICAgICAgICAgUmVkdWNpbmcgZWFjaCBhZGFwdGF0aW9uIHN0YWdlIHRvIDE1JS83NSUvMTAlIG9mXG5DaGFpbiAxOiAgICAgICAgICB0aGUgZ2l2ZW4gbnVtYmVyIG9mIHdhcm11cCBpdGVyYXRpb25zOlxuQ2hhaW4gMTogICAgICAgICAgICBpbml0X2J1ZmZlciA9IDE1XG5DaGFpbiAxOiAgICAgICAgICAgIGFkYXB0X3dpbmRvdyA9IDc1XG5DaGFpbiAxOiAgICAgICAgICAgIHRlcm1fYnVmZmVyID0gMTBcbkNoYWluIDE6IFxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgIDEgLyAyMDAgWyAgMCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgMjAgLyAyMDAgWyAxMCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgNDAgLyAyMDAgWyAyMCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgNjAgLyAyMDAgWyAzMCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgODAgLyAyMDAgWyA0MCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxMDAgLyAyMDAgWyA1MCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxMDEgLyAyMDAgWyA1MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAxOiBJdGVyYXRpb246IDEyMCAvIDIwMCBbIDYwJV0gIChTYW1wbGluZylcbkNoYWluIDE6IEl0ZXJhdGlvbjogMTQwIC8gMjAwIFsgNzAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxNjAgLyAyMDAgWyA4MCVdICAoU2FtcGxpbmcpXG5cblNBTVBMSU5HIEZPUiBNT0RFTCAnbW9kZWxfMCcgTk9XIChDSEFJTiAyKS5cbkNoYWluIDI6IFxuQ2hhaW4gMjogR3JhZGllbnQgZXZhbHVhdGlvbiB0b29rIDQuNGUtMDUgc2Vjb25kc1xuQ2hhaW4gMjogMTAwMCB0cmFuc2l0aW9ucyB1c2luZyAxMCBsZWFwZnJvZyBzdGVwcyBwZXIgdHJhbnNpdGlvbiB3b3VsZCB0YWtlIDAuNDQgc2Vjb25kcy5cbkNoYWluIDI6IEFkanVzdCB5b3VyIGV4cGVjdGF0aW9ucyBhY2NvcmRpbmdseSFcbkNoYWluIDI6IFxuQ2hhaW4gMjogXG5DaGFpbiAyOiBXQVJOSU5HOiBUaGVyZSBhcmVuJ3QgZW5vdWdoIHdhcm11cCBpdGVyYXRpb25zIHRvIGZpdCB0aGVcbkNoYWluIDI6ICAgICAgICAgIHRocmVlIHN0YWdlcyBvZiBhZGFwdGF0aW9uIGFzIGN1cnJlbnRseSBjb25maWd1cmVkLlxuQ2hhaW4gMjogICAgICAgICAgUmVkdWNpbmcgZWFjaCBhZGFwdGF0aW9uIHN0YWdlIHRvIDE1JS83NSUvMTAlIG9mXG5DaGFpbiAyOiAgICAgICAgICB0aGUgZ2l2ZW4gbnVtYmVyIG9mIHdhcm11cCBpdGVyYXRpb25zOlxuQ2hhaW4gMjogICAgICAgICAgICBpbml0X2J1ZmZlciA9IDE1XG5DaGFpbiAyOiAgICAgICAgICAgIGFkYXB0X3dpbmRvdyA9IDc1XG5DaGFpbiAyOiAgICAgICAgICAgIHRlcm1fYnVmZmVyID0gMTBcbkNoYWluIDI6IFxuQ2hhaW4gMjogSXRlcmF0aW9uOiAgIDEgLyAyMDAgWyAgMCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAgMjAgLyAyMDAgWyAxMCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxODAgLyAyMDAgWyA5MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAxOiBJdGVyYXRpb246IDIwMCAvIDIwMCBbMTAwJV0gIChTYW1wbGluZylcbkNoYWluIDE6IFxuQ2hhaW4gMTogIEVsYXBzZWQgVGltZTogMC4wMjk3MjUgc2Vjb25kcyAoV2FybS11cClcbkNoYWluIDE6ICAgICAgICAgICAgICAgIDAuMDI4NDg1IHNlY29uZHMgKFNhbXBsaW5nKVxuQ2hhaW4gMTogICAgICAgICAgICAgICAgMC4wNTgyMSBzZWNvbmRzIChUb3RhbClcbkNoYWluIDE6IFxuQ2hhaW4gMjogSXRlcmF0aW9uOiAgNDAgLyAyMDAgWyAyMCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAgNjAgLyAyMDAgWyAzMCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAgODAgLyAyMDAgWyA0MCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAxMDAgLyAyMDAgWyA1MCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAxMDEgLyAyMDAgWyA1MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAyOiBJdGVyYXRpb246IDEyMCAvIDIwMCBbIDYwJV0gIChTYW1wbGluZylcbkNoYWluIDI6IEl0ZXJhdGlvbjogMTQwIC8gMjAwIFsgNzAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAxNjAgLyAyMDAgWyA4MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAyOiBJdGVyYXRpb246IDE4MCAvIDIwMCBbIDkwJV0gIChTYW1wbGluZylcbkNoYWluIDI6IEl0ZXJhdGlvbjogMjAwIC8gMjAwIFsxMDAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMjogXG5DaGFpbiAyOiAgRWxhcHNlZCBUaW1lOiAwLjAyOTEyMyBzZWNvbmRzIChXYXJtLXVwKVxuQ2hhaW4gMjogICAgICAgICAgICAgICAgMC4wMjUwMDkgc2Vjb25kcyAoU2FtcGxpbmcpXG5DaGFpbiAyOiAgICAgICAgICAgICAgICAwLjA1NDEzMiBzZWNvbmRzIChUb3RhbClcbkNoYWluIDI6IFxuXG5TQU1QTElORyBGT1IgTU9ERUwgJ21vZGVsXzAnIE5PVyAoQ0hBSU4gMykuXG5DaGFpbiAzOiBcbkNoYWluIDM6IEdyYWRpZW50IGV2YWx1YXRpb24gdG9vayA0LjVlLTA1IHNlY29uZHNcbkNoYWluIDM6IDEwMDAgdHJhbnNpdGlvbnMgdXNpbmcgMTAgbGVhcGZyb2cgc3RlcHMgcGVyIHRyYW5zaXRpb24gd291bGQgdGFrZSAwLjQ1IHNlY29uZHMuXG5DaGFpbiAzOiBBZGp1c3QgeW91ciBleHBlY3RhdGlvbnMgYWNjb3JkaW5nbHkhXG5DaGFpbiAzOiBcbkNoYWluIDM6IFxuQ2hhaW4gMzogV0FSTklORzogVGhlcmUgYXJlbid0IGVub3VnaCB3YXJtdXAgaXRlcmF0aW9ucyB0byBmaXQgdGhlXG5DaGFpbiAzOiAgICAgICAgICB0aHJlZSBzdGFnZXMgb2YgYWRhcHRhdGlvbiBhcyBjdXJyZW50bHkgY29uZmlndXJlZC5cbkNoYWluIDM6ICAgICAgICAgIFJlZHVjaW5nIGVhY2ggYWRhcHRhdGlvbiBzdGFnZSB0byAxNSUvNzUlLzEwJSBvZlxuQ2hhaW4gMzogICAgICAgICAgdGhlIGdpdmVuIG51bWJlciBvZiB3YXJtdXAgaXRlcmF0aW9uczpcbkNoYWluIDM6ICAgICAgICAgICAgaW5pdF9idWZmZXIgPSAxNVxuQ2hhaW4gMzogICAgICAgICAgICBhZGFwdF93aW5kb3cgPSA3NVxuQ2hhaW4gMzogICAgICAgICAgICB0ZXJtX2J1ZmZlciA9IDEwXG5DaGFpbiAzOiBcbkNoYWluIDM6IEl0ZXJhdGlvbjogICAxIC8gMjAwIFsgIDAlXSAgKFdhcm11cClcbkNoYWluIDM6IEl0ZXJhdGlvbjogIDIwIC8gMjAwIFsgMTAlXSAgKFdhcm11cClcbkNoYWluIDM6IEl0ZXJhdGlvbjogIDQwIC8gMjAwIFsgMjAlXSAgKFdhcm11cClcbkNoYWluIDM6IEl0ZXJhdGlvbjogIDYwIC8gMjAwIFsgMzAlXSAgKFdhcm11cClcbkNoYWluIDM6IEl0ZXJhdGlvbjogIDgwIC8gMjAwIFsgNDAlXSAgKFdhcm11cClcbkNoYWluIDM6IEl0ZXJhdGlvbjogMTAwIC8gMjAwIFsgNTAlXSAgKFdhcm11cClcbkNoYWluIDM6IEl0ZXJhdGlvbjogMTAxIC8gMjAwIFsgNTAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAxMjAgLyAyMDAgWyA2MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAzOiBJdGVyYXRpb246IDE0MCAvIDIwMCBbIDcwJV0gIChTYW1wbGluZylcbkNoYWluIDM6IEl0ZXJhdGlvbjogMTYwIC8gMjAwIFsgODAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAxODAgLyAyMDAgWyA5MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAzOiBJdGVyYXRpb246IDIwMCAvIDIwMCBbMTAwJV0gIChTYW1wbGluZylcbkNoYWluIDM6IFxuQ2hhaW4gMzogIEVsYXBzZWQgVGltZTogMC4wMzM3NyBzZWNvbmRzIChXYXJtLXVwKVxuQ2hhaW4gMzogICAgICAgICAgICAgICAgMC4wMjgwNjYgc2Vjb25kcyAoU2FtcGxpbmcpXG5DaGFpbiAzOiAgICAgICAgICAgICAgICAwLjA2MTgzNiBzZWNvbmRzIChUb3RhbClcbkNoYWluIDM6IFxuXG5TQU1QTElORyBGT1IgTU9ERUwgJ21vZGVsXzAnIE5PVyAoQ0hBSU4gNCkuXG5DaGFpbiA0OiBcbkNoYWluIDQ6IEdyYWRpZW50IGV2YWx1YXRpb24gdG9vayA0LjRlLTA1IHNlY29uZHNcbkNoYWluIDQ6IDEwMDAgdHJhbnNpdGlvbnMgdXNpbmcgMTAgbGVhcGZyb2cgc3RlcHMgcGVyIHRyYW5zaXRpb24gd291bGQgdGFrZSAwLjQ0IHNlY29uZHMuXG5DaGFpbiA0OiBBZGp1c3QgeW91ciBleHBlY3RhdGlvbnMgYWNjb3JkaW5nbHkhXG5DaGFpbiA0OiBcbkNoYWluIDQ6IFxuQ2hhaW4gNDogV0FSTklORzogVGhlcmUgYXJlbid0IGVub3VnaCB3YXJtdXAgaXRlcmF0aW9ucyB0byBmaXQgdGhlXG5DaGFpbiA0OiAgICAgICAgICB0aHJlZSBzdGFnZXMgb2YgYWRhcHRhdGlvbiBhcyBjdXJyZW50bHkgY29uZmlndXJlZC5cbkNoYWluIDQ6ICAgICAgICAgIFJlZHVjaW5nIGVhY2ggYWRhcHRhdGlvbiBzdGFnZSB0byAxNSUvNzUlLzEwJSBvZlxuQ2hhaW4gNDogICAgICAgICAgdGhlIGdpdmVuIG51bWJlciBvZiB3YXJtdXAgaXRlcmF0aW9uczpcbkNoYWluIDQ6ICAgICAgICAgICAgaW5pdF9idWZmZXIgPSAxNVxuQ2hhaW4gNDogICAgICAgICAgICBhZGFwdF93aW5kb3cgPSA3NVxuQ2hhaW4gNDogICAgICAgICAgICB0ZXJtX2J1ZmZlciA9IDEwXG5DaGFpbiA0OiBcbkNoYWluIDQ6IEl0ZXJhdGlvbjogICAxIC8gMjAwIFsgIDAlXSAgKFdhcm11cClcbkNoYWluIDQ6IEl0ZXJhdGlvbjogIDIwIC8gMjAwIFsgMTAlXSAgKFdhcm11cClcbkNoYWluIDQ6IEl0ZXJhdGlvbjogIDQwIC8gMjAwIFsgMjAlXSAgKFdhcm11cClcbkNoYWluIDQ6IEl0ZXJhdGlvbjogIDYwIC8gMjAwIFsgMzAlXSAgKFdhcm11cClcbkNoYWluIDQ6IEl0ZXJhdGlvbjogIDgwIC8gMjAwIFsgNDAlXSAgKFdhcm11cClcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTAwIC8gMjAwIFsgNTAlXSAgKFdhcm11cClcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTAxIC8gMjAwIFsgNTAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gNDogSXRlcmF0aW9uOiAxMjAgLyAyMDAgWyA2MCVdICAoU2FtcGxpbmcpXG5DaGFpbiA0OiBJdGVyYXRpb246IDE0MCAvIDIwMCBbIDcwJV0gIChTYW1wbGluZylcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTYwIC8gMjAwIFsgODAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gNDogSXRlcmF0aW9uOiAxODAgLyAyMDAgWyA5MCVdICAoU2FtcGxpbmcpXG5DaGFpbiA0OiBJdGVyYXRpb246IDIwMCAvIDIwMCBbMTAwJV0gIChTYW1wbGluZylcbkNoYWluIDQ6IFxuQ2hhaW4gNDogIEVsYXBzZWQgVGltZTogMC4wMzA4Nzggc2Vjb25kcyAoV2FybS11cClcbkNoYWluIDQ6ICAgICAgICAgICAgICAgIDAuMDI3NzI0IHNlY29uZHMgKFNhbXBsaW5nKVxuQ2hhaW4gNDogICAgICAgICAgICAgICAgMC4wNTg2MDIgc2Vjb25kcyAoVG90YWwpXG5DaGFpbiA0OiBcbiJ9 -->
+<pre><code>starting worker pid=52918 on localhost:11594 at 15:47:05.379
+starting worker pid=52932 on localhost:11594 at 15:47:05.683
+starting worker pid=52946 on localhost:11594 at 15:47:06.045
+starting worker pid=52960 on localhost:11594 at 15:47:06.359
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 1).
+Chain 1: 
+Chain 1: Gradient evaluation took 4.5e-05 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.45 seconds.
+Chain 1: Adjust your expectations accordingly!
+Chain 1: 
+Chain 1: 
+Chain 1: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 1:          three stages of adaptation as currently configured.
+Chain 1:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 1:          the given number of warmup iterations:
+Chain 1:            init_buffer = 15
+Chain 1:            adapt_window = 75
+Chain 1:            term_buffer = 10
+Chain 1: 
+Chain 1: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 1: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 1: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 1: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 1: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 1: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 1: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 1: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 1: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 1: Iteration: 160 / 200 [ 80%]  (Sampling)
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 2).
+Chain 2: 
+Chain 2: Gradient evaluation took 4.4e-05 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.44 seconds.
+Chain 2: Adjust your expectations accordingly!
+Chain 2: 
+Chain 2: 
+Chain 2: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 2:          three stages of adaptation as currently configured.
+Chain 2:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 2:          the given number of warmup iterations:
+Chain 2:            init_buffer = 15
+Chain 2:            adapt_window = 75
+Chain 2:            term_buffer = 10
+Chain 2: 
+Chain 2: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 2: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 1: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 1: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 1: 
+Chain 1:  Elapsed Time: 0.029725 seconds (Warm-up)
+Chain 1:                0.028485 seconds (Sampling)
+Chain 1:                0.05821 seconds (Total)
+Chain 1: 
+Chain 2: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 2: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 2: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 2: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 2: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 2: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 2: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 2: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 2: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 2: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 2: 
+Chain 2:  Elapsed Time: 0.029123 seconds (Warm-up)
+Chain 2:                0.025009 seconds (Sampling)
+Chain 2:                0.054132 seconds (Total)
+Chain 2: 
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 3).
+Chain 3: 
+Chain 3: Gradient evaluation took 4.5e-05 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.45 seconds.
+Chain 3: Adjust your expectations accordingly!
+Chain 3: 
+Chain 3: 
+Chain 3: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 3:          three stages of adaptation as currently configured.
+Chain 3:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 3:          the given number of warmup iterations:
+Chain 3:            init_buffer = 15
+Chain 3:            adapt_window = 75
+Chain 3:            term_buffer = 10
+Chain 3: 
+Chain 3: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 3: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 3: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 3: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 3: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 3: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 3: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 3: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 3: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 3: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 3: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 3: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 3: 
+Chain 3:  Elapsed Time: 0.03377 seconds (Warm-up)
+Chain 3:                0.028066 seconds (Sampling)
+Chain 3:                0.061836 seconds (Total)
+Chain 3: 
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 4).
+Chain 4: 
+Chain 4: Gradient evaluation took 4.4e-05 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.44 seconds.
+Chain 4: Adjust your expectations accordingly!
+Chain 4: 
+Chain 4: 
+Chain 4: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 4:          three stages of adaptation as currently configured.
+Chain 4:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 4:          the given number of warmup iterations:
+Chain 4:            init_buffer = 15
+Chain 4:            adapt_window = 75
+Chain 4:            term_buffer = 10
+Chain 4: 
+Chain 4: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 4: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 4: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 4: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 4: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 4: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 4: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 4: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 4: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 4: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 4: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 4: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 4: 
+Chain 4:  Elapsed Time: 0.030878 seconds (Warm-up)
+Chain 4:                0.027724 seconds (Sampling)
+Chain 4:                0.058602 seconds (Total)
+Chain 4: </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQnVsayBFZmZlY3RpdmUgU2FtcGxlcyBTaXplIChFU1MpIGlzIHRvbyBsb3csIGluZGljYXRpbmcgcG9zdGVyaW9yIG1lYW5zIGFuZCBtZWRpYW5zIG1heSBiZSB1bnJlbGlhYmxlLlxuUnVubmluZyB0aGUgY2hhaW5zIGZvciBtb3JlIGl0ZXJhdGlvbnMgbWF5IGhlbHAuIFNlZVxuaHR0cDovL21jLXN0YW4ub3JnL21pc2Mvd2FybmluZ3MuaHRtbCNidWxrLWVzc1RhaWwgRWZmZWN0aXZlIFNhbXBsZXMgU2l6ZSAoRVNTKSBpcyB0b28gbG93LCBpbmRpY2F0aW5nIHBvc3RlcmlvciB2YXJpYW5jZXMgYW5kIHRhaWwgcXVhbnRpbGVzIG1heSBiZSB1bnJlbGlhYmxlLlxuUnVubmluZyB0aGUgY2hhaW5zIGZvciBtb3JlIGl0ZXJhdGlvbnMgbWF5IGhlbHAuIFNlZVxuaHR0cDovL21jLXN0YW4ub3JnL21pc2Mvd2FybmluZ3MuaHRtbCN0YWlsLWVzc1xuIn0= -->
+<pre><code>Bulk Effective Samples Size (ESS) is too low, indicating posterior means and medians may be unreliable.
+Running the chains for more iterations may help. See
+http://mc-stan.org/misc/warnings.html#bulk-essTail Effective Samples Size (ESS) is too low, indicating posterior variances and tail quantiles may be unreliable.
+Running the chains for more iterations may help. See
+http://mc-stan.org/misc/warnings.html#tail-ess</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoic3RhcnRpbmcgd29ya2VyIHBpZD01Mjk4NCBvbiBsb2NhbGhvc3Q6MTE1OTQgYXQgMTU6NDc6MjQuMDczXG5zdGFydGluZyB3b3JrZXIgcGlkPTUyOTk4IG9uIGxvY2FsaG9zdDoxMTU5NCBhdCAxNTo0NzoyNC40MzFcbnN0YXJ0aW5nIHdvcmtlciBwaWQ9NTMwMTIgb24gbG9jYWxob3N0OjExNTk0IGF0IDE1OjQ3OjI0Ljc0Nlxuc3RhcnRpbmcgd29ya2VyIHBpZD01MzAyNiBvbiBsb2NhbGhvc3Q6MTE1OTQgYXQgMTU6NDc6MjUuMDk0XG5cblNBTVBMSU5HIEZPUiBNT0RFTCAnbW9kZWxfMCcgTk9XIChDSEFJTiAxKS5cbkNoYWluIDE6IFxuQ2hhaW4gMTogR3JhZGllbnQgZXZhbHVhdGlvbiB0b29rIDQuNmUtMDUgc2Vjb25kc1xuQ2hhaW4gMTogMTAwMCB0cmFuc2l0aW9ucyB1c2luZyAxMCBsZWFwZnJvZyBzdGVwcyBwZXIgdHJhbnNpdGlvbiB3b3VsZCB0YWtlIDAuNDYgc2Vjb25kcy5cbkNoYWluIDE6IEFkanVzdCB5b3VyIGV4cGVjdGF0aW9ucyBhY2NvcmRpbmdseSFcbkNoYWluIDE6IFxuQ2hhaW4gMTogXG5DaGFpbiAxOiBXQVJOSU5HOiBUaGVyZSBhcmVuJ3QgZW5vdWdoIHdhcm11cCBpdGVyYXRpb25zIHRvIGZpdCB0aGVcbkNoYWluIDE6ICAgICAgICAgIHRocmVlIHN0YWdlcyBvZiBhZGFwdGF0aW9uIGFzIGN1cnJlbnRseSBjb25maWd1cmVkLlxuQ2hhaW4gMTogICAgICAgICAgUmVkdWNpbmcgZWFjaCBhZGFwdGF0aW9uIHN0YWdlIHRvIDE1JS83NSUvMTAlIG9mXG5DaGFpbiAxOiAgICAgICAgICB0aGUgZ2l2ZW4gbnVtYmVyIG9mIHdhcm11cCBpdGVyYXRpb25zOlxuQ2hhaW4gMTogICAgICAgICAgICBpbml0X2J1ZmZlciA9IDE1XG5DaGFpbiAxOiAgICAgICAgICAgIGFkYXB0X3dpbmRvdyA9IDc1XG5DaGFpbiAxOiAgICAgICAgICAgIHRlcm1fYnVmZmVyID0gMTBcbkNoYWluIDE6IFxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgIDEgLyAyMDAgWyAgMCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgMjAgLyAyMDAgWyAxMCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgNDAgLyAyMDAgWyAyMCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgNjAgLyAyMDAgWyAzMCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgODAgLyAyMDAgWyA0MCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxMDAgLyAyMDAgWyA1MCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxMDEgLyAyMDAgWyA1MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAxOiBJdGVyYXRpb246IDEyMCAvIDIwMCBbIDYwJV0gIChTYW1wbGluZylcbkNoYWluIDE6IEl0ZXJhdGlvbjogMTQwIC8gMjAwIFsgNzAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxNjAgLyAyMDAgWyA4MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAxOiBJdGVyYXRpb246IDE4MCAvIDIwMCBbIDkwJV0gIChTYW1wbGluZylcbkNoYWluIDE6IEl0ZXJhdGlvbjogMjAwIC8gMjAwIFsxMDAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMTogXG5DaGFpbiAxOiAgRWxhcHNlZCBUaW1lOiAwLjAyODg2NiBzZWNvbmRzIChXYXJtLXVwKVxuQ2hhaW4gMTogICAgICAgICAgICAgICAgMC4wMjc5ODggc2Vjb25kcyAoU2FtcGxpbmcpXG5DaGFpbiAxOiAgICAgICAgICAgICAgICAwLjA1Njg1NCBzZWNvbmRzIChUb3RhbClcbkNoYWluIDE6IFxuXG5TQU1QTElORyBGT1IgTU9ERUwgJ21vZGVsXzAnIE5PVyAoQ0hBSU4gMikuXG5DaGFpbiAyOiBcbkNoYWluIDI6IEdyYWRpZW50IGV2YWx1YXRpb24gdG9vayA0LjZlLTA1IHNlY29uZHNcbkNoYWluIDI6IDEwMDAgdHJhbnNpdGlvbnMgdXNpbmcgMTAgbGVhcGZyb2cgc3RlcHMgcGVyIHRyYW5zaXRpb24gd291bGQgdGFrZSAwLjQ2IHNlY29uZHMuXG5DaGFpbiAyOiBBZGp1c3QgeW91ciBleHBlY3RhdGlvbnMgYWNjb3JkaW5nbHkhXG5DaGFpbiAyOiBcbkNoYWluIDI6IFxuQ2hhaW4gMjogV0FSTklORzogVGhlcmUgYXJlbid0IGVub3VnaCB3YXJtdXAgaXRlcmF0aW9ucyB0byBmaXQgdGhlXG5DaGFpbiAyOiAgICAgICAgICB0aHJlZSBzdGFnZXMgb2YgYWRhcHRhdGlvbiBhcyBjdXJyZW50bHkgY29uZmlndXJlZC5cbkNoYWluIDI6ICAgICAgICAgIFJlZHVjaW5nIGVhY2ggYWRhcHRhdGlvbiBzdGFnZSB0byAxNSUvNzUlLzEwJSBvZlxuQ2hhaW4gMjogICAgICAgICAgdGhlIGdpdmVuIG51bWJlciBvZiB3YXJtdXAgaXRlcmF0aW9uczpcbkNoYWluIDI6ICAgICAgICAgICAgaW5pdF9idWZmZXIgPSAxNVxuQ2hhaW4gMjogICAgICAgICAgICBhZGFwdF93aW5kb3cgPSA3NVxuQ2hhaW4gMjogICAgICAgICAgICB0ZXJtX2J1ZmZlciA9IDEwXG5DaGFpbiAyOiBcbkNoYWluIDI6IEl0ZXJhdGlvbjogICAxIC8gMjAwIFsgIDAlXSAgKFdhcm11cClcbkNoYWluIDI6IEl0ZXJhdGlvbjogIDIwIC8gMjAwIFsgMTAlXSAgKFdhcm11cClcbkNoYWluIDI6IEl0ZXJhdGlvbjogIDQwIC8gMjAwIFsgMjAlXSAgKFdhcm11cClcbkNoYWluIDI6IEl0ZXJhdGlvbjogIDYwIC8gMjAwIFsgMzAlXSAgKFdhcm11cClcbkNoYWluIDI6IEl0ZXJhdGlvbjogIDgwIC8gMjAwIFsgNDAlXSAgKFdhcm11cClcbkNoYWluIDI6IEl0ZXJhdGlvbjogMTAwIC8gMjAwIFsgNTAlXSAgKFdhcm11cClcbkNoYWluIDI6IEl0ZXJhdGlvbjogMTAxIC8gMjAwIFsgNTAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAxMjAgLyAyMDAgWyA2MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAyOiBJdGVyYXRpb246IDE0MCAvIDIwMCBbIDcwJV0gIChTYW1wbGluZylcbkNoYWluIDI6IEl0ZXJhdGlvbjogMTYwIC8gMjAwIFsgODAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAxODAgLyAyMDAgWyA5MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAyOiBJdGVyYXRpb246IDIwMCAvIDIwMCBbMTAwJV0gIChTYW1wbGluZylcbkNoYWluIDI6IFxuQ2hhaW4gMjogIEVsYXBzZWQgVGltZTogMC4wMzA5MDQgc2Vjb25kcyAoV2FybS11cClcbkNoYWluIDI6ICAgICAgICAgICAgICAgIDAuMDI5NDA1IHNlY29uZHMgKFNhbXBsaW5nKVxuQ2hhaW4gMjogICAgICAgICAgICAgICAgMC4wNjAzMDkgc2Vjb25kcyAoVG90YWwpXG5DaGFpbiAyOiBcblxuU0FNUExJTkcgRk9SIE1PREVMICdtb2RlbF8wJyBOT1cgKENIQUlOIDMpLlxuQ2hhaW4gMzogXG5DaGFpbiAzOiBHcmFkaWVudCBldmFsdWF0aW9uIHRvb2sgNS44ZS0wNSBzZWNvbmRzXG5DaGFpbiAzOiAxMDAwIHRyYW5zaXRpb25zIHVzaW5nIDEwIGxlYXBmcm9nIHN0ZXBzIHBlciB0cmFuc2l0aW9uIHdvdWxkIHRha2UgMC41OCBzZWNvbmRzLlxuQ2hhaW4gMzogQWRqdXN0IHlvdXIgZXhwZWN0YXRpb25zIGFjY29yZGluZ2x5IVxuQ2hhaW4gMzogXG5DaGFpbiAzOiBcbkNoYWluIDM6IFdBUk5JTkc6IFRoZXJlIGFyZW4ndCBlbm91Z2ggd2FybXVwIGl0ZXJhdGlvbnMgdG8gZml0IHRoZVxuQ2hhaW4gMzogICAgICAgICAgdGhyZWUgc3RhZ2VzIG9mIGFkYXB0YXRpb24gYXMgY3VycmVudGx5IGNvbmZpZ3VyZWQuXG5DaGFpbiAzOiAgICAgICAgICBSZWR1Y2luZyBlYWNoIGFkYXB0YXRpb24gc3RhZ2UgdG8gMTUlLzc1JS8xMCUgb2ZcbkNoYWluIDM6ICAgICAgICAgIHRoZSBnaXZlbiBudW1iZXIgb2Ygd2FybXVwIGl0ZXJhdGlvbnM6XG5DaGFpbiAzOiAgICAgICAgICAgIGluaXRfYnVmZmVyID0gMTVcbkNoYWluIDM6ICAgICAgICAgICAgYWRhcHRfd2luZG93ID0gNzVcbkNoYWluIDM6ICAgICAgICAgICAgdGVybV9idWZmZXIgPSAxMFxuQ2hhaW4gMzogXG5DaGFpbiAzOiBJdGVyYXRpb246ICAgMSAvIDIwMCBbICAwJV0gIChXYXJtdXApXG5DaGFpbiAzOiBJdGVyYXRpb246ICAyMCAvIDIwMCBbIDEwJV0gIChXYXJtdXApXG5DaGFpbiAzOiBJdGVyYXRpb246ICA0MCAvIDIwMCBbIDIwJV0gIChXYXJtdXApXG5DaGFpbiAzOiBJdGVyYXRpb246ICA2MCAvIDIwMCBbIDMwJV0gIChXYXJtdXApXG5DaGFpbiAzOiBJdGVyYXRpb246ICA4MCAvIDIwMCBbIDQwJV0gIChXYXJtdXApXG5DaGFpbiAzOiBJdGVyYXRpb246IDEwMCAvIDIwMCBbIDUwJV0gIChXYXJtdXApXG5DaGFpbiAzOiBJdGVyYXRpb246IDEwMSAvIDIwMCBbIDUwJV0gIChTYW1wbGluZylcbkNoYWluIDM6IEl0ZXJhdGlvbjogMTIwIC8gMjAwIFsgNjAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAxNDAgLyAyMDAgWyA3MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAzOiBJdGVyYXRpb246IDE2MCAvIDIwMCBbIDgwJV0gIChTYW1wbGluZylcbkNoYWluIDM6IEl0ZXJhdGlvbjogMTgwIC8gMjAwIFsgOTAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAyMDAgLyAyMDAgWzEwMCVdICAoU2FtcGxpbmcpXG5DaGFpbiAzOiBcbkNoYWluIDM6ICBFbGFwc2VkIFRpbWU6IDAuMDI3OTQ2IHNlY29uZHMgKFdhcm0tdXApXG5DaGFpbiAzOiAgICAgICAgICAgICAgICAwLjAyODIyIHNlY29uZHMgKFNhbXBsaW5nKVxuQ2hhaW4gMzogICAgICAgICAgICAgICAgMC4wNTYxNjYgc2Vjb25kcyAoVG90YWwpXG5DaGFpbiAzOiBcblxuU0FNUExJTkcgRk9SIE1PREVMICdtb2RlbF8wJyBOT1cgKENIQUlOIDQpLlxuQ2hhaW4gNDogXG5DaGFpbiA0OiBHcmFkaWVudCBldmFsdWF0aW9uIHRvb2sgNC42ZS0wNSBzZWNvbmRzXG5DaGFpbiA0OiAxMDAwIHRyYW5zaXRpb25zIHVzaW5nIDEwIGxlYXBmcm9nIHN0ZXBzIHBlciB0cmFuc2l0aW9uIHdvdWxkIHRha2UgMC40NiBzZWNvbmRzLlxuQ2hhaW4gNDogQWRqdXN0IHlvdXIgZXhwZWN0YXRpb25zIGFjY29yZGluZ2x5IVxuQ2hhaW4gNDogXG5DaGFpbiA0OiBcbkNoYWluIDQ6IFdBUk5JTkc6IFRoZXJlIGFyZW4ndCBlbm91Z2ggd2FybXVwIGl0ZXJhdGlvbnMgdG8gZml0IHRoZVxuQ2hhaW4gNDogICAgICAgICAgdGhyZWUgc3RhZ2VzIG9mIGFkYXB0YXRpb24gYXMgY3VycmVudGx5IGNvbmZpZ3VyZWQuXG5DaGFpbiA0OiAgICAgICAgICBSZWR1Y2luZyBlYWNoIGFkYXB0YXRpb24gc3RhZ2UgdG8gMTUlLzc1JS8xMCUgb2ZcbkNoYWluIDQ6ICAgICAgICAgIHRoZSBnaXZlbiBudW1iZXIgb2Ygd2FybXVwIGl0ZXJhdGlvbnM6XG5DaGFpbiA0OiAgICAgICAgICAgIGluaXRfYnVmZmVyID0gMTVcbkNoYWluIDQ6ICAgICAgICAgICAgYWRhcHRfd2luZG93ID0gNzVcbkNoYWluIDQ6ICAgICAgICAgICAgdGVybV9idWZmZXIgPSAxMFxuQ2hhaW4gNDogXG5DaGFpbiA0OiBJdGVyYXRpb246ICAgMSAvIDIwMCBbICAwJV0gIChXYXJtdXApXG5DaGFpbiA0OiBJdGVyYXRpb246ICAyMCAvIDIwMCBbIDEwJV0gIChXYXJtdXApXG5DaGFpbiA0OiBJdGVyYXRpb246ICA0MCAvIDIwMCBbIDIwJV0gIChXYXJtdXApXG5DaGFpbiA0OiBJdGVyYXRpb246ICA2MCAvIDIwMCBbIDMwJV0gIChXYXJtdXApXG5DaGFpbiA0OiBJdGVyYXRpb246ICA4MCAvIDIwMCBbIDQwJV0gIChXYXJtdXApXG5DaGFpbiA0OiBJdGVyYXRpb246IDEwMCAvIDIwMCBbIDUwJV0gIChXYXJtdXApXG5DaGFpbiA0OiBJdGVyYXRpb246IDEwMSAvIDIwMCBbIDUwJV0gIChTYW1wbGluZylcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTIwIC8gMjAwIFsgNjAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gNDogSXRlcmF0aW9uOiAxNDAgLyAyMDAgWyA3MCVdICAoU2FtcGxpbmcpXG5DaGFpbiA0OiBJdGVyYXRpb246IDE2MCAvIDIwMCBbIDgwJV0gIChTYW1wbGluZylcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTgwIC8gMjAwIFsgOTAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gNDogSXRlcmF0aW9uOiAyMDAgLyAyMDAgWzEwMCVdICAoU2FtcGxpbmcpXG5DaGFpbiA0OiBcbkNoYWluIDQ6ICBFbGFwc2VkIFRpbWU6IDAuMDI4NTQ5IHNlY29uZHMgKFdhcm0tdXApXG5DaGFpbiA0OiAgICAgICAgICAgICAgICAwLjAyODAwNyBzZWNvbmRzIChTYW1wbGluZylcbkNoYWluIDQ6ICAgICAgICAgICAgICAgIDAuMDU2NTU2IHNlY29uZHMgKFRvdGFsKVxuQ2hhaW4gNDogXG4ifQ== -->
+<pre><code>starting worker pid=52984 on localhost:11594 at 15:47:24.073
+starting worker pid=52998 on localhost:11594 at 15:47:24.431
+starting worker pid=53012 on localhost:11594 at 15:47:24.746
+starting worker pid=53026 on localhost:11594 at 15:47:25.094
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 1).
+Chain 1: 
+Chain 1: Gradient evaluation took 4.6e-05 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.46 seconds.
+Chain 1: Adjust your expectations accordingly!
+Chain 1: 
+Chain 1: 
+Chain 1: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 1:          three stages of adaptation as currently configured.
+Chain 1:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 1:          the given number of warmup iterations:
+Chain 1:            init_buffer = 15
+Chain 1:            adapt_window = 75
+Chain 1:            term_buffer = 10
+Chain 1: 
+Chain 1: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 1: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 1: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 1: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 1: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 1: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 1: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 1: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 1: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 1: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 1: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 1: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 1: 
+Chain 1:  Elapsed Time: 0.028866 seconds (Warm-up)
+Chain 1:                0.027988 seconds (Sampling)
+Chain 1:                0.056854 seconds (Total)
+Chain 1: 
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 2).
+Chain 2: 
+Chain 2: Gradient evaluation took 4.6e-05 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.46 seconds.
+Chain 2: Adjust your expectations accordingly!
+Chain 2: 
+Chain 2: 
+Chain 2: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 2:          three stages of adaptation as currently configured.
+Chain 2:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 2:          the given number of warmup iterations:
+Chain 2:            init_buffer = 15
+Chain 2:            adapt_window = 75
+Chain 2:            term_buffer = 10
+Chain 2: 
+Chain 2: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 2: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 2: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 2: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 2: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 2: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 2: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 2: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 2: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 2: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 2: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 2: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 2: 
+Chain 2:  Elapsed Time: 0.030904 seconds (Warm-up)
+Chain 2:                0.029405 seconds (Sampling)
+Chain 2:                0.060309 seconds (Total)
+Chain 2: 
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 3).
+Chain 3: 
+Chain 3: Gradient evaluation took 5.8e-05 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.58 seconds.
+Chain 3: Adjust your expectations accordingly!
+Chain 3: 
+Chain 3: 
+Chain 3: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 3:          three stages of adaptation as currently configured.
+Chain 3:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 3:          the given number of warmup iterations:
+Chain 3:            init_buffer = 15
+Chain 3:            adapt_window = 75
+Chain 3:            term_buffer = 10
+Chain 3: 
+Chain 3: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 3: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 3: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 3: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 3: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 3: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 3: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 3: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 3: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 3: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 3: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 3: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 3: 
+Chain 3:  Elapsed Time: 0.027946 seconds (Warm-up)
+Chain 3:                0.02822 seconds (Sampling)
+Chain 3:                0.056166 seconds (Total)
+Chain 3: 
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 4).
+Chain 4: 
+Chain 4: Gradient evaluation took 4.6e-05 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.46 seconds.
+Chain 4: Adjust your expectations accordingly!
+Chain 4: 
+Chain 4: 
+Chain 4: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 4:          three stages of adaptation as currently configured.
+Chain 4:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 4:          the given number of warmup iterations:
+Chain 4:            init_buffer = 15
+Chain 4:            adapt_window = 75
+Chain 4:            term_buffer = 10
+Chain 4: 
+Chain 4: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 4: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 4: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 4: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 4: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 4: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 4: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 4: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 4: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 4: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 4: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 4: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 4: 
+Chain 4:  Elapsed Time: 0.028549 seconds (Warm-up)
+Chain 4:                0.028007 seconds (Sampling)
+Chain 4:                0.056556 seconds (Total)
+Chain 4: </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQnVsayBFZmZlY3RpdmUgU2FtcGxlcyBTaXplIChFU1MpIGlzIHRvbyBsb3csIGluZGljYXRpbmcgcG9zdGVyaW9yIG1lYW5zIGFuZCBtZWRpYW5zIG1heSBiZSB1bnJlbGlhYmxlLlxuUnVubmluZyB0aGUgY2hhaW5zIGZvciBtb3JlIGl0ZXJhdGlvbnMgbWF5IGhlbHAuIFNlZVxuaHR0cDovL21jLXN0YW4ub3JnL21pc2Mvd2FybmluZ3MuaHRtbCNidWxrLWVzc1RhaWwgRWZmZWN0aXZlIFNhbXBsZXMgU2l6ZSAoRVNTKSBpcyB0b28gbG93LCBpbmRpY2F0aW5nIHBvc3RlcmlvciB2YXJpYW5jZXMgYW5kIHRhaWwgcXVhbnRpbGVzIG1heSBiZSB1bnJlbGlhYmxlLlxuUnVubmluZyB0aGUgY2hhaW5zIGZvciBtb3JlIGl0ZXJhdGlvbnMgbWF5IGhlbHAuIFNlZVxuaHR0cDovL21jLXN0YW4ub3JnL21pc2Mvd2FybmluZ3MuaHRtbCN0YWlsLWVzc1xuIn0= -->
+<pre><code>Bulk Effective Samples Size (ESS) is too low, indicating posterior means and medians may be unreliable.
+Running the chains for more iterations may help. See
+http://mc-stan.org/misc/warnings.html#bulk-essTail Effective Samples Size (ESS) is too low, indicating posterior variances and tail quantiles may be unreliable.
+Running the chains for more iterations may help. See
+http://mc-stan.org/misc/warnings.html#tail-ess</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubEVMUEQyID0ga0ZvbGQoTW9kZWwyLCB0ZXN0SW5kaWNlcywgWClcbmBgYCJ9 -->
+<pre class="r"><code>lELPD2 = kFold(Model2, testIndices, X)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoic3RhcnRpbmcgd29ya2VyIHBpZD01MzA0NyBvbiBsb2NhbGhvc3Q6MTE1OTQgYXQgMTU6NDc6NDMuNTY5XG5zdGFydGluZyB3b3JrZXIgcGlkPTUzMDYxIG9uIGxvY2FsaG9zdDoxMTU5NCBhdCAxNTo0Nzo0My44NjdcbnN0YXJ0aW5nIHdvcmtlciBwaWQ9NTMwNzUgb24gbG9jYWxob3N0OjExNTk0IGF0IDE1OjQ3OjQ0LjIzMlxuc3RhcnRpbmcgd29ya2VyIHBpZD01MzA4OSBvbiBsb2NhbGhvc3Q6MTE1OTQgYXQgMTU6NDc6NDQuNjMwXG5cblNBTVBMSU5HIEZPUiBNT0RFTCAnbW9kZWxfMCcgTk9XIChDSEFJTiAxKS5cbkNoYWluIDE6IFJlamVjdGluZyBpbml0aWFsIHZhbHVlOlxuQ2hhaW4gMTogICBFcnJvciBldmFsdWF0aW5nIHRoZSBsb2cgcHJvYmFiaWxpdHkgYXQgdGhlIGluaXRpYWwgdmFsdWUuXG5DaGFpbiAxOiBFeGNlcHRpb246IHN0dWRlbnRfdF9scGRmOiBEZWdyZWVzIG9mIGZyZWVkb20gcGFyYW1ldGVyIGlzIC0wLjg4MDI3NywgYnV0IG11c3QgYmUgPiAwISAgKGluICdtb2RlbGFjN2EyMzJlNjM0NV9tb2RlbF8wJyBhdCBsaW5lIDE2KVxuXG5DaGFpbiAxOiBcbkNoYWluIDE6IEdyYWRpZW50IGV2YWx1YXRpb24gdG9vayAwLjAwMDQyMiBzZWNvbmRzXG5DaGFpbiAxOiAxMDAwIHRyYW5zaXRpb25zIHVzaW5nIDEwIGxlYXBmcm9nIHN0ZXBzIHBlciB0cmFuc2l0aW9uIHdvdWxkIHRha2UgNC4yMiBzZWNvbmRzLlxuQ2hhaW4gMTogQWRqdXN0IHlvdXIgZXhwZWN0YXRpb25zIGFjY29yZGluZ2x5IVxuQ2hhaW4gMTogXG5DaGFpbiAxOiBcbkNoYWluIDE6IFdBUk5JTkc6IFRoZXJlIGFyZW4ndCBlbm91Z2ggd2FybXVwIGl0ZXJhdGlvbnMgdG8gZml0IHRoZVxuQ2hhaW4gMTogICAgICAgICAgdGhyZWUgc3RhZ2VzIG9mIGFkYXB0YXRpb24gYXMgY3VycmVudGx5IGNvbmZpZ3VyZWQuXG5DaGFpbiAxOiAgICAgICAgICBSZWR1Y2luZyBlYWNoIGFkYXB0YXRpb24gc3RhZ2UgdG8gMTUlLzc1JS8xMCUgb2ZcbkNoYWluIDE6ICAgICAgICAgIHRoZSBnaXZlbiBudW1iZXIgb2Ygd2FybXVwIGl0ZXJhdGlvbnM6XG5DaGFpbiAxOiAgICAgICAgICAgIGluaXRfYnVmZmVyID0gMTVcbkNoYWluIDE6ICAgICAgICAgICAgYWRhcHRfd2luZG93ID0gNzVcbkNoYWluIDE6ICAgICAgICAgICAgdGVybV9idWZmZXIgPSAxMFxuQ2hhaW4gMTogXG5DaGFpbiAxOiBJdGVyYXRpb246ICAgMSAvIDIwMCBbICAwJV0gIChXYXJtdXApXG5DaGFpbiAxOiBJdGVyYXRpb246ICAyMCAvIDIwMCBbIDEwJV0gIChXYXJtdXApXG5cblNBTVBMSU5HIEZPUiBNT0RFTCAnbW9kZWxfMCcgTk9XIChDSEFJTiAyKS5cbkNoYWluIDI6IFxuQ2hhaW4gMjogR3JhZGllbnQgZXZhbHVhdGlvbiB0b29rIDAuMDAwNTIxIHNlY29uZHNcbkNoYWluIDI6IDEwMDAgdHJhbnNpdGlvbnMgdXNpbmcgMTAgbGVhcGZyb2cgc3RlcHMgcGVyIHRyYW5zaXRpb24gd291bGQgdGFrZSA1LjIxIHNlY29uZHMuXG5DaGFpbiAyOiBBZGp1c3QgeW91ciBleHBlY3RhdGlvbnMgYWNjb3JkaW5nbHkhXG5DaGFpbiAyOiBcbkNoYWluIDI6IFxuQ2hhaW4gMjogV0FSTklORzogVGhlcmUgYXJlbid0IGVub3VnaCB3YXJtdXAgaXRlcmF0aW9ucyB0byBmaXQgdGhlXG5DaGFpbiAyOiAgICAgICAgICB0aHJlZSBzdGFnZXMgb2YgYWRhcHRhdGlvbiBhcyBjdXJyZW50bHkgY29uZmlndXJlZC5cbkNoYWluIDI6ICAgICAgICAgIFJlZHVjaW5nIGVhY2ggYWRhcHRhdGlvbiBzdGFnZSB0byAxNSUvNzUlLzEwJSBvZlxuQ2hhaW4gMjogICAgICAgICAgdGhlIGdpdmVuIG51bWJlciBvZiB3YXJtdXAgaXRlcmF0aW9uczpcbkNoYWluIDI6ICAgICAgICAgICAgaW5pdF9idWZmZXIgPSAxNVxuQ2hhaW4gMjogICAgICAgICAgICBhZGFwdF93aW5kb3cgPSA3NVxuQ2hhaW4gMjogICAgICAgICAgICB0ZXJtX2J1ZmZlciA9IDEwXG5DaGFpbiAyOiBcbkNoYWluIDI6IEl0ZXJhdGlvbjogICAxIC8gMjAwIFsgIDAlXSAgKFdhcm11cClcbkNoYWluIDI6IEl0ZXJhdGlvbjogIDIwIC8gMjAwIFsgMTAlXSAgKFdhcm11cClcbkNoYWluIDE6IEl0ZXJhdGlvbjogIDQwIC8gMjAwIFsgMjAlXSAgKFdhcm11cClcblxuU0FNUExJTkcgRk9SIE1PREVMICdtb2RlbF8wJyBOT1cgKENIQUlOIDMpLlxuQ2hhaW4gMzogXG5DaGFpbiAzOiBHcmFkaWVudCBldmFsdWF0aW9uIHRvb2sgMC4wMDA0MjMgc2Vjb25kc1xuQ2hhaW4gMzogMTAwMCB0cmFuc2l0aW9ucyB1c2luZyAxMCBsZWFwZnJvZyBzdGVwcyBwZXIgdHJhbnNpdGlvbiB3b3VsZCB0YWtlIDQuMjMgc2Vjb25kcy5cbkNoYWluIDM6IEFkanVzdCB5b3VyIGV4cGVjdGF0aW9ucyBhY2NvcmRpbmdseSFcbkNoYWluIDM6IFxuQ2hhaW4gMzogXG5DaGFpbiAzOiBXQVJOSU5HOiBUaGVyZSBhcmVuJ3QgZW5vdWdoIHdhcm11cCBpdGVyYXRpb25zIHRvIGZpdCB0aGVcbkNoYWluIDM6ICAgICAgICAgIHRocmVlIHN0YWdlcyBvZiBhZGFwdGF0aW9uIGFzIGN1cnJlbnRseSBjb25maWd1cmVkLlxuQ2hhaW4gMzogICAgICAgICAgUmVkdWNpbmcgZWFjaCBhZGFwdGF0aW9uIHN0YWdlIHRvIDE1JS83NSUvMTAlIG9mXG5DaGFpbiAzOiAgICAgICAgICB0aGUgZ2l2ZW4gbnVtYmVyIG9mIHdhcm11cCBpdGVyYXRpb25zOlxuQ2hhaW4gMzogICAgICAgICAgICBpbml0X2J1ZmZlciA9IDE1XG5DaGFpbiAzOiAgICAgICAgICAgIGFkYXB0X3dpbmRvdyA9IDc1XG5DaGFpbiAzOiAgICAgICAgICAgIHRlcm1fYnVmZmVyID0gMTBcbkNoYWluIDM6IFxuQ2hhaW4gMzogSXRlcmF0aW9uOiAgIDEgLyAyMDAgWyAgMCVdICAoV2FybXVwKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAgMjAgLyAyMDAgWyAxMCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAgNDAgLyAyMDAgWyAyMCVdICAoV2FybXVwKVxuXG5TQU1QTElORyBGT1IgTU9ERUwgJ21vZGVsXzAnIE5PVyAoQ0hBSU4gNCkuXG5DaGFpbiA0OiBcbkNoYWluIDQ6IEdyYWRpZW50IGV2YWx1YXRpb24gdG9vayAwLjAwMDQyMSBzZWNvbmRzXG5DaGFpbiA0OiAxMDAwIHRyYW5zaXRpb25zIHVzaW5nIDEwIGxlYXBmcm9nIHN0ZXBzIHBlciB0cmFuc2l0aW9uIHdvdWxkIHRha2UgNC4yMSBzZWNvbmRzLlxuQ2hhaW4gNDogQWRqdXN0IHlvdXIgZXhwZWN0YXRpb25zIGFjY29yZGluZ2x5IVxuQ2hhaW4gNDogXG5DaGFpbiA0OiBcbkNoYWluIDQ6IFdBUk5JTkc6IFRoZXJlIGFyZW4ndCBlbm91Z2ggd2FybXVwIGl0ZXJhdGlvbnMgdG8gZml0IHRoZVxuQ2hhaW4gNDogICAgICAgICAgdGhyZWUgc3RhZ2VzIG9mIGFkYXB0YXRpb24gYXMgY3VycmVudGx5IGNvbmZpZ3VyZWQuXG5DaGFpbiA0OiAgICAgICAgICBSZWR1Y2luZyBlYWNoIGFkYXB0YXRpb24gc3RhZ2UgdG8gMTUlLzc1JS8xMCUgb2ZcbkNoYWluIDQ6ICAgICAgICAgIHRoZSBnaXZlbiBudW1iZXIgb2Ygd2FybXVwIGl0ZXJhdGlvbnM6XG5DaGFpbiA0OiAgICAgICAgICAgIGluaXRfYnVmZmVyID0gMTVcbkNoYWluIDQ6ICAgICAgICAgICAgYWRhcHRfd2luZG93ID0gNzVcbkNoYWluIDQ6ICAgICAgICAgICAgdGVybV9idWZmZXIgPSAxMFxuQ2hhaW4gNDogXG5DaGFpbiA0OiBJdGVyYXRpb246ICAgMSAvIDIwMCBbICAwJV0gIChXYXJtdXApXG5DaGFpbiAzOiBJdGVyYXRpb246ICA0MCAvIDIwMCBbIDIwJV0gIChXYXJtdXApXG5DaGFpbiAxOiBJdGVyYXRpb246ICA2MCAvIDIwMCBbIDMwJV0gIChXYXJtdXApXG5DaGFpbiA0OiBJdGVyYXRpb246ICAyMCAvIDIwMCBbIDEwJV0gIChXYXJtdXApXG5DaGFpbiAyOiBJdGVyYXRpb246ICA2MCAvIDIwMCBbIDMwJV0gIChXYXJtdXApXG5DaGFpbiAzOiBJdGVyYXRpb246ICA2MCAvIDIwMCBbIDMwJV0gIChXYXJtdXApXG5DaGFpbiAyOiBJdGVyYXRpb246ICA4MCAvIDIwMCBbIDQwJV0gIChXYXJtdXApXG5DaGFpbiA0OiBJdGVyYXRpb246ICA0MCAvIDIwMCBbIDIwJV0gIChXYXJtdXApXG5DaGFpbiAxOiBJdGVyYXRpb246ICA4MCAvIDIwMCBbIDQwJV0gIChXYXJtdXApXG5DaGFpbiAzOiBJdGVyYXRpb246ICA4MCAvIDIwMCBbIDQwJV0gIChXYXJtdXApXG5DaGFpbiAyOiBJdGVyYXRpb246IDEwMCAvIDIwMCBbIDUwJV0gIChXYXJtdXApXG5DaGFpbiAyOiBJdGVyYXRpb246IDEwMSAvIDIwMCBbIDUwJV0gIChTYW1wbGluZylcbkNoYWluIDQ6IEl0ZXJhdGlvbjogIDYwIC8gMjAwIFsgMzAlXSAgKFdhcm11cClcbkNoYWluIDM6IEl0ZXJhdGlvbjogMTAwIC8gMjAwIFsgNTAlXSAgKFdhcm11cClcbkNoYWluIDM6IEl0ZXJhdGlvbjogMTAxIC8gMjAwIFsgNTAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxMDAgLyAyMDAgWyA1MCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxMDEgLyAyMDAgWyA1MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAyOiBJdGVyYXRpb246IDEyMCAvIDIwMCBbIDYwJV0gIChTYW1wbGluZylcbkNoYWluIDM6IEl0ZXJhdGlvbjogMTIwIC8gMjAwIFsgNjAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gNDogSXRlcmF0aW9uOiAgODAgLyAyMDAgWyA0MCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAxNDAgLyAyMDAgWyA3MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAzOiBJdGVyYXRpb246IDE0MCAvIDIwMCBbIDcwJV0gIChTYW1wbGluZylcbkNoYWluIDE6IEl0ZXJhdGlvbjogMTIwIC8gMjAwIFsgNjAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAxNjAgLyAyMDAgWyA4MCVdICAoU2FtcGxpbmcpXG5DaGFpbiA0OiBJdGVyYXRpb246IDEwMCAvIDIwMCBbIDUwJV0gIChXYXJtdXApXG5DaGFpbiA0OiBJdGVyYXRpb246IDEwMSAvIDIwMCBbIDUwJV0gIChTYW1wbGluZylcbkNoYWluIDE6IEl0ZXJhdGlvbjogMTQwIC8gMjAwIFsgNzAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAxNjAgLyAyMDAgWyA4MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAyOiBJdGVyYXRpb246IDE4MCAvIDIwMCBbIDkwJV0gIChTYW1wbGluZylcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTIwIC8gMjAwIFsgNjAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxNjAgLyAyMDAgWyA4MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAzOiBJdGVyYXRpb246IDE4MCAvIDIwMCBbIDkwJV0gIChTYW1wbGluZylcbkNoYWluIDI6IEl0ZXJhdGlvbjogMjAwIC8gMjAwIFsxMDAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMjogXG5DaGFpbiAyOiAgRWxhcHNlZCBUaW1lOiAwLjU0NTY0NiBzZWNvbmRzIChXYXJtLXVwKVxuQ2hhaW4gMjogICAgICAgICAgICAgICAgMC43MTUzNzIgc2Vjb25kcyAoU2FtcGxpbmcpXG5DaGFpbiAyOiAgICAgICAgICAgICAgICAxLjI2MTAyIHNlY29uZHMgKFRvdGFsKVxuQ2hhaW4gMjogXG5DaGFpbiAxOiBJdGVyYXRpb246IDE4MCAvIDIwMCBbIDkwJV0gIChTYW1wbGluZylcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTQwIC8gMjAwIFsgNzAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAyMDAgLyAyMDAgWzEwMCVdICAoU2FtcGxpbmcpXG5DaGFpbiAzOiBcbkNoYWluIDM6ICBFbGFwc2VkIFRpbWU6IDAuNTAyMjk0IHNlY29uZHMgKFdhcm0tdXApXG5DaGFpbiAzOiAgICAgICAgICAgICAgICAwLjY1MjQ0MyBzZWNvbmRzIChTYW1wbGluZylcbkNoYWluIDM6ICAgICAgICAgICAgICAgIDEuMTU0NzQgc2Vjb25kcyAoVG90YWwpXG5DaGFpbiAzOiBcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTYwIC8gMjAwIFsgODAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAyMDAgLyAyMDAgWzEwMCVdICAoU2FtcGxpbmcpXG5DaGFpbiAxOiBcbkNoYWluIDE6ICBFbGFwc2VkIFRpbWU6IDAuNzQyMzk0IHNlY29uZHMgKFdhcm0tdXApXG5DaGFpbiAxOiAgICAgICAgICAgICAgICAwLjgxMjc3MSBzZWNvbmRzIChTYW1wbGluZylcbkNoYWluIDE6ICAgICAgICAgICAgICAgIDEuNTU1MTcgc2Vjb25kcyAoVG90YWwpXG5DaGFpbiAxOiBcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTgwIC8gMjAwIFsgOTAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gNDogSXRlcmF0aW9uOiAyMDAgLyAyMDAgWzEwMCVdICAoU2FtcGxpbmcpXG5DaGFpbiA0OiBcbkNoYWluIDQ6ICBFbGFwc2VkIFRpbWU6IDAuNzI0OTI4IHNlY29uZHMgKFdhcm0tdXApXG5DaGFpbiA0OiAgICAgICAgICAgICAgICAwLjgwOTU2MiBzZWNvbmRzIChTYW1wbGluZylcbkNoYWluIDQ6ICAgICAgICAgICAgICAgIDEuNTM0NDkgc2Vjb25kcyAoVG90YWwpXG5DaGFpbiA0OiBcbiJ9 -->
+<pre><code>starting worker pid=53047 on localhost:11594 at 15:47:43.569
+starting worker pid=53061 on localhost:11594 at 15:47:43.867
+starting worker pid=53075 on localhost:11594 at 15:47:44.232
+starting worker pid=53089 on localhost:11594 at 15:47:44.630
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 1).
+Chain 1: Rejecting initial value:
+Chain 1:   Error evaluating the log probability at the initial value.
+Chain 1: Exception: student_t_lpdf: Degrees of freedom parameter is -0.880277, but must be &gt; 0!  (in &#39;modelac7a232e6345_model_0&#39; at line 16)
+
+Chain 1: 
+Chain 1: Gradient evaluation took 0.000422 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 4.22 seconds.
+Chain 1: Adjust your expectations accordingly!
+Chain 1: 
+Chain 1: 
+Chain 1: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 1:          three stages of adaptation as currently configured.
+Chain 1:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 1:          the given number of warmup iterations:
+Chain 1:            init_buffer = 15
+Chain 1:            adapt_window = 75
+Chain 1:            term_buffer = 10
+Chain 1: 
+Chain 1: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 1: Iteration:  20 / 200 [ 10%]  (Warmup)
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 2).
+Chain 2: 
+Chain 2: Gradient evaluation took 0.000521 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 5.21 seconds.
+Chain 2: Adjust your expectations accordingly!
+Chain 2: 
+Chain 2: 
+Chain 2: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 2:          three stages of adaptation as currently configured.
+Chain 2:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 2:          the given number of warmup iterations:
+Chain 2:            init_buffer = 15
+Chain 2:            adapt_window = 75
+Chain 2:            term_buffer = 10
+Chain 2: 
+Chain 2: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 2: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 1: Iteration:  40 / 200 [ 20%]  (Warmup)
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 3).
+Chain 3: 
+Chain 3: Gradient evaluation took 0.000423 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 4.23 seconds.
+Chain 3: Adjust your expectations accordingly!
+Chain 3: 
+Chain 3: 
+Chain 3: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 3:          three stages of adaptation as currently configured.
+Chain 3:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 3:          the given number of warmup iterations:
+Chain 3:            init_buffer = 15
+Chain 3:            adapt_window = 75
+Chain 3:            term_buffer = 10
+Chain 3: 
+Chain 3: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 3: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 2: Iteration:  40 / 200 [ 20%]  (Warmup)
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 4).
+Chain 4: 
+Chain 4: Gradient evaluation took 0.000421 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 4.21 seconds.
+Chain 4: Adjust your expectations accordingly!
+Chain 4: 
+Chain 4: 
+Chain 4: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 4:          three stages of adaptation as currently configured.
+Chain 4:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 4:          the given number of warmup iterations:
+Chain 4:            init_buffer = 15
+Chain 4:            adapt_window = 75
+Chain 4:            term_buffer = 10
+Chain 4: 
+Chain 4: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 3: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 1: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 4: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 2: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 3: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 2: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 4: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 1: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 3: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 2: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 2: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 4: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 3: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 3: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 1: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 1: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 2: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 3: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 4: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 2: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 3: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 1: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 2: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 4: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 4: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 1: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 3: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 2: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 4: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 1: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 3: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 2: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 2: 
+Chain 2:  Elapsed Time: 0.545646 seconds (Warm-up)
+Chain 2:                0.715372 seconds (Sampling)
+Chain 2:                1.26102 seconds (Total)
+Chain 2: 
+Chain 1: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 4: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 3: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 3: 
+Chain 3:  Elapsed Time: 0.502294 seconds (Warm-up)
+Chain 3:                0.652443 seconds (Sampling)
+Chain 3:                1.15474 seconds (Total)
+Chain 3: 
+Chain 4: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 1: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 1: 
+Chain 1:  Elapsed Time: 0.742394 seconds (Warm-up)
+Chain 1:                0.812771 seconds (Sampling)
+Chain 1:                1.55517 seconds (Total)
+Chain 1: 
+Chain 4: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 4: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 4: 
+Chain 4:  Elapsed Time: 0.724928 seconds (Warm-up)
+Chain 4:                0.809562 seconds (Sampling)
+Chain 4:                1.53449 seconds (Total)
+Chain 4: </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiVGhlIGxhcmdlc3QgUi1oYXQgaXMgMS4yMiwgaW5kaWNhdGluZyBjaGFpbnMgaGF2ZSBub3QgbWl4ZWQuXG5SdW5uaW5nIHRoZSBjaGFpbnMgZm9yIG1vcmUgaXRlcmF0aW9ucyBtYXkgaGVscC4gU2VlXG5odHRwOi8vbWMtc3Rhbi5vcmcvbWlzYy93YXJuaW5ncy5odG1sI3ItaGF0QnVsayBFZmZlY3RpdmUgU2FtcGxlcyBTaXplIChFU1MpIGlzIHRvbyBsb3csIGluZGljYXRpbmcgcG9zdGVyaW9yIG1lYW5zIGFuZCBtZWRpYW5zIG1heSBiZSB1bnJlbGlhYmxlLlxuUnVubmluZyB0aGUgY2hhaW5zIGZvciBtb3JlIGl0ZXJhdGlvbnMgbWF5IGhlbHAuIFNlZVxuaHR0cDovL21jLXN0YW4ub3JnL21pc2Mvd2FybmluZ3MuaHRtbCNidWxrLWVzc1RhaWwgRWZmZWN0aXZlIFNhbXBsZXMgU2l6ZSAoRVNTKSBpcyB0b28gbG93LCBpbmRpY2F0aW5nIHBvc3RlcmlvciB2YXJpYW5jZXMgYW5kIHRhaWwgcXVhbnRpbGVzIG1heSBiZSB1bnJlbGlhYmxlLlxuUnVubmluZyB0aGUgY2hhaW5zIGZvciBtb3JlIGl0ZXJhdGlvbnMgbWF5IGhlbHAuIFNlZVxuaHR0cDovL21jLXN0YW4ub3JnL21pc2Mvd2FybmluZ3MuaHRtbCN0YWlsLWVzc1xuIn0= -->
+<pre><code>The largest R-hat is 1.22, indicating chains have not mixed.
+Running the chains for more iterations may help. See
+http://mc-stan.org/misc/warnings.html#r-hatBulk Effective Samples Size (ESS) is too low, indicating posterior means and medians may be unreliable.
+Running the chains for more iterations may help. See
+http://mc-stan.org/misc/warnings.html#bulk-essTail Effective Samples Size (ESS) is too low, indicating posterior variances and tail quantiles may be unreliable.
+Running the chains for more iterations may help. See
+http://mc-stan.org/misc/warnings.html#tail-ess</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoic3RhcnRpbmcgd29ya2VyIHBpZD01MzEyMiBvbiBsb2NhbGhvc3Q6MTE1OTQgYXQgMTU6NDg6MDkuNjY3XG5zdGFydGluZyB3b3JrZXIgcGlkPTUzMTM2IG9uIGxvY2FsaG9zdDoxMTU5NCBhdCAxNTo0ODowOS45NTRcbnN0YXJ0aW5nIHdvcmtlciBwaWQ9NTMxNTAgb24gbG9jYWxob3N0OjExNTk0IGF0IDE1OjQ4OjEwLjM5Nlxuc3RhcnRpbmcgd29ya2VyIHBpZD01MzE2NCBvbiBsb2NhbGhvc3Q6MTE1OTQgYXQgMTU6NDg6MTAuNjk1XG5cblNBTVBMSU5HIEZPUiBNT0RFTCAnbW9kZWxfMCcgTk9XIChDSEFJTiAxKS5cbkNoYWluIDE6IFxuQ2hhaW4gMTogR3JhZGllbnQgZXZhbHVhdGlvbiB0b29rIDAuMDAwNDM2IHNlY29uZHNcbkNoYWluIDE6IDEwMDAgdHJhbnNpdGlvbnMgdXNpbmcgMTAgbGVhcGZyb2cgc3RlcHMgcGVyIHRyYW5zaXRpb24gd291bGQgdGFrZSA0LjM2IHNlY29uZHMuXG5DaGFpbiAxOiBBZGp1c3QgeW91ciBleHBlY3RhdGlvbnMgYWNjb3JkaW5nbHkhXG5DaGFpbiAxOiBcbkNoYWluIDE6IFxuQ2hhaW4gMTogV0FSTklORzogVGhlcmUgYXJlbid0IGVub3VnaCB3YXJtdXAgaXRlcmF0aW9ucyB0byBmaXQgdGhlXG5DaGFpbiAxOiAgICAgICAgICB0aHJlZSBzdGFnZXMgb2YgYWRhcHRhdGlvbiBhcyBjdXJyZW50bHkgY29uZmlndXJlZC5cbkNoYWluIDE6ICAgICAgICAgIFJlZHVjaW5nIGVhY2ggYWRhcHRhdGlvbiBzdGFnZSB0byAxNSUvNzUlLzEwJSBvZlxuQ2hhaW4gMTogICAgICAgICAgdGhlIGdpdmVuIG51bWJlciBvZiB3YXJtdXAgaXRlcmF0aW9uczpcbkNoYWluIDE6ICAgICAgICAgICAgaW5pdF9idWZmZXIgPSAxNVxuQ2hhaW4gMTogICAgICAgICAgICBhZGFwdF93aW5kb3cgPSA3NVxuQ2hhaW4gMTogICAgICAgICAgICB0ZXJtX2J1ZmZlciA9IDEwXG5DaGFpbiAxOiBcbkNoYWluIDE6IEl0ZXJhdGlvbjogICAxIC8gMjAwIFsgIDAlXSAgKFdhcm11cClcblxuU0FNUExJTkcgRk9SIE1PREVMICdtb2RlbF8wJyBOT1cgKENIQUlOIDIpLlxuQ2hhaW4gMjogUmVqZWN0aW5nIGluaXRpYWwgdmFsdWU6XG5DaGFpbiAyOiAgIEVycm9yIGV2YWx1YXRpbmcgdGhlIGxvZyBwcm9iYWJpbGl0eSBhdCB0aGUgaW5pdGlhbCB2YWx1ZS5cbkNoYWluIDI6IEV4Y2VwdGlvbjogc3R1ZGVudF90X2xwZGY6IERlZ3JlZXMgb2YgZnJlZWRvbSBwYXJhbWV0ZXIgaXMgLTEuNDkwODEsIGJ1dCBtdXN0IGJlID4gMCEgIChpbiAnbW9kZWxhYzdhMjMyZTYzNDVfbW9kZWxfMCcgYXQgbGluZSAxNilcblxuQ2hhaW4gMjogXG5DaGFpbiAyOiBHcmFkaWVudCBldmFsdWF0aW9uIHRvb2sgMC4wMDA0MDQgc2Vjb25kc1xuQ2hhaW4gMjogMTAwMCB0cmFuc2l0aW9ucyB1c2luZyAxMCBsZWFwZnJvZyBzdGVwcyBwZXIgdHJhbnNpdGlvbiB3b3VsZCB0YWtlIDQuMDQgc2Vjb25kcy5cbkNoYWluIDI6IEFkanVzdCB5b3VyIGV4cGVjdGF0aW9ucyBhY2NvcmRpbmdseSFcbkNoYWluIDI6IFxuQ2hhaW4gMjogXG5DaGFpbiAyOiBXQVJOSU5HOiBUaGVyZSBhcmVuJ3QgZW5vdWdoIHdhcm11cCBpdGVyYXRpb25zIHRvIGZpdCB0aGVcbkNoYWluIDI6ICAgICAgICAgIHRocmVlIHN0YWdlcyBvZiBhZGFwdGF0aW9uIGFzIGN1cnJlbnRseSBjb25maWd1cmVkLlxuQ2hhaW4gMjogICAgICAgICAgUmVkdWNpbmcgZWFjaCBhZGFwdGF0aW9uIHN0YWdlIHRvIDE1JS83NSUvMTAlIG9mXG5DaGFpbiAyOiAgICAgICAgICB0aGUgZ2l2ZW4gbnVtYmVyIG9mIHdhcm11cCBpdGVyYXRpb25zOlxuQ2hhaW4gMjogICAgICAgICAgICBpbml0X2J1ZmZlciA9IDE1XG5DaGFpbiAyOiAgICAgICAgICAgIGFkYXB0X3dpbmRvdyA9IDc1XG5DaGFpbiAyOiAgICAgICAgICAgIHRlcm1fYnVmZmVyID0gMTBcbkNoYWluIDI6IFxuQ2hhaW4gMjogSXRlcmF0aW9uOiAgIDEgLyAyMDAgWyAgMCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAgMjAgLyAyMDAgWyAxMCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgMjAgLyAyMDAgWyAxMCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAgNDAgLyAyMDAgWyAyMCVdICAoV2FybXVwKVxuXG5TQU1QTElORyBGT1IgTU9ERUwgJ21vZGVsXzAnIE5PVyAoQ0hBSU4gMykuXG5DaGFpbiAzOiBSZWplY3RpbmcgaW5pdGlhbCB2YWx1ZTpcbkNoYWluIDM6ICAgRXJyb3IgZXZhbHVhdGluZyB0aGUgbG9nIHByb2JhYmlsaXR5IGF0IHRoZSBpbml0aWFsIHZhbHVlLlxuQ2hhaW4gMzogRXhjZXB0aW9uOiBzdHVkZW50X3RfbHBkZjogRGVncmVlcyBvZiBmcmVlZG9tIHBhcmFtZXRlciBpcyAtMC41MDMyNzYsIGJ1dCBtdXN0IGJlID4gMCEgIChpbiAnbW9kZWxhYzdhMjMyZTYzNDVfbW9kZWxfMCcgYXQgbGluZSAxNilcblxuQ2hhaW4gMzogUmVqZWN0aW5nIGluaXRpYWwgdmFsdWU6XG5DaGFpbiAzOiAgIEVycm9yIGV2YWx1YXRpbmcgdGhlIGxvZyBwcm9iYWJpbGl0eSBhdCB0aGUgaW5pdGlhbCB2YWx1ZS5cbkNoYWluIDM6IEV4Y2VwdGlvbjogc3R1ZGVudF90X2xwZGY6IERlZ3JlZXMgb2YgZnJlZWRvbSBwYXJhbWV0ZXIgaXMgLTAuMjc5MDIyLCBidXQgbXVzdCBiZSA+IDAhICAoaW4gJ21vZGVsYWM3YTIzMmU2MzQ1X21vZGVsXzAnIGF0IGxpbmUgMTYpXG5cbkNoYWluIDM6IFJlamVjdGluZyBpbml0aWFsIHZhbHVlOlxuQ2hhaW4gMzogICBFcnJvciBldmFsdWF0aW5nIHRoZSBsb2cgcHJvYmFiaWxpdHkgYXQgdGhlIGluaXRpYWwgdmFsdWUuXG5DaGFpbiAzOiBFeGNlcHRpb246IHN0dWRlbnRfdF9scGRmOiBEZWdyZWVzIG9mIGZyZWVkb20gcGFyYW1ldGVyIGlzIC0xLjU5NzI0LCBidXQgbXVzdCBiZSA+IDAhICAoaW4gJ21vZGVsYWM3YTIzMmU2MzQ1X21vZGVsXzAnIGF0IGxpbmUgMTYpXG5cbkNoYWluIDM6IFxuQ2hhaW4gMzogR3JhZGllbnQgZXZhbHVhdGlvbiB0b29rIDAuMDAwNDA1IHNlY29uZHNcbkNoYWluIDM6IDEwMDAgdHJhbnNpdGlvbnMgdXNpbmcgMTAgbGVhcGZyb2cgc3RlcHMgcGVyIHRyYW5zaXRpb24gd291bGQgdGFrZSA0LjA1IHNlY29uZHMuXG5DaGFpbiAzOiBBZGp1c3QgeW91ciBleHBlY3RhdGlvbnMgYWNjb3JkaW5nbHkhXG5DaGFpbiAzOiBcbkNoYWluIDM6IFxuQ2hhaW4gMzogV0FSTklORzogVGhlcmUgYXJlbid0IGVub3VnaCB3YXJtdXAgaXRlcmF0aW9ucyB0byBmaXQgdGhlXG5DaGFpbiAzOiAgICAgICAgICB0aHJlZSBzdGFnZXMgb2YgYWRhcHRhdGlvbiBhcyBjdXJyZW50bHkgY29uZmlndXJlZC5cbkNoYWluIDM6ICAgICAgICAgIFJlZHVjaW5nIGVhY2ggYWRhcHRhdGlvbiBzdGFnZSB0byAxNSUvNzUlLzEwJSBvZlxuQ2hhaW4gMzogICAgICAgICAgdGhlIGdpdmVuIG51bWJlciBvZiB3YXJtdXAgaXRlcmF0aW9uczpcbkNoYWluIDM6ICAgICAgICAgICAgaW5pdF9idWZmZXIgPSAxNVxuQ2hhaW4gMzogICAgICAgICAgICBhZGFwdF93aW5kb3cgPSA3NVxuQ2hhaW4gMzogICAgICAgICAgICB0ZXJtX2J1ZmZlciA9IDEwXG5DaGFpbiAzOiBcbkNoYWluIDM6IEl0ZXJhdGlvbjogICAxIC8gMjAwIFsgIDAlXSAgKFdhcm11cClcbkNoYWluIDE6IEl0ZXJhdGlvbjogIDQwIC8gMjAwIFsgMjAlXSAgKFdhcm11cClcbkNoYWluIDI6IEl0ZXJhdGlvbjogIDYwIC8gMjAwIFsgMzAlXSAgKFdhcm11cClcbkNoYWluIDM6IEl0ZXJhdGlvbjogIDIwIC8gMjAwIFsgMTAlXSAgKFdhcm11cClcblxuU0FNUExJTkcgRk9SIE1PREVMICdtb2RlbF8wJyBOT1cgKENIQUlOIDQpLlxuQ2hhaW4gNDogUmVqZWN0aW5nIGluaXRpYWwgdmFsdWU6XG5DaGFpbiA0OiAgIEVycm9yIGV2YWx1YXRpbmcgdGhlIGxvZyBwcm9iYWJpbGl0eSBhdCB0aGUgaW5pdGlhbCB2YWx1ZS5cbkNoYWluIDQ6IEV4Y2VwdGlvbjogc3R1ZGVudF90X2xwZGY6IERlZ3JlZXMgb2YgZnJlZWRvbSBwYXJhbWV0ZXIgaXMgLTAuMTIyNzQxLCBidXQgbXVzdCBiZSA+IDAhICAoaW4gJ21vZGVsYWM3YTIzMmU2MzQ1X21vZGVsXzAnIGF0IGxpbmUgMTYpXG5cbkNoYWluIDQ6IFJlamVjdGluZyBpbml0aWFsIHZhbHVlOlxuQ2hhaW4gNDogICBFcnJvciBldmFsdWF0aW5nIHRoZSBsb2cgcHJvYmFiaWxpdHkgYXQgdGhlIGluaXRpYWwgdmFsdWUuXG5DaGFpbiA0OiBFeGNlcHRpb246IHN0dWRlbnRfdF9scGRmOiBEZWdyZWVzIG9mIGZyZWVkb20gcGFyYW1ldGVyIGlzIC0wLjU5MTg3MiwgYnV0IG11c3QgYmUgPiAwISAgKGluICdtb2RlbGFjN2EyMzJlNjM0NV9tb2RlbF8wJyBhdCBsaW5lIDE2KVxuXG5DaGFpbiA0OiBcbkNoYWluIDQ6IEdyYWRpZW50IGV2YWx1YXRpb24gdG9vayAwLjAwMDQ1IHNlY29uZHNcbkNoYWluIDQ6IDEwMDAgdHJhbnNpdGlvbnMgdXNpbmcgMTAgbGVhcGZyb2cgc3RlcHMgcGVyIHRyYW5zaXRpb24gd291bGQgdGFrZSA0LjUgc2Vjb25kcy5cbkNoYWluIDQ6IEFkanVzdCB5b3VyIGV4cGVjdGF0aW9ucyBhY2NvcmRpbmdseSFcbkNoYWluIDQ6IFxuQ2hhaW4gNDogXG5DaGFpbiA0OiBXQVJOSU5HOiBUaGVyZSBhcmVuJ3QgZW5vdWdoIHdhcm11cCBpdGVyYXRpb25zIHRvIGZpdCB0aGVcbkNoYWluIDQ6ICAgICAgICAgIHRocmVlIHN0YWdlcyBvZiBhZGFwdGF0aW9uIGFzIGN1cnJlbnRseSBjb25maWd1cmVkLlxuQ2hhaW4gNDogICAgICAgICAgUmVkdWNpbmcgZWFjaCBhZGFwdGF0aW9uIHN0YWdlIHRvIDE1JS83NSUvMTAlIG9mXG5DaGFpbiA0OiAgICAgICAgICB0aGUgZ2l2ZW4gbnVtYmVyIG9mIHdhcm11cCBpdGVyYXRpb25zOlxuQ2hhaW4gNDogICAgICAgICAgICBpbml0X2J1ZmZlciA9IDE1XG5DaGFpbiA0OiAgICAgICAgICAgIGFkYXB0X3dpbmRvdyA9IDc1XG5DaGFpbiA0OiAgICAgICAgICAgIHRlcm1fYnVmZmVyID0gMTBcbkNoYWluIDQ6IFxuQ2hhaW4gNDogSXRlcmF0aW9uOiAgIDEgLyAyMDAgWyAgMCVdICAoV2FybXVwKVxuQ2hhaW4gNDogSXRlcmF0aW9uOiAgMjAgLyAyMDAgWyAxMCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAgODAgLyAyMDAgWyA0MCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgNjAgLyAyMDAgWyAzMCVdICAoV2FybXVwKVxuQ2hhaW4gNDogSXRlcmF0aW9uOiAgNDAgLyAyMDAgWyAyMCVdICAoV2FybXVwKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAgNDAgLyAyMDAgWyAyMCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAxMDAgLyAyMDAgWyA1MCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAxMDEgLyAyMDAgWyA1MCVdICAoU2FtcGxpbmcpXG5DaGFpbiBDaGFpbiAxOiBJdGVyYXRpb246ICA4MCAvIDIwMCBbIDQwJV0gIChXYXJtdXApXG40OiBJdGVyYXRpb246ICA2MCAvIDIwMCBbIDMwJV0gIChXYXJtdXApXG5DaGFpbiAxOiBJdGVyYXRpb246IDEwMCAvIDIwMCBbIDUwJV0gIChXYXJtdXApXG5DaGFpbiAxOiBJdGVyYXRpb246IDEwMSAvIDIwMCBbIDUwJV0gIChTYW1wbGluZylcbkNoYWluIDM6IEl0ZXJhdGlvbjogIDYwIC8gMjAwIFsgMzAlXSAgKFdhcm11cClcbkNoYWluIDI6IEl0ZXJhdGlvbjogMTIwIC8gMjAwIFsgNjAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gNDogSXRlcmF0aW9uOiAgODAgLyAyMDAgWyA0MCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxMjAgLyAyMDAgWyA2MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAzOiBJdGVyYXRpb246ICA4MCAvIDIwMCBbIDQwJV0gIChXYXJtdXApXG5DaGFpbiAyOiBJdGVyYXRpb246IDE0MCAvIDIwMCBbIDcwJV0gIChTYW1wbGluZylcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTAwIC8gMjAwIFsgNTAlXSAgKFdhcm11cClcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTAxIC8gMjAwIFsgNTAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAxMDAgLyAyMDAgWyA1MCVdICAoV2FybXVwKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAxMDEgLyAyMDAgWyA1MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAxOiBJdGVyYXRpb246IDE0MCAvIDIwMCBbIDcwJV0gIChTYW1wbGluZylcbkNoYWluIDI6IEl0ZXJhdGlvbjogMTYwIC8gMjAwIFsgODAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gNDogSXRlcmF0aW9uOiAxMjAgLyAyMDAgWyA2MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAxOiBJdGVyYXRpb246IDE2MCAvIDIwMCBbIDgwJV0gIChTYW1wbGluZylcbkNoYWluIDI6IEl0ZXJhdGlvbjogMTgwIC8gMjAwIFsgOTAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAxMjAgLyAyMDAgWyA2MCVdICAoU2FtcGxpbmcpXG5DaGFpbiA0OiBJdGVyYXRpb246IDE0MCAvIDIwMCBbIDcwJV0gIChTYW1wbGluZylcbkNoYWluIDM6IEl0ZXJhdGlvbjogMTQwIC8gMjAwIFsgNzAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAyMDAgLyAyMDAgWzEwMCVdICAoU2FtcGxpbmcpXG5DaGFpbiAyOiBcbkNoYWluIDI6ICBFbGFwc2VkIFRpbWU6IDAuNTgzNTA1IHNlY29uZHMgKFdhcm0tdXApXG5DaGFpbiAyOiAgICAgICAgICAgICAgICAwLjY5Mjg4MyBzZWNvbmRzIChTYW1wbGluZylcbkNoYWluIDI6ICAgICAgICAgICAgICAgIDEuMjc2Mzkgc2Vjb25kcyAoVG90YWwpXG5DaGFpbiAyOiBcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTYwIC8gMjAwIFsgODAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxODAgLyAyMDAgWyA5MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAzOiBJdGVyYXRpb246IDE2MCAvIDIwMCBbIDgwJV0gIChTYW1wbGluZylcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTgwIC8gMjAwIFsgOTAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAyMDAgLyAyMDAgWzEwMCVdICAoU2FtcGxpbmcpXG5DaGFpbiAxOiBcbkNoYWluIDE6ICBFbGFwc2VkIFRpbWU6IDAuNzI2MjYzIHNlY29uZHMgKFdhcm0tdXApXG5DaGFpbiAxOiAgICAgICAgICAgICAgICAwLjgwNDA2NCBzZWNvbmRzIChTYW1wbGluZylcbkNoYWluIDE6ICAgICAgICAgICAgICAgIDEuNTMwMzMgc2Vjb25kcyAoVG90YWwpXG5DaGFpbiAxOiBcbkNoYWluIDM6IEl0ZXJhdGlvbjogMTgwIC8gMjAwIFsgOTAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gNDogSXRlcmF0aW9uOiAyMDAgLyAyMDAgWzEwMCVdICAoU2FtcGxpbmcpXG5DaGFpbiA0OiBcbkNoYWluIDQ6ICBFbGFwc2VkIFRpbWU6IDAuNjA5NDY4IHNlY29uZHMgKFdhcm0tdXApXG5DaGFpbiA0OiAgICAgICAgICAgICAgICAwLjcxMDI2IHNlY29uZHMgKFNhbXBsaW5nKVxuQ2hhaW4gNDogICAgICAgICAgICAgICAgMS4zMTk3MyBzZWNvbmRzIChUb3RhbClcbkNoYWluIDQ6IFxuQ2hhaW4gMzogSXRlcmF0aW9uOiAyMDAgLyAyMDAgWzEwMCVdICAoU2FtcGxpbmcpXG5DaGFpbiAzOiBcbkNoYWluIDM6ICBFbGFwc2VkIFRpbWU6IDAuNzkzNDk3IHNlY29uZHMgKFdhcm0tdXApXG5DaGFpbiAzOiAgICAgICAgICAgICAgICAwLjY3NDQzOCBzZWNvbmRzIChTYW1wbGluZylcbkNoYWluIDM6ICAgICAgICAgICAgICAgIDEuNDY3OTMgc2Vjb25kcyAoVG90YWwpXG5DaGFpbiAzOiBcbiJ9 -->
+<pre><code>starting worker pid=53122 on localhost:11594 at 15:48:09.667
+starting worker pid=53136 on localhost:11594 at 15:48:09.954
+starting worker pid=53150 on localhost:11594 at 15:48:10.396
+starting worker pid=53164 on localhost:11594 at 15:48:10.695
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 1).
+Chain 1: 
+Chain 1: Gradient evaluation took 0.000436 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 4.36 seconds.
+Chain 1: Adjust your expectations accordingly!
+Chain 1: 
+Chain 1: 
+Chain 1: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 1:          three stages of adaptation as currently configured.
+Chain 1:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 1:          the given number of warmup iterations:
+Chain 1:            init_buffer = 15
+Chain 1:            adapt_window = 75
+Chain 1:            term_buffer = 10
+Chain 1: 
+Chain 1: Iteration:   1 / 200 [  0%]  (Warmup)
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 2).
+Chain 2: Rejecting initial value:
+Chain 2:   Error evaluating the log probability at the initial value.
+Chain 2: Exception: student_t_lpdf: Degrees of freedom parameter is -1.49081, but must be &gt; 0!  (in &#39;modelac7a232e6345_model_0&#39; at line 16)
+
+Chain 2: 
+Chain 2: Gradient evaluation took 0.000404 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 4.04 seconds.
+Chain 2: Adjust your expectations accordingly!
+Chain 2: 
+Chain 2: 
+Chain 2: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 2:          three stages of adaptation as currently configured.
+Chain 2:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 2:          the given number of warmup iterations:
+Chain 2:            init_buffer = 15
+Chain 2:            adapt_window = 75
+Chain 2:            term_buffer = 10
+Chain 2: 
+Chain 2: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 2: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 1: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 2: Iteration:  40 / 200 [ 20%]  (Warmup)
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 3).
+Chain 3: Rejecting initial value:
+Chain 3:   Error evaluating the log probability at the initial value.
+Chain 3: Exception: student_t_lpdf: Degrees of freedom parameter is -0.503276, but must be &gt; 0!  (in &#39;modelac7a232e6345_model_0&#39; at line 16)
+
+Chain 3: Rejecting initial value:
+Chain 3:   Error evaluating the log probability at the initial value.
+Chain 3: Exception: student_t_lpdf: Degrees of freedom parameter is -0.279022, but must be &gt; 0!  (in &#39;modelac7a232e6345_model_0&#39; at line 16)
+
+Chain 3: Rejecting initial value:
+Chain 3:   Error evaluating the log probability at the initial value.
+Chain 3: Exception: student_t_lpdf: Degrees of freedom parameter is -1.59724, but must be &gt; 0!  (in &#39;modelac7a232e6345_model_0&#39; at line 16)
+
+Chain 3: 
+Chain 3: Gradient evaluation took 0.000405 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 4.05 seconds.
+Chain 3: Adjust your expectations accordingly!
+Chain 3: 
+Chain 3: 
+Chain 3: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 3:          three stages of adaptation as currently configured.
+Chain 3:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 3:          the given number of warmup iterations:
+Chain 3:            init_buffer = 15
+Chain 3:            adapt_window = 75
+Chain 3:            term_buffer = 10
+Chain 3: 
+Chain 3: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 1: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 2: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 3: Iteration:  20 / 200 [ 10%]  (Warmup)
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 4).
+Chain 4: Rejecting initial value:
+Chain 4:   Error evaluating the log probability at the initial value.
+Chain 4: Exception: student_t_lpdf: Degrees of freedom parameter is -0.122741, but must be &gt; 0!  (in &#39;modelac7a232e6345_model_0&#39; at line 16)
+
+Chain 4: Rejecting initial value:
+Chain 4:   Error evaluating the log probability at the initial value.
+Chain 4: Exception: student_t_lpdf: Degrees of freedom parameter is -0.591872, but must be &gt; 0!  (in &#39;modelac7a232e6345_model_0&#39; at line 16)
+
+Chain 4: 
+Chain 4: Gradient evaluation took 0.00045 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 4.5 seconds.
+Chain 4: Adjust your expectations accordingly!
+Chain 4: 
+Chain 4: 
+Chain 4: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 4:          three stages of adaptation as currently configured.
+Chain 4:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 4:          the given number of warmup iterations:
+Chain 4:            init_buffer = 15
+Chain 4:            adapt_window = 75
+Chain 4:            term_buffer = 10
+Chain 4: 
+Chain 4: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 4: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 2: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 1: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 4: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 3: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 2: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 2: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain Chain 1: Iteration:  80 / 200 [ 40%]  (Warmup)
+4: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 1: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 1: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 3: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 2: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 4: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 1: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 3: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 2: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 4: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 4: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 3: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 3: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 1: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 2: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 4: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 1: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 2: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 3: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 4: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 3: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 2: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 2: 
+Chain 2:  Elapsed Time: 0.583505 seconds (Warm-up)
+Chain 2:                0.692883 seconds (Sampling)
+Chain 2:                1.27639 seconds (Total)
+Chain 2: 
+Chain 4: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 1: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 3: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 4: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 1: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 1: 
+Chain 1:  Elapsed Time: 0.726263 seconds (Warm-up)
+Chain 1:                0.804064 seconds (Sampling)
+Chain 1:                1.53033 seconds (Total)
+Chain 1: 
+Chain 3: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 4: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 4: 
+Chain 4:  Elapsed Time: 0.609468 seconds (Warm-up)
+Chain 4:                0.71026 seconds (Sampling)
+Chain 4:                1.31973 seconds (Total)
+Chain 4: 
+Chain 3: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 3: 
+Chain 3:  Elapsed Time: 0.793497 seconds (Warm-up)
+Chain 3:                0.674438 seconds (Sampling)
+Chain 3:                1.46793 seconds (Total)
+Chain 3: </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiVGhlIGxhcmdlc3QgUi1oYXQgaXMgMS4wNiwgaW5kaWNhdGluZyBjaGFpbnMgaGF2ZSBub3QgbWl4ZWQuXG5SdW5uaW5nIHRoZSBjaGFpbnMgZm9yIG1vcmUgaXRlcmF0aW9ucyBtYXkgaGVscC4gU2VlXG5odHRwOi8vbWMtc3Rhbi5vcmcvbWlzYy93YXJuaW5ncy5odG1sI3ItaGF0QnVsayBFZmZlY3RpdmUgU2FtcGxlcyBTaXplIChFU1MpIGlzIHRvbyBsb3csIGluZGljYXRpbmcgcG9zdGVyaW9yIG1lYW5zIGFuZCBtZWRpYW5zIG1heSBiZSB1bnJlbGlhYmxlLlxuUnVubmluZyB0aGUgY2hhaW5zIGZvciBtb3JlIGl0ZXJhdGlvbnMgbWF5IGhlbHAuIFNlZVxuaHR0cDovL21jLXN0YW4ub3JnL21pc2Mvd2FybmluZ3MuaHRtbCNidWxrLWVzc1RhaWwgRWZmZWN0aXZlIFNhbXBsZXMgU2l6ZSAoRVNTKSBpcyB0b28gbG93LCBpbmRpY2F0aW5nIHBvc3RlcmlvciB2YXJpYW5jZXMgYW5kIHRhaWwgcXVhbnRpbGVzIG1heSBiZSB1bnJlbGlhYmxlLlxuUnVubmluZyB0aGUgY2hhaW5zIGZvciBtb3JlIGl0ZXJhdGlvbnMgbWF5IGhlbHAuIFNlZVxuaHR0cDovL21jLXN0YW4ub3JnL21pc2Mvd2FybmluZ3MuaHRtbCN0YWlsLWVzc1xuIn0= -->
+<pre><code>The largest R-hat is 1.06, indicating chains have not mixed.
+Running the chains for more iterations may help. See
+http://mc-stan.org/misc/warnings.html#r-hatBulk Effective Samples Size (ESS) is too low, indicating posterior means and medians may be unreliable.
+Running the chains for more iterations may help. See
+http://mc-stan.org/misc/warnings.html#bulk-essTail Effective Samples Size (ESS) is too low, indicating posterior variances and tail quantiles may be unreliable.
+Running the chains for more iterations may help. See
+http://mc-stan.org/misc/warnings.html#tail-ess</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoic3RhcnRpbmcgd29ya2VyIHBpZD01MzE5MSBvbiBsb2NhbGhvc3Q6MTE1OTQgYXQgMTU6NDg6MzcuNjE0XG5zdGFydGluZyB3b3JrZXIgcGlkPTUzMjA1IG9uIGxvY2FsaG9zdDoxMTU5NCBhdCAxNTo0ODozOC4wNDdcbnN0YXJ0aW5nIHdvcmtlciBwaWQ9NTMyMTkgb24gbG9jYWxob3N0OjExNTk0IGF0IDE1OjQ4OjM4LjUzMlxuc3RhcnRpbmcgd29ya2VyIHBpZD01MzIzMyBvbiBsb2NhbGhvc3Q6MTE1OTQgYXQgMTU6NDg6MzguOTE2XG5cblNBTVBMSU5HIEZPUiBNT0RFTCAnbW9kZWxfMCcgTk9XIChDSEFJTiAxKS5cbkNoYWluIDE6IFxuQ2hhaW4gMTogR3JhZGllbnQgZXZhbHVhdGlvbiB0b29rIDAuMDAwNDE3IHNlY29uZHNcbkNoYWluIDE6IDEwMDAgdHJhbnNpdGlvbnMgdXNpbmcgMTAgbGVhcGZyb2cgc3RlcHMgcGVyIHRyYW5zaXRpb24gd291bGQgdGFrZSA0LjE3IHNlY29uZHMuXG5DaGFpbiAxOiBBZGp1c3QgeW91ciBleHBlY3RhdGlvbnMgYWNjb3JkaW5nbHkhXG5DaGFpbiAxOiBcbkNoYWluIDE6IFxuQ2hhaW4gMTogV0FSTklORzogVGhlcmUgYXJlbid0IGVub3VnaCB3YXJtdXAgaXRlcmF0aW9ucyB0byBmaXQgdGhlXG5DaGFpbiAxOiAgICAgICAgICB0aHJlZSBzdGFnZXMgb2YgYWRhcHRhdGlvbiBhcyBjdXJyZW50bHkgY29uZmlndXJlZC5cbkNoYWluIDE6ICAgICAgICAgIFJlZHVjaW5nIGVhY2ggYWRhcHRhdGlvbiBzdGFnZSB0byAxNSUvNzUlLzEwJSBvZlxuQ2hhaW4gMTogICAgICAgICAgdGhlIGdpdmVuIG51bWJlciBvZiB3YXJtdXAgaXRlcmF0aW9uczpcbkNoYWluIDE6ICAgICAgICAgICAgaW5pdF9idWZmZXIgPSAxNVxuQ2hhaW4gMTogICAgICAgICAgICBhZGFwdF93aW5kb3cgPSA3NVxuQ2hhaW4gMTogICAgICAgICAgICB0ZXJtX2J1ZmZlciA9IDEwXG5DaGFpbiAxOiBcbkNoYWluIDE6IEl0ZXJhdGlvbjogICAxIC8gMjAwIFsgIDAlXSAgKFdhcm11cClcbkNoYWluIDE6IEl0ZXJhdGlvbjogIDIwIC8gMjAwIFsgMTAlXSAgKFdhcm11cClcblxuU0FNUExJTkcgRk9SIE1PREVMICdtb2RlbF8wJyBOT1cgKENIQUlOIDIpLlxuQ2hhaW4gMjogUmVqZWN0aW5nIGluaXRpYWwgdmFsdWU6XG5DaGFpbiAyOiAgIEVycm9yIGV2YWx1YXRpbmcgdGhlIGxvZyBwcm9iYWJpbGl0eSBhdCB0aGUgaW5pdGlhbCB2YWx1ZS5cbkNoYWluIDI6IEV4Y2VwdGlvbjogc3R1ZGVudF90X2xwZGY6IERlZ3JlZXMgb2YgZnJlZWRvbSBwYXJhbWV0ZXIgaXMgLTEuMjU3NDYsIGJ1dCBtdXN0IGJlID4gMCEgIChpbiAnbW9kZWxhYzdhMjMyZTYzNDVfbW9kZWxfMCcgYXQgbGluZSAxNilcblxuQ2hhaW4gMjogUmVqZWN0aW5nIGluaXRpYWwgdmFsdWU6XG5DaGFpbiAyOiAgIEVycm9yIGV2YWx1YXRpbmcgdGhlIGxvZyBwcm9iYWJpbGl0eSBhdCB0aGUgaW5pdGlhbCB2YWx1ZS5cbkNoYWluIDI6IEV4Y2VwdGlvbjogc3R1ZGVudF90X2xwZGY6IERlZ3JlZXMgb2YgZnJlZWRvbSBwYXJhbWV0ZXIgaXMgLTEuNzkyMDUsIGJ1dCBtdXN0IGJlID4gMCEgIChpbiAnbW9kZWxhYzdhMjMyZTYzNDVfbW9kZWxfMCcgYXQgbGluZSAxNilcblxuQ2hhaW4gMjogXG5DaGFpbiAyOiBHcmFkaWVudCBldmFsdWF0aW9uIHRvb2sgMC4wMDA0NDkgc2Vjb25kc1xuQ2hhaW4gMjogMTAwMCB0cmFuc2l0aW9ucyB1c2luZyAxMCBsZWFwZnJvZyBzdGVwcyBwZXIgdHJhbnNpdGlvbiB3b3VsZCB0YWtlIDQuNDkgc2Vjb25kcy5cbkNoYWluIDI6IEFkanVzdCB5b3VyIGV4cGVjdGF0aW9ucyBhY2NvcmRpbmdseSFcbkNoYWluIDI6IFxuQ2hhaW4gMjogXG5DaGFpbiAyOiBXQVJOSU5HOiBUaGVyZSBhcmVuJ3QgZW5vdWdoIHdhcm11cCBpdGVyYXRpb25zIHRvIGZpdCB0aGVcbkNoYWluIDI6ICAgICAgICAgIHRocmVlIHN0YWdlcyBvZiBhZGFwdGF0aW9uIGFzIGN1cnJlbnRseSBjb25maWd1cmVkLlxuQ2hhaW4gMjogICAgICAgICAgUmVkdWNpbmcgZWFjaCBhZGFwdGF0aW9uIHN0YWdlIHRvIDE1JS83NSUvMTAlIG9mXG5DaGFpbiAyOiAgICAgICAgICB0aGUgZ2l2ZW4gbnVtYmVyIG9mIHdhcm11cCBpdGVyYXRpb25zOlxuQ2hhaW4gMjogICAgICAgICAgICBpbml0X2J1ZmZlciA9IDE1XG5DaGFpbiAyOiAgICAgICAgICAgIGFkYXB0X3dpbmRvdyA9IDc1XG5DaGFpbiAyOiAgICAgICAgICAgIHRlcm1fYnVmZmVyID0gMTBcbkNoYWluIDI6IFxuQ2hhaW4gMjogSXRlcmF0aW9uOiAgIDEgLyAyMDAgWyAgMCVdICAoV2FybXVwKVxuXG5TQU1QTElORyBGT1IgTU9ERUwgJ21vZGVsXzAnIE5PVyAoQ0hBSU4gMykuXG5DaGFpbiAzOiBcbkNoYWluIDM6IEdyYWRpZW50IGV2YWx1YXRpb24gdG9vayAwLjAwMDQwNCBzZWNvbmRzXG5DaGFpbiAzOiAxMDAwIHRyYW5zaXRpb25zIHVzaW5nIDEwIGxlYXBmcm9nIHN0ZXBzIHBlciB0cmFuc2l0aW9uIHdvdWxkIHRha2UgNC4wNCBzZWNvbmRzLlxuQ2hhaW4gMzogQWRqdXN0IHlvdXIgZXhwZWN0YXRpb25zIGFjY29yZGluZ2x5IVxuQ2hhaW4gMzogXG5DaGFpbiAzOiBcbkNoYWluIDM6IFdBUk5JTkc6IFRoZXJlIGFyZW4ndCBlbm91Z2ggd2FybXVwIGl0ZXJhdGlvbnMgdG8gZml0IHRoZVxuQ2hhaW4gMzogICAgICAgICAgdGhyZWUgc3RhZ2VzIG9mIGFkYXB0YXRpb24gYXMgY3VycmVudGx5IGNvbmZpZ3VyZWQuXG5DaGFpbiAzOiAgICAgICAgICBSZWR1Y2luZyBlYWNoIGFkYXB0YXRpb24gc3RhZ2UgdG8gMTUlLzc1JS8xMCUgb2ZcbkNoYWluIDM6ICAgICAgICAgIHRoZSBnaXZlbiBudW1iZXIgb2Ygd2FybXVwIGl0ZXJhdGlvbnM6XG5DaGFpbiAzOiAgICAgICAgICAgIGluaXRfYnVmZmVyID0gMTVcbkNoYWluIDM6ICAgICAgICAgICAgYWRhcHRfd2luZG93ID0gNzVcbkNoYWluIDM6ICAgICAgICAgICAgdGVybV9idWZmZXIgPSAxMFxuQ2hhaW4gMzogXG5DaGFpbiAzOiBJdGVyYXRpb246ICAgMSAvIDIwMCBbICAwJV0gIChXYXJtdXApXG5DaGFpbiAzOiBJdGVyYXRpb246ICAyMCAvIDIwMCBbIDEwJV0gIChXYXJtdXApXG5cblNBTVBMSU5HIEZPUiBNT0RFTCAnbW9kZWxfMCcgTk9XIChDSEFJTiA0KS5cbkNoYWluIDQ6IFJlamVjdGluZyBpbml0aWFsIHZhbHVlOlxuQ2hhaW4gNDogICBFcnJvciBldmFsdWF0aW5nIHRoZSBsb2cgcHJvYmFiaWxpdHkgYXQgdGhlIGluaXRpYWwgdmFsdWUuXG5DaGFpbiA0OiBFeGNlcHRpb246IHN0dWRlbnRfdF9scGRmOiBEZWdyZWVzIG9mIGZyZWVkb20gcGFyYW1ldGVyIGlzIC0xLjQ2Mzk0LCBidXQgbXVzdCBiZSA+IDAhICAoaW4gJ21vZGVsYWM3YTIzMmU2MzQ1X21vZGVsXzAnIGF0IGxpbmUgMTYpXG5cbkNoYWluIDQ6IFxuQ2hhaW4gNDogR3JhZGllbnQgZXZhbHVhdGlvbiB0b29rIDAuMDAwNDQyIHNlY29uZHNcbkNoYWluIDQ6IDEwMDAgdHJhbnNpdGlvbnMgdXNpbmcgMTAgbGVhcGZyb2cgc3RlcHMgcGVyIHRyYW5zaXRpb24gd291bGQgdGFrZSA0LjQyIHNlY29uZHMuXG5DaGFpbiA0OiBBZGp1c3QgeW91ciBleHBlY3RhdGlvbnMgYWNjb3JkaW5nbHkhXG5DaGFpbiA0OiBcbkNoYWluIDQ6IFxuQ2hhaW4gNDogV0FSTklORzogVGhlcmUgYXJlbid0IGVub3VnaCB3YXJtdXAgaXRlcmF0aW9ucyB0byBmaXQgdGhlXG5DaGFpbiA0OiAgICAgICAgICB0aHJlZSBzdGFnZXMgb2YgYWRhcHRhdGlvbiBhcyBjdXJyZW50bHkgY29uZmlndXJlZC5cbkNoYWluIDQ6ICAgICAgICAgIFJlZHVjaW5nIGVhY2ggYWRhcHRhdGlvbiBzdGFnZSB0byAxNSUvNzUlLzEwJSBvZlxuQ2hhaW4gNDogICAgICAgICAgdGhlIGdpdmVuIG51bWJlciBvZiB3YXJtdXAgaXRlcmF0aW9uczpcbkNoYWluIDQ6ICAgICAgICAgICAgaW5pdF9idWZmZXIgPSAxNVxuQ2hhaW4gNDogICAgICAgICAgICBhZGFwdF93aW5kb3cgPSA3NVxuQ2hhaW4gNDogICAgICAgICAgICB0ZXJtX2J1ZmZlciA9IDEwXG5DaGFpbiA0OiBcbkNoYWluIDQ6IEl0ZXJhdGlvbjogICAxIC8gMjAwIFsgIDAlXSAgKFdhcm11cClcbkNoYWluIENoYWluIDI6IEl0ZXJhdGlvbjogIDIwIC8gMjAwIFsgMTAlXSAgKFdhcm11cClcbjE6IEl0ZXJhdGlvbjogIDQwIC8gMjAwIFsgMjAlXSAgKFdhcm11cClcbkNoYWluIDQ6IEl0ZXJhdGlvbjogIDIwIC8gMjAwIFsgMTAlXSAgKFdhcm11cClcbkNoYWluIDQ6IEl0ZXJhdGlvbjogIDQwIC8gMjAwIFsgMjAlXSAgKFdhcm11cClcbkNoYWluIDE6IEl0ZXJhdGlvbjogIDYwIC8gMjAwIFsgMzAlXSAgKFdhcm11cClcbkNoYWluIDQ6IEl0ZXJhdGlvbjogIDYwIC8gMjAwIFsgMzAlXSAgKFdhcm11cClcbkNoYWluIDM6IEl0ZXJhdGlvbjogIDQwIC8gMjAwIFsgMjAlXSAgKFdhcm11cClcbkNoYWluIDI6IEl0ZXJhdGlvbjogIDQwIC8gMjAwIFsgMjAlXSAgKFdhcm11cClcbkNoYWluIDE6IEl0ZXJhdGlvbjogIDgwIC8gMjAwIFsgNDAlXSAgKFdhcm11cClcbkNoYWluIDQ6IEl0ZXJhdGlvbjogIDgwIC8gMjAwIFsgNDAlXSAgKFdhcm11cClcbkNoYWluIDI6IEl0ZXJhdGlvbjogIDYwIC8gMjAwIFsgMzAlXSAgKFdhcm11cClcbkNoYWluIDE6IEl0ZXJhdGlvbjogMTAwIC8gMjAwIFsgNTAlXSAgKFdhcm11cClcbkNoYWluIDE6IEl0ZXJhdGlvbjogMTAxIC8gMjAwIFsgNTAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAgNjAgLyAyMDAgWyAzMCVdICAoV2FybXVwKVxuQ2hhaW4gNDogSXRlcmF0aW9uOiAxMDAgLyAyMDAgWyA1MCVdICAoV2FybXVwKVxuQ2hhaW4gNDogSXRlcmF0aW9uOiAxMDEgLyAyMDAgWyA1MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAxOiBJdGVyYXRpb246IDEyMCAvIDIwMCBbIDYwJV0gIChTYW1wbGluZylcbkNoYWluIDI6IEl0ZXJhdGlvbjogIDgwIC8gMjAwIFsgNDAlXSAgKFdhcm11cClcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTIwIC8gMjAwIFsgNjAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAgODAgLyAyMDAgWyA0MCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxNDAgLyAyMDAgWyA3MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAyOiBJdGVyYXRpb246IDEwMCAvIDIwMCBbIDUwJV0gIChXYXJtdXApXG5DaGFpbiAyOiBJdGVyYXRpb246IDEwMSAvIDIwMCBbIDUwJV0gIChTYW1wbGluZylcbkNoYWluIDM6IEl0ZXJhdGlvbjogMTAwIC8gMjAwIFsgNTAlXSAgKFdhcm11cClcbkNoYWluIDM6IEl0ZXJhdGlvbjogMTAxIC8gMjAwIFsgNTAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxNjAgLyAyMDAgWyA4MCVdICAoU2FtcGxpbmcpXG5DaGFpbiA0OiBJdGVyYXRpb246IDE0MCAvIDIwMCBbIDcwJV0gIChTYW1wbGluZylcbkNoYWluIDI6IEl0ZXJhdGlvbjogMTIwIC8gMjAwIFsgNjAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxODAgLyAyMDAgWyA5MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAzOiBJdGVyYXRpb246IDEyMCAvIDIwMCBbIDYwJV0gIChTYW1wbGluZylcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTYwIC8gMjAwIFsgODAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAxNDAgLyAyMDAgWyA3MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAyOiBJdGVyYXRpb246IDE0MCAvIDIwMCBbIDcwJV0gIChTYW1wbGluZylcbkNoYWluIDE6IEl0ZXJhdGlvbjogMjAwIC8gMjAwIFsxMDAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMTogXG5DaGFpbiAxOiAgRWxhcHNlZCBUaW1lOiAwLjgxNDc0MSBzZWNvbmRzIChXYXJtLXVwKVxuQ2hhaW4gMTogICAgICAgICAgICAgICAgMC42NTYyOTcgc2Vjb25kcyAoU2FtcGxpbmcpXG5DaGFpbiAxOiAgICAgICAgICAgICAgICAxLjQ3MTA0IHNlY29uZHMgKFRvdGFsKVxuQ2hhaW4gMTogXG5DaGFpbiA0OiBJdGVyYXRpb246IDE4MCAvIDIwMCBbIDkwJV0gIChTYW1wbGluZylcbkNoYWluIDM6IEl0ZXJhdGlvbjogMTYwIC8gMjAwIFsgODAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAxNjAgLyAyMDAgWyA4MCVdICAoU2FtcGxpbmcpXG5DaGFpbiA0OiBJdGVyYXRpb246IDIwMCAvIDIwMCBbMTAwJV0gIChTYW1wbGluZylcbkNoYWluIDQ6IFxuQ2hhaW4gNDogIEVsYXBzZWQgVGltZTogMC41Mzk3MjEgc2Vjb25kcyAoV2FybS11cClcbkNoYWluIDQ6ICAgICAgICAgICAgICAgIDAuODEyODA5IHNlY29uZHMgKFNhbXBsaW5nKVxuQ2hhaW4gNDogICAgICAgICAgICAgICAgMS4zNTI1MyBzZWNvbmRzIChUb3RhbClcbkNoYWluIDQ6IFxuQ2hhaW4gMzogSXRlcmF0aW9uOiAxODAgLyAyMDAgWyA5MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAyOiBJdGVyYXRpb246IDE4MCAvIDIwMCBbIDkwJV0gIChTYW1wbGluZylcbkNoYWluIDM6IEl0ZXJhdGlvbjogMjAwIC8gMjAwIFsxMDAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMzogXG5DaGFpbiAzOiAgRWxhcHNlZCBUaW1lOiAwLjkxMzU3OSBzZWNvbmRzIChXYXJtLXVwKVxuQ2hhaW4gMzogICAgICAgICAgICAgICAgMC43MjIzOTQgc2Vjb25kcyAoU2FtcGxpbmcpXG5DaGFpbiAzOiAgICAgICAgICAgICAgICAxLjYzNTk3IHNlY29uZHMgKFRvdGFsKVxuQ2hhaW4gMzogXG5DaGFpbiAyOiBJdGVyYXRpb246IDIwMCAvIDIwMCBbMTAwJV0gIChTYW1wbGluZylcbkNoYWluIDI6IFxuQ2hhaW4gMjogIEVsYXBzZWQgVGltZTogMS4wNDQwNyBzZWNvbmRzIChXYXJtLXVwKVxuQ2hhaW4gMjogICAgICAgICAgICAgICAgMC43OTY1MTEgc2Vjb25kcyAoU2FtcGxpbmcpXG5DaGFpbiAyOiAgICAgICAgICAgICAgICAxLjg0MDU4IHNlY29uZHMgKFRvdGFsKVxuQ2hhaW4gMjogXG4ifQ== -->
+<pre><code>starting worker pid=53191 on localhost:11594 at 15:48:37.614
+starting worker pid=53205 on localhost:11594 at 15:48:38.047
+starting worker pid=53219 on localhost:11594 at 15:48:38.532
+starting worker pid=53233 on localhost:11594 at 15:48:38.916
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 1).
+Chain 1: 
+Chain 1: Gradient evaluation took 0.000417 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 4.17 seconds.
+Chain 1: Adjust your expectations accordingly!
+Chain 1: 
+Chain 1: 
+Chain 1: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 1:          three stages of adaptation as currently configured.
+Chain 1:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 1:          the given number of warmup iterations:
+Chain 1:            init_buffer = 15
+Chain 1:            adapt_window = 75
+Chain 1:            term_buffer = 10
+Chain 1: 
+Chain 1: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 1: Iteration:  20 / 200 [ 10%]  (Warmup)
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 2).
+Chain 2: Rejecting initial value:
+Chain 2:   Error evaluating the log probability at the initial value.
+Chain 2: Exception: student_t_lpdf: Degrees of freedom parameter is -1.25746, but must be &gt; 0!  (in &#39;modelac7a232e6345_model_0&#39; at line 16)
+
+Chain 2: Rejecting initial value:
+Chain 2:   Error evaluating the log probability at the initial value.
+Chain 2: Exception: student_t_lpdf: Degrees of freedom parameter is -1.79205, but must be &gt; 0!  (in &#39;modelac7a232e6345_model_0&#39; at line 16)
+
+Chain 2: 
+Chain 2: Gradient evaluation took 0.000449 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 4.49 seconds.
+Chain 2: Adjust your expectations accordingly!
+Chain 2: 
+Chain 2: 
+Chain 2: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 2:          three stages of adaptation as currently configured.
+Chain 2:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 2:          the given number of warmup iterations:
+Chain 2:            init_buffer = 15
+Chain 2:            adapt_window = 75
+Chain 2:            term_buffer = 10
+Chain 2: 
+Chain 2: Iteration:   1 / 200 [  0%]  (Warmup)
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 3).
+Chain 3: 
+Chain 3: Gradient evaluation took 0.000404 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 4.04 seconds.
+Chain 3: Adjust your expectations accordingly!
+Chain 3: 
+Chain 3: 
+Chain 3: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 3:          three stages of adaptation as currently configured.
+Chain 3:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 3:          the given number of warmup iterations:
+Chain 3:            init_buffer = 15
+Chain 3:            adapt_window = 75
+Chain 3:            term_buffer = 10
+Chain 3: 
+Chain 3: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 3: Iteration:  20 / 200 [ 10%]  (Warmup)
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 4).
+Chain 4: Rejecting initial value:
+Chain 4:   Error evaluating the log probability at the initial value.
+Chain 4: Exception: student_t_lpdf: Degrees of freedom parameter is -1.46394, but must be &gt; 0!  (in &#39;modelac7a232e6345_model_0&#39; at line 16)
+
+Chain 4: 
+Chain 4: Gradient evaluation took 0.000442 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 4.42 seconds.
+Chain 4: Adjust your expectations accordingly!
+Chain 4: 
+Chain 4: 
+Chain 4: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 4:          three stages of adaptation as currently configured.
+Chain 4:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 4:          the given number of warmup iterations:
+Chain 4:            init_buffer = 15
+Chain 4:            adapt_window = 75
+Chain 4:            term_buffer = 10
+Chain 4: 
+Chain 4: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain Chain 2: Iteration:  20 / 200 [ 10%]  (Warmup)
+1: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 4: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 4: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 1: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 4: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 3: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 2: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 1: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 4: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 2: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 1: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 1: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 3: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 4: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 4: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 1: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 2: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 4: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 3: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 1: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 2: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 2: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 3: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 3: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 1: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 4: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 2: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 1: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 3: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 4: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 3: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 2: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 1: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 1: 
+Chain 1:  Elapsed Time: 0.814741 seconds (Warm-up)
+Chain 1:                0.656297 seconds (Sampling)
+Chain 1:                1.47104 seconds (Total)
+Chain 1: 
+Chain 4: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 3: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 2: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 4: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 4: 
+Chain 4:  Elapsed Time: 0.539721 seconds (Warm-up)
+Chain 4:                0.812809 seconds (Sampling)
+Chain 4:                1.35253 seconds (Total)
+Chain 4: 
+Chain 3: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 2: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 3: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 3: 
+Chain 3:  Elapsed Time: 0.913579 seconds (Warm-up)
+Chain 3:                0.722394 seconds (Sampling)
+Chain 3:                1.63597 seconds (Total)
+Chain 3: 
+Chain 2: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 2: 
+Chain 2:  Elapsed Time: 1.04407 seconds (Warm-up)
+Chain 2:                0.796511 seconds (Sampling)
+Chain 2:                1.84058 seconds (Total)
+Chain 2: </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiVGhlIGxhcmdlc3QgUi1oYXQgaXMgMS4wOSwgaW5kaWNhdGluZyBjaGFpbnMgaGF2ZSBub3QgbWl4ZWQuXG5SdW5uaW5nIHRoZSBjaGFpbnMgZm9yIG1vcmUgaXRlcmF0aW9ucyBtYXkgaGVscC4gU2VlXG5odHRwOi8vbWMtc3Rhbi5vcmcvbWlzYy93YXJuaW5ncy5odG1sI3ItaGF0QnVsayBFZmZlY3RpdmUgU2FtcGxlcyBTaXplIChFU1MpIGlzIHRvbyBsb3csIGluZGljYXRpbmcgcG9zdGVyaW9yIG1lYW5zIGFuZCBtZWRpYW5zIG1heSBiZSB1bnJlbGlhYmxlLlxuUnVubmluZyB0aGUgY2hhaW5zIGZvciBtb3JlIGl0ZXJhdGlvbnMgbWF5IGhlbHAuIFNlZVxuaHR0cDovL21jLXN0YW4ub3JnL21pc2Mvd2FybmluZ3MuaHRtbCNidWxrLWVzc1RhaWwgRWZmZWN0aXZlIFNhbXBsZXMgU2l6ZSAoRVNTKSBpcyB0b28gbG93LCBpbmRpY2F0aW5nIHBvc3RlcmlvciB2YXJpYW5jZXMgYW5kIHRhaWwgcXVhbnRpbGVzIG1heSBiZSB1bnJlbGlhYmxlLlxuUnVubmluZyB0aGUgY2hhaW5zIGZvciBtb3JlIGl0ZXJhdGlvbnMgbWF5IGhlbHAuIFNlZVxuaHR0cDovL21jLXN0YW4ub3JnL21pc2Mvd2FybmluZ3MuaHRtbCN0YWlsLWVzc1xuIn0= -->
+<pre><code>The largest R-hat is 1.09, indicating chains have not mixed.
+Running the chains for more iterations may help. See
+http://mc-stan.org/misc/warnings.html#r-hatBulk Effective Samples Size (ESS) is too low, indicating posterior means and medians may be unreliable.
+Running the chains for more iterations may help. See
+http://mc-stan.org/misc/warnings.html#bulk-essTail Effective Samples Size (ESS) is too low, indicating posterior variances and tail quantiles may be unreliable.
+Running the chains for more iterations may help. See
+http://mc-stan.org/misc/warnings.html#tail-ess</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoic3RhcnRpbmcgd29ya2VyIHBpZD01MzI4MiBvbiBsb2NhbGhvc3Q6MTE1OTQgYXQgMTU6NDk6MTIuNjMxXG5zdGFydGluZyB3b3JrZXIgcGlkPTUzMjk2IG9uIGxvY2FsaG9zdDoxMTU5NCBhdCAxNTo0OToxMi45NDlcbnN0YXJ0aW5nIHdvcmtlciBwaWQ9NTMzMTAgb24gbG9jYWxob3N0OjExNTk0IGF0IDE1OjQ5OjEzLjI3OVxuc3RhcnRpbmcgd29ya2VyIHBpZD01MzMyNCBvbiBsb2NhbGhvc3Q6MTE1OTQgYXQgMTU6NDk6MTMuNjM1XG5cblNBTVBMSU5HIEZPUiBNT0RFTCAnbW9kZWxfMCcgTk9XIChDSEFJTiAxKS5cbkNoYWluIDE6IFJlamVjdGluZyBpbml0aWFsIHZhbHVlOlxuQ2hhaW4gMTogICBFcnJvciBldmFsdWF0aW5nIHRoZSBsb2cgcHJvYmFiaWxpdHkgYXQgdGhlIGluaXRpYWwgdmFsdWUuXG5DaGFpbiAxOiBFeGNlcHRpb246IHN0dWRlbnRfdF9scGRmOiBEZWdyZWVzIG9mIGZyZWVkb20gcGFyYW1ldGVyIGlzIC0wLjA3ODAwMzcsIGJ1dCBtdXN0IGJlID4gMCEgIChpbiAnbW9kZWxhYzdhMjMyZTYzNDVfbW9kZWxfMCcgYXQgbGluZSAxNilcblxuQ2hhaW4gMTogUmVqZWN0aW5nIGluaXRpYWwgdmFsdWU6XG5DaGFpbiAxOiAgIEVycm9yIGV2YWx1YXRpbmcgdGhlIGxvZyBwcm9iYWJpbGl0eSBhdCB0aGUgaW5pdGlhbCB2YWx1ZS5cbkNoYWluIDE6IEV4Y2VwdGlvbjogc3R1ZGVudF90X2xwZGY6IERlZ3JlZXMgb2YgZnJlZWRvbSBwYXJhbWV0ZXIgaXMgLTAuMTIzNjExLCBidXQgbXVzdCBiZSA+IDAhICAoaW4gJ21vZGVsYWM3YTIzMmU2MzQ1X21vZGVsXzAnIGF0IGxpbmUgMTYpXG5cbkNoYWluIDE6IFJlamVjdGluZyBpbml0aWFsIHZhbHVlOlxuQ2hhaW4gMTogICBFcnJvciBldmFsdWF0aW5nIHRoZSBsb2cgcHJvYmFiaWxpdHkgYXQgdGhlIGluaXRpYWwgdmFsdWUuXG5DaGFpbiAxOiBFeGNlcHRpb246IHN0dWRlbnRfdF9scGRmOiBEZWdyZWVzIG9mIGZyZWVkb20gcGFyYW1ldGVyIGlzIC0xLjk0NDI4LCBidXQgbXVzdCBiZSA+IDAhICAoaW4gJ21vZGVsYWM3YTIzMmU2MzQ1X21vZGVsXzAnIGF0IGxpbmUgMTYpXG5cbkNoYWluIDE6IFxuQ2hhaW4gMTogR3JhZGllbnQgZXZhbHVhdGlvbiB0b29rIDAuMDAwMzk5IHNlY29uZHNcbkNoYWluIDE6IDEwMDAgdHJhbnNpdGlvbnMgdXNpbmcgMTAgbGVhcGZyb2cgc3RlcHMgcGVyIHRyYW5zaXRpb24gd291bGQgdGFrZSAzLjk5IHNlY29uZHMuXG5DaGFpbiAxOiBBZGp1c3QgeW91ciBleHBlY3RhdGlvbnMgYWNjb3JkaW5nbHkhXG5DaGFpbiAxOiBcbkNoYWluIDE6IFxuQ2hhaW4gMTogV0FSTklORzogVGhlcmUgYXJlbid0IGVub3VnaCB3YXJtdXAgaXRlcmF0aW9ucyB0byBmaXQgdGhlXG5DaGFpbiAxOiAgICAgICAgICB0aHJlZSBzdGFnZXMgb2YgYWRhcHRhdGlvbiBhcyBjdXJyZW50bHkgY29uZmlndXJlZC5cbkNoYWluIDE6ICAgICAgICAgIFJlZHVjaW5nIGVhY2ggYWRhcHRhdGlvbiBzdGFnZSB0byAxNSUvNzUlLzEwJSBvZlxuQ2hhaW4gMTogICAgICAgICAgdGhlIGdpdmVuIG51bWJlciBvZiB3YXJtdXAgaXRlcmF0aW9uczpcbkNoYWluIDE6ICAgICAgICAgICAgaW5pdF9idWZmZXIgPSAxNVxuQ2hhaW4gMTogICAgICAgICAgICBhZGFwdF93aW5kb3cgPSA3NVxuQ2hhaW4gMTogICAgICAgICAgICB0ZXJtX2J1ZmZlciA9IDEwXG5DaGFpbiAxOiBcbkNoYWluIDE6IEl0ZXJhdGlvbjogICAxIC8gMjAwIFsgIDAlXSAgKFdhcm11cClcblxuU0FNUExJTkcgRk9SIE1PREVMICdtb2RlbF8wJyBOT1cgKENIQUlOIDIpLlxuQ2hhaW4gMjogUmVqZWN0aW5nIGluaXRpYWwgdmFsdWU6XG5DaGFpbiAyOiAgIEVycm9yIGV2YWx1YXRpbmcgdGhlIGxvZyBwcm9iYWJpbGl0eSBhdCB0aGUgaW5pdGlhbCB2YWx1ZS5cbkNoYWluIDI6IEV4Y2VwdGlvbjogc3R1ZGVudF90X2xwZGY6IERlZ3JlZXMgb2YgZnJlZWRvbSBwYXJhbWV0ZXIgaXMgLTAuNzM1NzM4LCBidXQgbXVzdCBiZSA+IDAhICAoaW4gJ21vZGVsYWM3YTIzMmU2MzQ1X21vZGVsXzAnIGF0IGxpbmUgMTYpXG5cbkNoYWluIDI6IFJlamVjdGluZyBpbml0aWFsIHZhbHVlOlxuQ2hhaW4gMjogICBFcnJvciBldmFsdWF0aW5nIHRoZSBsb2cgcHJvYmFiaWxpdHkgYXQgdGhlIGluaXRpYWwgdmFsdWUuXG5DaGFpbiAyOiBFeGNlcHRpb246IHN0dWRlbnRfdF9scGRmOiBEZWdyZWVzIG9mIGZyZWVkb20gcGFyYW1ldGVyIGlzIC0wLjE2OTU3MywgYnV0IG11c3QgYmUgPiAwISAgKGluICdtb2RlbGFjN2EyMzJlNjM0NV9tb2RlbF8wJyBhdCBsaW5lIDE2KVxuXG5DaGFpbiAyOiBcbkNoYWluIDI6IEdyYWRpZW50IGV2YWx1YXRpb24gdG9vayAwLjAwMDQzMiBzZWNvbmRzXG5DaGFpbiAyOiAxMDAwIHRyYW5zaXRpb25zIHVzaW5nIDEwIGxlYXBmcm9nIHN0ZXBzIHBlciB0cmFuc2l0aW9uIHdvdWxkIHRha2UgNC4zMiBzZWNvbmRzLlxuQ2hhaW4gMjogQWRqdXN0IHlvdXIgZXhwZWN0YXRpb25zIGFjY29yZGluZ2x5IVxuQ2hhaW4gMjogXG5DaGFpbiAyOiBcbkNoYWluIDI6IFdBUk5JTkc6IFRoZXJlIGFyZW4ndCBlbm91Z2ggd2FybXVwIGl0ZXJhdGlvbnMgdG8gZml0IHRoZVxuQ2hhaW4gMjogICAgICAgICAgdGhyZWUgc3RhZ2VzIG9mIGFkYXB0YXRpb24gYXMgY3VycmVudGx5IGNvbmZpZ3VyZWQuXG5DaGFpbiAyOiAgICAgICAgICBSZWR1Y2luZyBlYWNoIGFkYXB0YXRpb24gc3RhZ2UgdG8gMTUlLzc1JS8xMCUgb2ZcbkNoYWluIDI6ICAgICAgICAgIHRoZSBnaXZlbiBudW1iZXIgb2Ygd2FybXVwIGl0ZXJhdGlvbnM6XG5DaGFpbiAyOiAgICAgICAgICAgIGluaXRfYnVmZmVyID0gMTVcbkNoYWluIDI6ICAgICAgICAgICAgYWRhcHRfd2luZG93ID0gNzVcbkNoYWluIDI6ICAgICAgICAgICAgdGVybV9idWZmZXIgPSAxMFxuQ2hhaW4gMjogXG5DaGFpbiAyOiBJdGVyYXRpb246ICAgMSAvIDIwMCBbICAwJV0gIChXYXJtdXApXG5DaGFpbiAyOiBJdGVyYXRpb246ICAyMCAvIDIwMCBbIDEwJV0gIChXYXJtdXApXG5DaGFpbiAxOiBJdGVyYXRpb246ICAyMCAvIDIwMCBbIDEwJV0gIChXYXJtdXApXG5cblNBTVBMSU5HIEZPUiBNT0RFTCAnbW9kZWxfMCcgTk9XIChDSEFJTiAzKS5cbkNoYWluIDM6IFJlamVjdGluZyBpbml0aWFsIHZhbHVlOlxuQ2hhaW4gMzogICBFcnJvciBldmFsdWF0aW5nIHRoZSBsb2cgcHJvYmFiaWxpdHkgYXQgdGhlIGluaXRpYWwgdmFsdWUuXG5DaGFpbiAzOiBFeGNlcHRpb246IHN0dWRlbnRfdF9scGRmOiBEZWdyZWVzIG9mIGZyZWVkb20gcGFyYW1ldGVyIGlzIC0wLjEwODAyLCBidXQgbXVzdCBiZSA+IDAhICAoaW4gJ21vZGVsYWM3YTIzMmU2MzQ1X21vZGVsXzAnIGF0IGxpbmUgMTYpXG5cbkNoYWluIDM6IFxuQ2hhaW4gMzogR3JhZGllbnQgZXZhbHVhdGlvbiB0b29rIDAuMDAwNDExIHNlY29uZHNcbkNoYWluIDM6IDEwMDAgdHJhbnNpdGlvbnMgdXNpbmcgMTAgbGVhcGZyb2cgc3RlcHMgcGVyIHRyYW5zaXRpb24gd291bGQgdGFrZSA0LjExIHNlY29uZHMuXG5DaGFpbiAzOiBBZGp1c3QgeW91ciBleHBlY3RhdGlvbnMgYWNjb3JkaW5nbHkhXG5DaGFpbiAzOiBcbkNoYWluIDM6IFxuQ2hhaW4gMzogV0FSTklORzogVGhlcmUgYXJlbid0IGVub3VnaCB3YXJtdXAgaXRlcmF0aW9ucyB0byBmaXQgdGhlXG5DaGFpbiAzOiAgICAgICAgICB0aHJlZSBzdGFnZXMgb2YgYWRhcHRhdGlvbiBhcyBjdXJyZW50bHkgY29uZmlndXJlZC5cbkNoYWluIDM6ICAgICAgICAgIFJlZHVjaW5nIGVhY2ggYWRhcHRhdGlvbiBzdGFnZSB0byAxNSUvNzUlLzEwJSBvZlxuQ2hhaW4gMzogICAgICAgICAgdGhlIGdpdmVuIG51bWJlciBvZiB3YXJtdXAgaXRlcmF0aW9uczpcbkNoYWluIDM6ICAgICAgICAgICAgaW5pdF9idWZmZXIgPSAxNVxuQ2hhaW4gMzogICAgICAgICAgICBhZGFwdF93aW5kb3cgPSA3NVxuQ2hhaW4gMzogICAgICAgICAgICB0ZXJtX2J1ZmZlciA9IDEwXG5DaGFpbiAzOiBcbkNoYWluIDM6IEl0ZXJhdGlvbjogICAxIC8gMjAwIFsgIDAlXSAgKFdhcm11cClcbkNoYWluIDM6IEl0ZXJhdGlvbjogIDIwIC8gMjAwIFsgMTAlXSAgKFdhcm11cClcbkNoYWluIDI6IEl0ZXJhdGlvbjogIDQwIC8gMjAwIFsgMjAlXSAgKFdhcm11cClcblxuU0FNUExJTkcgRk9SIE1PREVMICdtb2RlbF8wJyBOT1cgKENIQUlOIDQpLlxuQ2hhaW4gNDogUmVqZWN0aW5nIGluaXRpYWwgdmFsdWU6XG5DaGFpbiA0OiAgIEVycm9yIGV2YWx1YXRpbmcgdGhlIGxvZyBwcm9iYWJpbGl0eSBhdCB0aGUgaW5pdGlhbCB2YWx1ZS5cbkNoYWluIDQ6IEV4Y2VwdGlvbjogc3R1ZGVudF90X2xwZGY6IERlZ3JlZXMgb2YgZnJlZWRvbSBwYXJhbWV0ZXIgaXMgLTEuMzY4NDQsIGJ1dCBtdXN0IGJlID4gMCEgIChpbiAnbW9kZWxhYzdhMjMyZTYzNDVfbW9kZWxfMCcgYXQgbGluZSAxNilcblxuQ2hhaW4gNDogUmVqZWN0aW5nIGluaXRpYWwgdmFsdWU6XG5DaGFpbiA0OiAgIEVycm9yIGV2YWx1YXRpbmcgdGhlIGxvZyBwcm9iYWJpbGl0eSBhdCB0aGUgaW5pdGlhbCB2YWx1ZS5cbkNoYWluIDQ6IEV4Y2VwdGlvbjogc3R1ZGVudF90X2xwZGY6IERlZ3JlZXMgb2YgZnJlZWRvbSBwYXJhbWV0ZXIgaXMgLTAuMDgxMTI2NiwgYnV0IG11c3QgYmUgPiAwISAgKGluICdtb2RlbGFjN2EyMzJlNjM0NV9tb2RlbF8wJyBhdCBsaW5lIDE2KVxuXG5DaGFpbiA0OiBcbkNoYWluIDQ6IEdyYWRpZW50IGV2YWx1YXRpb24gdG9vayAwLjAwMDQxIHNlY29uZHNcbkNoYWluIDQ6IDEwMDAgdHJhbnNpdGlvbnMgdXNpbmcgMTAgbGVhcGZyb2cgc3RlcHMgcGVyIHRyYW5zaXRpb24gd291bGQgdGFrZSA0LjEgc2Vjb25kcy5cbkNoYWluIDQ6IEFkanVzdCB5b3VyIGV4cGVjdGF0aW9ucyBhY2NvcmRpbmdseSFcbkNoYWluIDQ6IFxuQ2hhaW4gNDogXG5DaGFpbiA0OiBXQVJOSU5HOiBUaGVyZSBhcmVuJ3QgZW5vdWdoIHdhcm11cCBpdGVyYXRpb25zIHRvIGZpdCB0aGVcbkNoYWluIDQ6ICAgICAgICAgIHRocmVlIHN0YWdlcyBvZiBhZGFwdGF0aW9uIGFzIGN1cnJlbnRseSBjb25maWd1cmVkLlxuQ2hhaW4gNDogICAgICAgICAgUmVkdWNpbmcgZWFjaCBhZGFwdGF0aW9uIHN0YWdlIHRvIDE1JS83NSUvMTAlIG9mXG5DaGFpbiA0OiAgICAgICAgICB0aGUgZ2l2ZW4gbnVtYmVyIG9mIHdhcm11cCBpdGVyYXRpb25zOlxuQ2hhaW4gNDogICAgICAgICAgICBpbml0X2J1ZmZlciA9IDE1XG5DaGFpbiA0OiAgICAgICAgICAgIGFkYXB0X3dpbmRvdyA9IDc1XG5DaGFpbiA0OiAgICAgICAgICAgIHRlcm1fYnVmZmVyID0gMTBcbkNoYWluIDQ6IFxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgNDAgLyAyMDAgWyAyMCVdICAoV2FybXVwKVxuQ2hhaW4gNDogSXRlcmF0aW9uOiAgIDEgLyAyMDAgWyAgMCVdICAoV2FybXVwKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAgNDAgLyAyMDAgWyAyMCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgNjAgLyAyMDAgWyAzMCVdICAoV2FybXVwKVxuQ2hhaW4gNDogSXRlcmF0aW9uOiAgMjAgLyAyMDAgWyAxMCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAgNjAgLyAyMDAgWyAzMCVdICAoV2FybXVwKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAgNjAgLyAyMDAgWyAzMCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAgODAgLyAyMDAgWyA0MCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgODAgLyAyMDAgWyA0MCVdICAoV2FybXVwKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAgODAgLyAyMDAgWyA0MCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxMDAgLyAyMDAgWyA1MCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxMDEgLyAyMDAgWyA1MCVdICAoU2FtcGxpbmcpXG5DaGFpbiA0OiBJdGVyYXRpb246ICA0MCAvIDIwMCBbIDIwJV0gIChXYXJtdXApXG5DaGFpbiAyOiBJdGVyYXRpb246IDEwMCAvIDIwMCBbIDUwJV0gIChXYXJtdXApXG5DaGFpbiAyOiBJdGVyYXRpb246IDEwMSAvIDIwMCBbIDUwJV0gIChTYW1wbGluZylcbkNoYWluIDM6IEl0ZXJhdGlvbjogMTAwIC8gMjAwIFsgNTAlXSAgKFdhcm11cClcbkNoYWluIDM6IEl0ZXJhdGlvbjogMTAxIC8gMjAwIFsgNTAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gNDogSXRlcmF0aW9uOiAgNjAgLyAyMDAgWyAzMCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxMjAgLyAyMDAgWyA2MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAyOiBJdGVyYXRpb246IDEyMCAvIDIwMCBbIDYwJV0gIChTYW1wbGluZylcbkNoYWluIDQ6IEl0ZXJhdGlvbjogIDgwIC8gMjAwIFsgNDAlXSAgKFdhcm11cClcbkNoYWluIDE6IEl0ZXJhdGlvbjogMTQwIC8gMjAwIFsgNzAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAxMjAgLyAyMDAgWyA2MCVdICAoU2FtcGxpbmcpXG5DaGFpbiA0OiBJdGVyYXRpb246IDEwMCAvIDIwMCBbIDUwJV0gIChXYXJtdXApXG5DaGFpbiA0OiBJdGVyYXRpb246IDEwMSAvIDIwMCBbIDUwJV0gIChTYW1wbGluZylcbkNoYWluIDI6IEl0ZXJhdGlvbjogMTQwIC8gMjAwIFsgNzAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxNjAgLyAyMDAgWyA4MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAzOiBJdGVyYXRpb246IDE0MCAvIDIwMCBbIDcwJV0gIChTYW1wbGluZylcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTIwIC8gMjAwIFsgNjAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxODAgLyAyMDAgWyA5MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAzOiBJdGVyYXRpb246IDE2MCAvIDIwMCBbIDgwJV0gIChTYW1wbGluZylcbkNoYWluIDI6IEl0ZXJhdGlvbjogMTYwIC8gMjAwIFsgODAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gNDogSXRlcmF0aW9uOiAxNDAgLyAyMDAgWyA3MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAxOiBJdGVyYXRpb246IDIwMCAvIDIwMCBbMTAwJV0gIChTYW1wbGluZylcbkNoYWluIDE6IFxuQ2hhaW4gMTogIEVsYXBzZWQgVGltZTogMC44MjI3MzMgc2Vjb25kcyAoV2FybS11cClcbkNoYWluIDE6ICAgICAgICAgICAgICAgIDAuNzU4MjM0IHNlY29uZHMgKFNhbXBsaW5nKVxuQ2hhaW4gMTogICAgICAgICAgICAgICAgMS41ODA5NyBzZWNvbmRzIChUb3RhbClcbkNoYWluIDE6IFxuQ2hhaW4gMzogSXRlcmF0aW9uOiAxODAgLyAyMDAgWyA5MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAyOiBJdGVyYXRpb246IDE4MCAvIDIwMCBbIDkwJV0gIChTYW1wbGluZylcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTYwIC8gMjAwIFsgODAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAyMDAgLyAyMDAgWzEwMCVdICAoU2FtcGxpbmcpXG5DaGFpbiAzOiBcbkNoYWluIDM6ICBFbGFwc2VkIFRpbWU6IDAuNzIxNjI1IHNlY29uZHMgKFdhcm0tdXApXG5DaGFpbiAzOiAgICAgICAgICAgICAgICAwLjgxNTgyMSBzZWNvbmRzIChTYW1wbGluZylcbkNoYWluIDM6ICAgICAgICAgICAgICAgIDEuNTM3NDUgc2Vjb25kcyAoVG90YWwpXG5DaGFpbiAzOiBcbkNoYWluIDI6IEl0ZXJhdGlvbjogMjAwIC8gMjAwIFsxMDAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMjogXG5DaGFpbiAyOiAgRWxhcHNlZCBUaW1lOiAwLjg3MjM1NiBzZWNvbmRzIChXYXJtLXVwKVxuQ2hhaW4gMjogICAgICAgICAgICAgICAgMC44NjY5Mzcgc2Vjb25kcyAoU2FtcGxpbmcpXG5DaGFpbiAyOiAgICAgICAgICAgICAgICAxLjczOTI5IHNlY29uZHMgKFRvdGFsKVxuQ2hhaW4gMjogXG5DaGFpbiA0OiBJdGVyYXRpb246IDE4MCAvIDIwMCBbIDkwJV0gIChTYW1wbGluZylcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMjAwIC8gMjAwIFsxMDAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gNDogXG5DaGFpbiA0OiAgRWxhcHNlZCBUaW1lOiAwLjgyNTc4NSBzZWNvbmRzIChXYXJtLXVwKVxuQ2hhaW4gNDogICAgICAgICAgICAgICAgMC43OTMzNjkgc2Vjb25kcyAoU2FtcGxpbmcpXG5DaGFpbiA0OiAgICAgICAgICAgICAgICAxLjYxOTE1IHNlY29uZHMgKFRvdGFsKVxuQ2hhaW4gNDogXG4ifQ== -->
+<pre><code>starting worker pid=53282 on localhost:11594 at 15:49:12.631
+starting worker pid=53296 on localhost:11594 at 15:49:12.949
+starting worker pid=53310 on localhost:11594 at 15:49:13.279
+starting worker pid=53324 on localhost:11594 at 15:49:13.635
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 1).
+Chain 1: Rejecting initial value:
+Chain 1:   Error evaluating the log probability at the initial value.
+Chain 1: Exception: student_t_lpdf: Degrees of freedom parameter is -0.0780037, but must be &gt; 0!  (in &#39;modelac7a232e6345_model_0&#39; at line 16)
+
+Chain 1: Rejecting initial value:
+Chain 1:   Error evaluating the log probability at the initial value.
+Chain 1: Exception: student_t_lpdf: Degrees of freedom parameter is -0.123611, but must be &gt; 0!  (in &#39;modelac7a232e6345_model_0&#39; at line 16)
+
+Chain 1: Rejecting initial value:
+Chain 1:   Error evaluating the log probability at the initial value.
+Chain 1: Exception: student_t_lpdf: Degrees of freedom parameter is -1.94428, but must be &gt; 0!  (in &#39;modelac7a232e6345_model_0&#39; at line 16)
+
+Chain 1: 
+Chain 1: Gradient evaluation took 0.000399 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 3.99 seconds.
+Chain 1: Adjust your expectations accordingly!
+Chain 1: 
+Chain 1: 
+Chain 1: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 1:          three stages of adaptation as currently configured.
+Chain 1:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 1:          the given number of warmup iterations:
+Chain 1:            init_buffer = 15
+Chain 1:            adapt_window = 75
+Chain 1:            term_buffer = 10
+Chain 1: 
+Chain 1: Iteration:   1 / 200 [  0%]  (Warmup)
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 2).
+Chain 2: Rejecting initial value:
+Chain 2:   Error evaluating the log probability at the initial value.
+Chain 2: Exception: student_t_lpdf: Degrees of freedom parameter is -0.735738, but must be &gt; 0!  (in &#39;modelac7a232e6345_model_0&#39; at line 16)
+
+Chain 2: Rejecting initial value:
+Chain 2:   Error evaluating the log probability at the initial value.
+Chain 2: Exception: student_t_lpdf: Degrees of freedom parameter is -0.169573, but must be &gt; 0!  (in &#39;modelac7a232e6345_model_0&#39; at line 16)
+
+Chain 2: 
+Chain 2: Gradient evaluation took 0.000432 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 4.32 seconds.
+Chain 2: Adjust your expectations accordingly!
+Chain 2: 
+Chain 2: 
+Chain 2: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 2:          three stages of adaptation as currently configured.
+Chain 2:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 2:          the given number of warmup iterations:
+Chain 2:            init_buffer = 15
+Chain 2:            adapt_window = 75
+Chain 2:            term_buffer = 10
+Chain 2: 
+Chain 2: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 2: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 1: Iteration:  20 / 200 [ 10%]  (Warmup)
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 3).
+Chain 3: Rejecting initial value:
+Chain 3:   Error evaluating the log probability at the initial value.
+Chain 3: Exception: student_t_lpdf: Degrees of freedom parameter is -0.10802, but must be &gt; 0!  (in &#39;modelac7a232e6345_model_0&#39; at line 16)
+
+Chain 3: 
+Chain 3: Gradient evaluation took 0.000411 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 4.11 seconds.
+Chain 3: Adjust your expectations accordingly!
+Chain 3: 
+Chain 3: 
+Chain 3: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 3:          three stages of adaptation as currently configured.
+Chain 3:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 3:          the given number of warmup iterations:
+Chain 3:            init_buffer = 15
+Chain 3:            adapt_window = 75
+Chain 3:            term_buffer = 10
+Chain 3: 
+Chain 3: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 3: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 2: Iteration:  40 / 200 [ 20%]  (Warmup)
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 4).
+Chain 4: Rejecting initial value:
+Chain 4:   Error evaluating the log probability at the initial value.
+Chain 4: Exception: student_t_lpdf: Degrees of freedom parameter is -1.36844, but must be &gt; 0!  (in &#39;modelac7a232e6345_model_0&#39; at line 16)
+
+Chain 4: Rejecting initial value:
+Chain 4:   Error evaluating the log probability at the initial value.
+Chain 4: Exception: student_t_lpdf: Degrees of freedom parameter is -0.0811266, but must be &gt; 0!  (in &#39;modelac7a232e6345_model_0&#39; at line 16)
+
+Chain 4: 
+Chain 4: Gradient evaluation took 0.00041 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 4.1 seconds.
+Chain 4: Adjust your expectations accordingly!
+Chain 4: 
+Chain 4: 
+Chain 4: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 4:          three stages of adaptation as currently configured.
+Chain 4:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 4:          the given number of warmup iterations:
+Chain 4:            init_buffer = 15
+Chain 4:            adapt_window = 75
+Chain 4:            term_buffer = 10
+Chain 4: 
+Chain 1: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 4: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 3: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 1: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 4: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 2: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 3: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 2: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 1: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 3: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 1: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 1: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 4: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 2: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 2: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 3: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 3: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 4: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 1: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 2: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 4: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 1: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 3: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 4: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 4: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 2: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 1: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 3: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 4: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 1: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 3: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 2: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 4: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 1: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 1: 
+Chain 1:  Elapsed Time: 0.822733 seconds (Warm-up)
+Chain 1:                0.758234 seconds (Sampling)
+Chain 1:                1.58097 seconds (Total)
+Chain 1: 
+Chain 3: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 2: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 4: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 3: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 3: 
+Chain 3:  Elapsed Time: 0.721625 seconds (Warm-up)
+Chain 3:                0.815821 seconds (Sampling)
+Chain 3:                1.53745 seconds (Total)
+Chain 3: 
+Chain 2: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 2: 
+Chain 2:  Elapsed Time: 0.872356 seconds (Warm-up)
+Chain 2:                0.866937 seconds (Sampling)
+Chain 2:                1.73929 seconds (Total)
+Chain 2: 
+Chain 4: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 4: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 4: 
+Chain 4:  Elapsed Time: 0.825785 seconds (Warm-up)
+Chain 4:                0.793369 seconds (Sampling)
+Chain 4:                1.61915 seconds (Total)
+Chain 4: </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQnVsayBFZmZlY3RpdmUgU2FtcGxlcyBTaXplIChFU1MpIGlzIHRvbyBsb3csIGluZGljYXRpbmcgcG9zdGVyaW9yIG1lYW5zIGFuZCBtZWRpYW5zIG1heSBiZSB1bnJlbGlhYmxlLlxuUnVubmluZyB0aGUgY2hhaW5zIGZvciBtb3JlIGl0ZXJhdGlvbnMgbWF5IGhlbHAuIFNlZVxuaHR0cDovL21jLXN0YW4ub3JnL21pc2Mvd2FybmluZ3MuaHRtbCNidWxrLWVzc1RhaWwgRWZmZWN0aXZlIFNhbXBsZXMgU2l6ZSAoRVNTKSBpcyB0b28gbG93LCBpbmRpY2F0aW5nIHBvc3RlcmlvciB2YXJpYW5jZXMgYW5kIHRhaWwgcXVhbnRpbGVzIG1heSBiZSB1bnJlbGlhYmxlLlxuUnVubmluZyB0aGUgY2hhaW5zIGZvciBtb3JlIGl0ZXJhdGlvbnMgbWF5IGhlbHAuIFNlZVxuaHR0cDovL21jLXN0YW4ub3JnL21pc2Mvd2FybmluZ3MuaHRtbCN0YWlsLWVzc1xuIn0= -->
+<pre><code>Bulk Effective Samples Size (ESS) is too low, indicating posterior means and medians may be unreliable.
+Running the chains for more iterations may help. See
+http://mc-stan.org/misc/warnings.html#bulk-essTail Effective Samples Size (ESS) is too low, indicating posterior variances and tail quantiles may be unreliable.
+Running the chains for more iterations may help. See
+http://mc-stan.org/misc/warnings.html#tail-ess</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoic3RhcnRpbmcgd29ya2VyIHBpZD01MzM0OSBvbiBsb2NhbGhvc3Q6MTE1OTQgYXQgMTU6NDk6NDIuMjA3XG5zdGFydGluZyB3b3JrZXIgcGlkPTUzMzYzIG9uIGxvY2FsaG9zdDoxMTU5NCBhdCAxNTo0OTo0Mi41NzVcbnN0YXJ0aW5nIHdvcmtlciBwaWQ9NTMzNzcgb24gbG9jYWxob3N0OjExNTk0IGF0IDE1OjQ5OjQyLjg2OFxuc3RhcnRpbmcgd29ya2VyIHBpZD01MzM5MSBvbiBsb2NhbGhvc3Q6MTE1OTQgYXQgMTU6NDk6NDMuMTU4XG5cblNBTVBMSU5HIEZPUiBNT0RFTCAnbW9kZWxfMCcgTk9XIChDSEFJTiAxKS5cbkNoYWluIDE6IFxuQ2hhaW4gMTogR3JhZGllbnQgZXZhbHVhdGlvbiB0b29rIDAuMDAwNDA5IHNlY29uZHNcbkNoYWluIDE6IDEwMDAgdHJhbnNpdGlvbnMgdXNpbmcgMTAgbGVhcGZyb2cgc3RlcHMgcGVyIHRyYW5zaXRpb24gd291bGQgdGFrZSA0LjA5IHNlY29uZHMuXG5DaGFpbiAxOiBBZGp1c3QgeW91ciBleHBlY3RhdGlvbnMgYWNjb3JkaW5nbHkhXG5DaGFpbiAxOiBcbkNoYWluIDE6IFxuQ2hhaW4gMTogV0FSTklORzogVGhlcmUgYXJlbid0IGVub3VnaCB3YXJtdXAgaXRlcmF0aW9ucyB0byBmaXQgdGhlXG5DaGFpbiAxOiAgICAgICAgICB0aHJlZSBzdGFnZXMgb2YgYWRhcHRhdGlvbiBhcyBjdXJyZW50bHkgY29uZmlndXJlZC5cbkNoYWluIDE6ICAgICAgICAgIFJlZHVjaW5nIGVhY2ggYWRhcHRhdGlvbiBzdGFnZSB0byAxNSUvNzUlLzEwJSBvZlxuQ2hhaW4gMTogICAgICAgICAgdGhlIGdpdmVuIG51bWJlciBvZiB3YXJtdXAgaXRlcmF0aW9uczpcbkNoYWluIDE6ICAgICAgICAgICAgaW5pdF9idWZmZXIgPSAxNVxuQ2hhaW4gMTogICAgICAgICAgICBhZGFwdF93aW5kb3cgPSA3NVxuQ2hhaW4gMTogICAgICAgICAgICB0ZXJtX2J1ZmZlciA9IDEwXG5DaGFpbiAxOiBcbkNoYWluIDE6IEl0ZXJhdGlvbjogICAxIC8gMjAwIFsgIDAlXSAgKFdhcm11cClcbkNoYWluIDE6IEl0ZXJhdGlvbjogIDIwIC8gMjAwIFsgMTAlXSAgKFdhcm11cClcblxuU0FNUExJTkcgRk9SIE1PREVMICdtb2RlbF8wJyBOT1cgKENIQUlOIDIpLlxuQ2hhaW4gMjogXG5DaGFpbiAyOiBHcmFkaWVudCBldmFsdWF0aW9uIHRvb2sgMC4wMDA0MTIgc2Vjb25kc1xuQ2hhaW4gMjogMTAwMCB0cmFuc2l0aW9ucyB1c2luZyAxMCBsZWFwZnJvZyBzdGVwcyBwZXIgdHJhbnNpdGlvbiB3b3VsZCB0YWtlIDQuMTIgc2Vjb25kcy5cbkNoYWluIDI6IEFkanVzdCB5b3VyIGV4cGVjdGF0aW9ucyBhY2NvcmRpbmdseSFcbkNoYWluIDI6IFxuQ2hhaW4gMjogXG5DaGFpbiAyOiBXQVJOSU5HOiBUaGVyZSBhcmVuJ3QgZW5vdWdoIHdhcm11cCBpdGVyYXRpb25zIHRvIGZpdCB0aGVcbkNoYWluIDI6ICAgICAgICAgIHRocmVlIHN0YWdlcyBvZiBhZGFwdGF0aW9uIGFzIGN1cnJlbnRseSBjb25maWd1cmVkLlxuQ2hhaW4gMjogICAgICAgICAgUmVkdWNpbmcgZWFjaCBhZGFwdGF0aW9uIHN0YWdlIHRvIDE1JS83NSUvMTAlIG9mXG5DaGFpbiAyOiAgICAgICAgICB0aGUgZ2l2ZW4gbnVtYmVyIG9mIHdhcm11cCBpdGVyYXRpb25zOlxuQ2hhaW4gMjogICAgICAgICAgICBpbml0X2J1ZmZlciA9IDE1XG5DaGFpbiAyOiAgICAgICAgICAgIGFkYXB0X3dpbmRvdyA9IDc1XG5DaGFpbiAyOiAgICAgICAgICAgIHRlcm1fYnVmZmVyID0gMTBcbkNoYWluIDI6IFxuQ2hhaW4gMjogSXRlcmF0aW9uOiAgIDEgLyAyMDAgWyAgMCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAgMjAgLyAyMDAgWyAxMCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAgNDAgLyAyMDAgWyAyMCVdICAoV2FybXVwKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAgNDAgLyAyMDAgWyAyMCVdICAoV2FybXVwKVxuXG5TQU1QTElORyBGT1IgTU9ERUwgJ21vZGVsXzAnIE5PVyAoQ0hBSU4gMykuXG5DaGFpbiAzOiBcbkNoYWluIDM6IEdyYWRpZW50IGV2YWx1YXRpb24gdG9vayAwLjAwMDQ2NiBzZWNvbmRzXG5DaGFpbiAzOiAxMDAwIHRyYW5zaXRpb25zIHVzaW5nIDEwIGxlYXBmcm9nIHN0ZXBzIHBlciB0cmFuc2l0aW9uIHdvdWxkIHRha2UgNC42NiBzZWNvbmRzLlxuQ2hhaW4gMzogQWRqdXN0IHlvdXIgZXhwZWN0YXRpb25zIGFjY29yZGluZ2x5IVxuQ2hhaW4gMzogXG5DaGFpbiAzOiBcbkNoYWluIDM6IFdBUk5JTkc6IFRoZXJlIGFyZW4ndCBlbm91Z2ggd2FybXVwIGl0ZXJhdGlvbnMgdG8gZml0IHRoZVxuQ2hhaW4gMzogICAgICAgICAgdGhyZWUgc3RhZ2VzIG9mIGFkYXB0YXRpb24gYXMgY3VycmVudGx5IGNvbmZpZ3VyZWQuXG5DaGFpbiAzOiAgICAgICAgICBSZWR1Y2luZyBlYWNoIGFkYXB0YXRpb24gc3RhZ2UgdG8gMTUlLzc1JS8xMCUgb2ZcbkNoYWluIDM6ICAgICAgICAgIHRoZSBnaXZlbiBudW1iZXIgb2Ygd2FybXVwIGl0ZXJhdGlvbnM6XG5DaGFpbiAzOiAgICAgICAgICAgIGluaXRfYnVmZmVyID0gMTVcbkNoYWluIDM6ICAgICAgICAgICAgYWRhcHRfd2luZG93ID0gNzVcbkNoYWluIDM6ICAgICAgICAgICAgdGVybV9idWZmZXIgPSAxMFxuQ2hhaW4gMzogXG5DaGFpbiAzOiBJdGVyYXRpb246ICAgMSAvIDIwMCBbICAwJV0gIChXYXJtdXApXG5DaGFpbiAzOiBJdGVyYXRpb246ICAyMCAvIDIwMCBbIDEwJV0gIChXYXJtdXApXG5cblNBTVBMSU5HIEZPUiBNT0RFTCAnbW9kZWxfMCcgTk9XIChDSEFJTiA0KS5cbkNoYWluIDQ6IFJlamVjdGluZyBpbml0aWFsIHZhbHVlOlxuQ2hhaW4gNDogICBFcnJvciBldmFsdWF0aW5nIHRoZSBsb2cgcHJvYmFiaWxpdHkgYXQgdGhlIGluaXRpYWwgdmFsdWUuXG5DaGFpbiA0OiBFeGNlcHRpb246IHN0dWRlbnRfdF9scGRmOiBEZWdyZWVzIG9mIGZyZWVkb20gcGFyYW1ldGVyIGlzIC0wLjM5ODg2NywgYnV0IG11c3QgYmUgPiAwISAgKGluICdtb2RlbGFjN2EyMzJlNjM0NV9tb2RlbF8wJyBhdCBsaW5lIDE2KVxuXG5DaGFpbiA0OiBcbkNoYWluIDQ6IEdyYWRpZW50IGV2YWx1YXRpb24gdG9vayAwLjAwMDQwNSBzZWNvbmRzXG5DaGFpbiA0OiAxMDAwIHRyYW5zaXRpb25zIHVzaW5nIDEwIGxlYXBmcm9nIHN0ZXBzIHBlciB0cmFuc2l0aW9uIHdvdWxkIHRha2UgNC4wNSBzZWNvbmRzLlxuQ2hhaW4gNDogQWRqdXN0IHlvdXIgZXhwZWN0YXRpb25zIGFjY29yZGluZ2x5IVxuQ2hhaW4gNDogXG5DaGFpbiA0OiBcbkNoYWluIDQ6IFdBUk5JTkc6IFRoZXJlIGFyZW4ndCBlbm91Z2ggd2FybXVwIGl0ZXJhdGlvbnMgdG8gZml0IHRoZVxuQ2hhaW4gNDogICAgICAgICAgdGhyZWUgc3RhZ2VzIG9mIGFkYXB0YXRpb24gYXMgY3VycmVudGx5IGNvbmZpZ3VyZWQuXG5DaGFpbiA0OiAgICAgICAgICBSZWR1Y2luZyBlYWNoIGFkYXB0YXRpb24gc3RhZ2UgdG8gMTUlLzc1JS8xMCUgb2ZcbkNoYWluIDQ6ICAgICAgICAgIHRoZSBnaXZlbiBudW1iZXIgb2Ygd2FybXVwIGl0ZXJhdGlvbnM6XG5DaGFpbiA0OiAgICAgICAgICAgIGluaXRfYnVmZmVyID0gMTVcbkNoYWluIDQ6ICAgICAgICAgICAgYWRhcHRfd2luZG93ID0gNzVcbkNoYWluIDQ6ICAgICAgICAgICAgdGVybV9idWZmZXIgPSAxMFxuQ2hhaW4gNDogXG5DaGFpbiA0OiBJdGVyYXRpb246ICAgMSAvIDIwMCBbICAwJV0gIChXYXJtdXApXG5DaGFpbiAxOiBJdGVyYXRpb246ICA2MCAvIDIwMCBbIDMwJV0gIChXYXJtdXApXG5DaGFpbiA0OiBJdGVyYXRpb246ICAyMCAvIDIwMCBbIDEwJV0gIChXYXJtdXApXG5DaGFpbiAyOiBJdGVyYXRpb246ICA2MCAvIDIwMCBbIDMwJV0gIChXYXJtdXApXG5DaGFpbiAzOiBJdGVyYXRpb246ICA0MCAvIDIwMCBbIDIwJV0gIChXYXJtdXApXG5DaGFpbiA0OiBJdGVyYXRpb246ICA0MCAvIDIwMCBbIDIwJV0gIChXYXJtdXApXG5DaGFpbiAxOiBJdGVyYXRpb246ICA4MCAvIDIwMCBbIDQwJV0gIChXYXJtdXApXG5DaGFpbiAyOiBJdGVyYXRpb246ICA4MCAvIDIwMCBbIDQwJV0gIChXYXJtdXApXG5DaGFpbiAzOiBJdGVyYXRpb246ICA2MCAvIDIwMCBbIDMwJV0gIChXYXJtdXApXG5DaGFpbiA0OiBJdGVyYXRpb246ICA2MCAvIDIwMCBbIDMwJV0gIChXYXJtdXApXG5DaGFpbiAxOiBJdGVyYXRpb246IDEwMCAvIDIwMCBbIDUwJV0gIChXYXJtdXApXG5DaGFpbiAxOiBJdGVyYXRpb246IDEwMSAvIDIwMCBbIDUwJV0gIChTYW1wbGluZylcbkNoYWluIDI6IEl0ZXJhdGlvbjogMTAwIC8gMjAwIFsgNTAlXSAgKFdhcm11cClcbkNoYWluIDI6IEl0ZXJhdGlvbjogMTAxIC8gMjAwIFsgNTAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gNDogSXRlcmF0aW9uOiAgODAgLyAyMDAgWyA0MCVdICAoV2FybXVwKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxMjAgLyAyMDAgWyA2MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAzOiBJdGVyYXRpb246ICA4MCAvIDIwMCBbIDQwJV0gIChXYXJtdXApXG5DaGFpbiAyOiBJdGVyYXRpb246IDEyMCAvIDIwMCBbIDYwJV0gIChTYW1wbGluZylcbkNoYWluIDE6IEl0ZXJhdGlvbjogMTQwIC8gMjAwIFsgNzAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAxMDAgLyAyMDAgWyA1MCVdICAoV2FybXVwKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAxMDEgLyAyMDAgWyA1MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAxOiBJdGVyYXRpb246IDE2MCAvIDIwMCBbIDgwJV0gIChTYW1wbGluZylcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTAwIC8gMjAwIFsgNTAlXSAgKFdhcm11cClcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTAxIC8gMjAwIFsgNTAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMjogSXRlcmF0aW9uOiAxNDAgLyAyMDAgWyA3MCVdICAoU2FtcGxpbmcpXG5DaGFpbiAzOiBJdGVyYXRpb246IDEyMCAvIDIwMCBbIDYwJV0gIChTYW1wbGluZylcbkNoYWluIDI6IEl0ZXJhdGlvbjogMTYwIC8gMjAwIFsgODAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAxODAgLyAyMDAgWyA5MCVdICAoU2FtcGxpbmcpXG5DaGFpbiA0OiBJdGVyYXRpb246IDEyMCAvIDIwMCBbIDYwJV0gIChTYW1wbGluZylcbkNoYWluIDM6IEl0ZXJhdGlvbjogMTQwIC8gMjAwIFsgNzAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMTogSXRlcmF0aW9uOiAyMDAgLyAyMDAgWzEwMCVdICAoU2FtcGxpbmcpXG5DaGFpbiAxOiBcbkNoYWluIDE6ICBFbGFwc2VkIFRpbWU6IDAuNzIzNTI5IHNlY29uZHMgKFdhcm0tdXApXG5DaGFpbiAxOiAgICAgICAgICAgICAgICAwLjYyNzA4MiBzZWNvbmRzIChTYW1wbGluZylcbkNoYWluIDE6ICAgICAgICAgICAgICAgIDEuMzUwNjEgc2Vjb25kcyAoVG90YWwpXG5DaGFpbiAxOiBcbkNoYWluIDI6IEl0ZXJhdGlvbjogMTgwIC8gMjAwIFsgOTAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAxNjAgLyAyMDAgWyA4MCVdICAoU2FtcGxpbmcpXG5DaGFpbiA0OiBJdGVyYXRpb246IDE0MCAvIDIwMCBbIDcwJV0gIChTYW1wbGluZylcbkNoYWluIDI6IEl0ZXJhdGlvbjogMjAwIC8gMjAwIFsxMDAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMjogXG5DaGFpbiAyOiAgRWxhcHNlZCBUaW1lOiAwLjY2NTQ3OCBzZWNvbmRzIChXYXJtLXVwKVxuQ2hhaW4gMjogICAgICAgICAgICAgICAgMC43MTYzNzIgc2Vjb25kcyAoU2FtcGxpbmcpXG5DaGFpbiAyOiAgICAgICAgICAgICAgICAxLjM4MTg1IHNlY29uZHMgKFRvdGFsKVxuQ2hhaW4gMjogXG5DaGFpbiAzOiBJdGVyYXRpb246IDE4MCAvIDIwMCBbIDkwJV0gIChTYW1wbGluZylcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTYwIC8gMjAwIFsgODAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gMzogSXRlcmF0aW9uOiAyMDAgLyAyMDAgWzEwMCVdICAoU2FtcGxpbmcpXG5DaGFpbiAzOiBcbkNoYWluIDM6ICBFbGFwc2VkIFRpbWU6IDAuNjYwMDA5IHNlY29uZHMgKFdhcm0tdXApXG5DaGFpbiAzOiAgICAgICAgICAgICAgICAwLjY2MjczNSBzZWNvbmRzIChTYW1wbGluZylcbkNoYWluIDM6ICAgICAgICAgICAgICAgIDEuMzIyNzQgc2Vjb25kcyAoVG90YWwpXG5DaGFpbiAzOiBcbkNoYWluIDQ6IEl0ZXJhdGlvbjogMTgwIC8gMjAwIFsgOTAlXSAgKFNhbXBsaW5nKVxuQ2hhaW4gNDogSXRlcmF0aW9uOiAyMDAgLyAyMDAgWzEwMCVdICAoU2FtcGxpbmcpXG5DaGFpbiA0OiBcbkNoYWluIDQ6ICBFbGFwc2VkIFRpbWU6IDAuNjEzMjExIHNlY29uZHMgKFdhcm0tdXApXG5DaGFpbiA0OiAgICAgICAgICAgICAgICAwLjg5NjcxMSBzZWNvbmRzIChTYW1wbGluZylcbkNoYWluIDQ6ICAgICAgICAgICAgICAgIDEuNTA5OTIgc2Vjb25kcyAoVG90YWwpXG5DaGFpbiA0OiBcbiJ9 -->
+<pre><code>starting worker pid=53349 on localhost:11594 at 15:49:42.207
+starting worker pid=53363 on localhost:11594 at 15:49:42.575
+starting worker pid=53377 on localhost:11594 at 15:49:42.868
+starting worker pid=53391 on localhost:11594 at 15:49:43.158
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 1).
+Chain 1: 
+Chain 1: Gradient evaluation took 0.000409 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 4.09 seconds.
+Chain 1: Adjust your expectations accordingly!
+Chain 1: 
+Chain 1: 
+Chain 1: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 1:          three stages of adaptation as currently configured.
+Chain 1:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 1:          the given number of warmup iterations:
+Chain 1:            init_buffer = 15
+Chain 1:            adapt_window = 75
+Chain 1:            term_buffer = 10
+Chain 1: 
+Chain 1: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 1: Iteration:  20 / 200 [ 10%]  (Warmup)
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 2).
+Chain 2: 
+Chain 2: Gradient evaluation took 0.000412 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 4.12 seconds.
+Chain 2: Adjust your expectations accordingly!
+Chain 2: 
+Chain 2: 
+Chain 2: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 2:          three stages of adaptation as currently configured.
+Chain 2:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 2:          the given number of warmup iterations:
+Chain 2:            init_buffer = 15
+Chain 2:            adapt_window = 75
+Chain 2:            term_buffer = 10
+Chain 2: 
+Chain 2: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 2: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 1: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 2: Iteration:  40 / 200 [ 20%]  (Warmup)
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 3).
+Chain 3: 
+Chain 3: Gradient evaluation took 0.000466 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 4.66 seconds.
+Chain 3: Adjust your expectations accordingly!
+Chain 3: 
+Chain 3: 
+Chain 3: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 3:          three stages of adaptation as currently configured.
+Chain 3:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 3:          the given number of warmup iterations:
+Chain 3:            init_buffer = 15
+Chain 3:            adapt_window = 75
+Chain 3:            term_buffer = 10
+Chain 3: 
+Chain 3: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 3: Iteration:  20 / 200 [ 10%]  (Warmup)
+
+SAMPLING FOR MODEL &#39;model_0&#39; NOW (CHAIN 4).
+Chain 4: Rejecting initial value:
+Chain 4:   Error evaluating the log probability at the initial value.
+Chain 4: Exception: student_t_lpdf: Degrees of freedom parameter is -0.398867, but must be &gt; 0!  (in &#39;modelac7a232e6345_model_0&#39; at line 16)
+
+Chain 4: 
+Chain 4: Gradient evaluation took 0.000405 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 4.05 seconds.
+Chain 4: Adjust your expectations accordingly!
+Chain 4: 
+Chain 4: 
+Chain 4: WARNING: There aren&#39;t enough warmup iterations to fit the
+Chain 4:          three stages of adaptation as currently configured.
+Chain 4:          Reducing each adaptation stage to 15%/75%/10% of
+Chain 4:          the given number of warmup iterations:
+Chain 4:            init_buffer = 15
+Chain 4:            adapt_window = 75
+Chain 4:            term_buffer = 10
+Chain 4: 
+Chain 4: Iteration:   1 / 200 [  0%]  (Warmup)
+Chain 1: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 4: Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 2: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 3: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 4: Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 1: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 2: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 3: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 4: Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 1: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 1: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 2: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 2: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 4: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 1: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 3: Iteration:  80 / 200 [ 40%]  (Warmup)
+Chain 2: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 1: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 3: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 3: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 1: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 4: Iteration: 100 / 200 [ 50%]  (Warmup)
+Chain 4: Iteration: 101 / 200 [ 50%]  (Sampling)
+Chain 2: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 3: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 2: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 1: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 4: Iteration: 120 / 200 [ 60%]  (Sampling)
+Chain 3: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 1: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 1: 
+Chain 1:  Elapsed Time: 0.723529 seconds (Warm-up)
+Chain 1:                0.627082 seconds (Sampling)
+Chain 1:                1.35061 seconds (Total)
+Chain 1: 
+Chain 2: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 3: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 4: Iteration: 140 / 200 [ 70%]  (Sampling)
+Chain 2: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 2: 
+Chain 2:  Elapsed Time: 0.665478 seconds (Warm-up)
+Chain 2:                0.716372 seconds (Sampling)
+Chain 2:                1.38185 seconds (Total)
+Chain 2: 
+Chain 3: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 4: Iteration: 160 / 200 [ 80%]  (Sampling)
+Chain 3: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 3: 
+Chain 3:  Elapsed Time: 0.660009 seconds (Warm-up)
+Chain 3:                0.662735 seconds (Sampling)
+Chain 3:                1.32274 seconds (Total)
+Chain 3: 
+Chain 4: Iteration: 180 / 200 [ 90%]  (Sampling)
+Chain 4: Iteration: 200 / 200 [100%]  (Sampling)
+Chain 4: 
+Chain 4:  Elapsed Time: 0.613211 seconds (Warm-up)
+Chain 4:                0.896711 seconds (Sampling)
+Chain 4:                1.50992 seconds (Total)
+Chain 4: </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiVGhlIGxhcmdlc3QgUi1oYXQgaXMgMS4xNCwgaW5kaWNhdGluZyBjaGFpbnMgaGF2ZSBub3QgbWl4ZWQuXG5SdW5uaW5nIHRoZSBjaGFpbnMgZm9yIG1vcmUgaXRlcmF0aW9ucyBtYXkgaGVscC4gU2VlXG5odHRwOi8vbWMtc3Rhbi5vcmcvbWlzYy93YXJuaW5ncy5odG1sI3ItaGF0QnVsayBFZmZlY3RpdmUgU2FtcGxlcyBTaXplIChFU1MpIGlzIHRvbyBsb3csIGluZGljYXRpbmcgcG9zdGVyaW9yIG1lYW5zIGFuZCBtZWRpYW5zIG1heSBiZSB1bnJlbGlhYmxlLlxuUnVubmluZyB0aGUgY2hhaW5zIGZvciBtb3JlIGl0ZXJhdGlvbnMgbWF5IGhlbHAuIFNlZVxuaHR0cDovL21jLXN0YW4ub3JnL21pc2Mvd2FybmluZ3MuaHRtbCNidWxrLWVzc1RhaWwgRWZmZWN0aXZlIFNhbXBsZXMgU2l6ZSAoRVNTKSBpcyB0b28gbG93LCBpbmRpY2F0aW5nIHBvc3RlcmlvciB2YXJpYW5jZXMgYW5kIHRhaWwgcXVhbnRpbGVzIG1heSBiZSB1bnJlbGlhYmxlLlxuUnVubmluZyB0aGUgY2hhaW5zIGZvciBtb3JlIGl0ZXJhdGlvbnMgbWF5IGhlbHAuIFNlZVxuaHR0cDovL21jLXN0YW4ub3JnL21pc2Mvd2FybmluZ3MuaHRtbCN0YWlsLWVzc1xuIn0= -->
+<pre><code>The largest R-hat is 1.14, indicating chains have not mixed.
+Running the chains for more iterations may help. See
+http://mc-stan.org/misc/warnings.html#r-hatBulk Effective Samples Size (ESS) is too low, indicating posterior means and medians may be unreliable.
+Running the chains for more iterations may help. See
+http://mc-stan.org/misc/warnings.html#bulk-essTail Effective Samples Size (ESS) is too low, indicating posterior variances and tail quantiles may be unreliable.
+Running the chains for more iterations may help. See
+http://mc-stan.org/misc/warnings.html#tail-ess</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3VtKGxFTFBEMSlcblxuYGBgIn0= -->
+<pre class="r"><code>sum(lELPD1)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIC0xNjk4My40N1xuIn0= -->
+<pre><code>[1] -16983.47</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3VtKGxFTFBEMilcblxuYGBgIn0= -->
+<pre class="r"><code>sum(lELPD2)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIC0xNjM3OS4wNFxuIn0= -->
+<pre><code>[1] -16379.04</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Transformed parameters and Jacobians</p>
+<p>Example model where the defined parameter <code>alpha</code> does not have prior defined in the <code>model</code> but instead we specify a parameter for the transformed parameter <code>theta</code>. This will give a warning and an incorrect estimate for <code>theta</code> because nonilnear transformations on parameters that are then used for sampling require the definition of a Jacobian (i.e. the description of how the nonlinear transform changes the probability density of the transformed parameter compared to the original)</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuTj00XG5ZPWMoMCwwLDEsMClcbmZpdCA9IHN0YW4oJy4uL3N0YW5Nb2RlbHMvbW9kZWxfMC45LnN0YW4nLCBpdGVyPTIwMCwgY2hhaW5zPTQsIGRhdGE9bGlzdChOPU4sIFk9WSkpXG5gYGAifQ== -->
+<pre class="r"><code>N=4
+Y=c(0,0,1,0)
+fit = stan(&#39;../stanModels/model_0.9.stan&#39;, iter=200, chains=4, data=list(N=N, Y=Y))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJpbnQoZml0LCBwcm9icz1jKC4yNSwuNSwuNzUpKVxuYGBgIn0= -->
+<pre class="r"><code>print(fit, probs=c(.25,.5,.75))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiU3RhbiBtb2RlbF8wIgpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sKLS0tCgpDcmVhdGUgZmFrZSBkYXRhCgpgYGB7cn0KWSA9IHJub3JtKDEwLCAxLjUsIC4yKQpgYGAKCkNvbXBpbGUgYW5kIHJ1biB0aGUgTUNNQwoKYGBge3J9CmZpdCA9IHN0YW4oJy4uL3N0YW5Nb2RlbHMvbW9kZWxfMC5zdGFuJywgaXRlcj0yMDAsIGNoYWlucz00LAogICAgICAgICAgIGRhdGEgPSBsaXN0KFk9WSkpCmBgYAoKSW50ZXJwcmV0aW5nIHJlc3VsdHMKCmBgYHtyfQpwcmludChmaXQsIHByb2JzPWMoLjI1LCAuNSwgLjc1KSkKYGBgCgpFeHRyYWN0IGFuZCBwbG90IHBvc3RlcmlvcgoKYGBge3J9CmRhdGEuZnJhbWUobXUgPWV4dHJhY3QoZml0LCAnbXUnKVtbMV1dKSAlPiUKICBnZ3Bsb3QoYWVzKHg9bXUpKSsKICBnZW9tX2hpc3RvZ3JhbSgpCmBgYAoKSW50ZXJhY3RpdmUgZXhwbG9yYXRpb24gaW4gYHNoaW55c3RhbmAKCmBgYHtyfQojIHJlcXVpcmUoc2hpbnlzdGFuKQpgYGAKCgpgYGB7cn0KIyBhRml0ID0gYXMuc2hpbnlzdGFuKGZpdCkKIyBsYXVuY2hfc2hpbnlzdGFuKGFGaXQpCmBgYAoKUmUgcnVuIG1vZGVsIHdpdGggYGdlbmVyYXRlZCBxdWFudGl0aWVzYCBibG9jawoKYGBge3J9CmZpdCA9IHN0YW4oJy4uL3N0YW5Nb2RlbHMvbW9kZWxfMC5zdGFuJywgaXRlcj0yMDAsIGNoYWlucz00LAogICAgICAgICAgIGRhdGEgPSBsaXN0KFk9WSkpCmBgYAoKYGBge3J9CnByaW50KGZpdCwgcHJvYnM9YyguMjUsLjUsLjc1KSkKYGBgCgpOZXcgbW9kZWwgd2hlcmUgaGVpZ2h0ICBgWWAgaXMgYSBmdW5jdGlvbiBvZiB3ZWlnaHQgYFhgCgpgYGB7cn0KTiA9IDEwMApYID0gcm5vcm0oTiwgNjAsIDEwKQpiZXRhID0gLjMKc2lnbWEgPSAuMwpZID0gYmV0YSAqIGxvZyhYKSArIHJub3JtKE4sIDAsIHNpZ21hKQpmaXQgPSBzdGFuKCcuLi9zdGFuTW9kZWxzL21vZGVsXzAuMS5zdGFuJywgaXRlciA9IDIwMCwgY2hhaW5zID0gNCwKICAgICAgICAgICBkYXRhID0gbGlzdChZPVksIFg9WCwgTj1OKSkKYGBgCgpgYGB7cn0KcHJpbnQoZml0LCBwcm9icz1jKC4yNSwuNSwuNzUpKQpgYGAKCkZpdCBuZXcgbW9kZWwgd2l0aCBgdHJhbnNmb3JtZWQgcGFyYW1ldGVyc2AgYmxvY2sKCmBgYHtyfQpZID0gcm5vcm0oMTAsIDEuNSwgLjIpCmZpdCA9IHN0YW4oJy4uL3N0YW5Nb2RlbHMvbW9kZWxfMC4yLnN0YW4nLCBpdGVyID0gMjAwLCBjaGFpbnMgPSA0LCBkYXRhPSBsaXN0KFk9WSkpCmBgYAoKYGBge3J9CnByaW50KGZpdCwgcHJvYnM9YyguMjUsLjUsLjc1KSkKYGBgCgpDcmVhdGluZyBwb3N0ZXJpb3IgcHJlZGljdGl2ZSBjaGVjayB2YXJpYWJsZSB3aXRoaW4gYHt9YCB0byBhdm9pZCBtZW1vcnkgb3ZlcmhlYWQuCgpgYGB7cn0KWSA9IHJub3JtKDEwLCAxLjUsIC4yKQpmaXQgPSBzdGFuKCcuLi9zdGFuTW9kZWxzL21vZGVsXzAuMy5zdGFuJywgaXRlciA9IDIwMCwgY2hhaW5zID0gNCwgZGF0YT0gbGlzdChZPVkpKQpgYGAKCk5vdGUgbGFjayBvZiBgbFNpbURhdGFgIHZhcmlhYmxlIGluIHRoZSBvdXRwdXQKCmBgYHtyfQpwcmludChmaXQsIHByb2JzPWMoLjI1LC41LC43NSkpCmBgYAoKQ3JlYXRpbmcgY3VzdG9tIHByb2JhYmlsaXR5IGRpc3RyaWJ1dGlvbnMuCgpgYGB7cn0KTiA9IDQKWCA9IGMoLTEuNSwgMi4zLCAwLjEsIC0wLjQpCmZpdCA9IHN0YW4oJy4uL3N0YW5Nb2RlbHMvbW9kZWxfMC40LnN0YW4nLCBpdGVyID0gMjAwLCBjaGFpbnMgPSA0LCBkYXRhPSBsaXN0KE49TiwgWD1YKSkKYGBgCgpgYGB7cn0KcHJpbnQoZml0LCBwcm9icz1jKC4yNSwuNSwuNzUpKQpgYGAKCgo=</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiU3RhbiBtb2RlbF8wIgpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sKLS0tCgpDcmVhdGUgZmFrZSBkYXRhCgpgYGB7cn0KWSA9IHJub3JtKDEwLCAxLjUsIC4yKQpgYGAKCkNvbXBpbGUgYW5kIHJ1biB0aGUgTUNNQwoKYGBge3J9CmZpdCA9IHN0YW4oJy4uL3N0YW5Nb2RlbHMvbW9kZWxfMC5zdGFuJywgaXRlcj0yMDAsIGNoYWlucz00LAogICAgICAgICAgIGRhdGEgPSBsaXN0KFk9WSkpCmBgYAoKSW50ZXJwcmV0aW5nIHJlc3VsdHMKCmBgYHtyfQpwcmludChmaXQsIHByb2JzPWMoLjI1LCAuNSwgLjc1KSkKYGBgCgpFeHRyYWN0IGFuZCBwbG90IHBvc3RlcmlvcgoKYGBge3J9CmRhdGEuZnJhbWUobXUgPWV4dHJhY3QoZml0LCAnbXUnKVtbMV1dKSAlPiUKICBnZ3Bsb3QoYWVzKHg9bXUpKSsKICBnZW9tX2hpc3RvZ3JhbSgpCmBgYAoKSW50ZXJhY3RpdmUgZXhwbG9yYXRpb24gaW4gYHNoaW55c3RhbmAKCmBgYHtyfQojIHJlcXVpcmUoc2hpbnlzdGFuKQpgYGAKCgpgYGB7cn0KIyBhRml0ID0gYXMuc2hpbnlzdGFuKGZpdCkKIyBsYXVuY2hfc2hpbnlzdGFuKGFGaXQpCmBgYAoKUmUgcnVuIG1vZGVsIHdpdGggYGdlbmVyYXRlZCBxdWFudGl0aWVzYCBibG9jawoKYGBge3J9CmZpdCA9IHN0YW4oJy4uL3N0YW5Nb2RlbHMvbW9kZWxfMC5zdGFuJywgaXRlcj0yMDAsIGNoYWlucz00LAogICAgICAgICAgIGRhdGEgPSBsaXN0KFk9WSkpCmBgYAoKYGBge3J9CnByaW50KGZpdCwgcHJvYnM9YyguMjUsLjUsLjc1KSkKYGBgCgpOZXcgbW9kZWwgd2hlcmUgaGVpZ2h0ICBgWWAgaXMgYSBmdW5jdGlvbiBvZiB3ZWlnaHQgYFhgCgpgYGB7cn0KTiA9IDEwMApYID0gcm5vcm0oTiwgNjAsIDEwKQpiZXRhID0gLjMKc2lnbWEgPSAuMwpZID0gYmV0YSAqIGxvZyhYKSArIHJub3JtKE4sIDAsIHNpZ21hKQpmaXQgPSBzdGFuKCcuLi9zdGFuTW9kZWxzL21vZGVsXzAuMS5zdGFuJywgaXRlciA9IDIwMCwgY2hhaW5zID0gNCwKICAgICAgICAgICBkYXRhID0gbGlzdChZPVksIFg9WCwgTj1OKSkKYGBgCgpgYGB7cn0KcHJpbnQoZml0LCBwcm9icz1jKC4yNSwuNSwuNzUpKQpgYGAKCkZpdCBuZXcgbW9kZWwgd2l0aCBgdHJhbnNmb3JtZWQgcGFyYW1ldGVyc2AgYmxvY2sKCmBgYHtyfQpZID0gcm5vcm0oMTAsIDEuNSwgLjIpCmZpdCA9IHN0YW4oJy4uL3N0YW5Nb2RlbHMvbW9kZWxfMC4yLnN0YW4nLCBpdGVyID0gMjAwLCBjaGFpbnMgPSA0LCBkYXRhPSBsaXN0KFk9WSkpCmBgYAoKYGBge3J9CnByaW50KGZpdCwgcHJvYnM9YyguMjUsLjUsLjc1KSkKYGBgCgpDcmVhdGluZyBwb3N0ZXJpb3IgcHJlZGljdGl2ZSBjaGVjayB2YXJpYWJsZSB3aXRoaW4gYHt9YCB0byBhdm9pZCBtZW1vcnkgb3ZlcmhlYWQuCgpgYGB7cn0KWSA9IHJub3JtKDEwLCAxLjUsIC4yKQpmaXQgPSBzdGFuKCcuLi9zdGFuTW9kZWxzL21vZGVsXzAuMy5zdGFuJywgaXRlciA9IDIwMCwgY2hhaW5zID0gNCwgZGF0YT0gbGlzdChZPVkpKQpgYGAKCk5vdGUgbGFjayBvZiBgbFNpbURhdGFgIHZhcmlhYmxlIGluIHRoZSBvdXRwdXQKCmBgYHtyfQpwcmludChmaXQsIHByb2JzPWMoLjI1LC41LC43NSkpCmBgYAoKQ3JlYXRpbmcgY3VzdG9tIHByb2JhYmlsaXR5IGRpc3RyaWJ1dGlvbnMuCgpgYGB7cn0KTiA9IDQKWCA9IGMoLTEuNSwgMi4zLCAwLjEsIC0wLjQpCmZpdCA9IHN0YW4oJy4uL3N0YW5Nb2RlbHMvbW9kZWxfMC40LnN0YW4nLCBpdGVyID0gMjAwLCBjaGFpbnMgPSA0LCBkYXRhPSBsaXN0KE49TiwgWD1YKSkKYGBgCgpgYGB7cn0KcHJpbnQoZml0LCBwcm9icz1jKC4yNSwuNSwuNzUpKQpgYGAKClVzaW5nIFdBSUMgYW5kIExPTy1DVgoKR2VuZXJhdGUgZGF0YSBmcm9tIGEgdC1kaXN0cmlidXRpb24gYW5kIGNvbXBhcmUgdHdvIG1vZGVscyB0aGF0IGRlc2NyaWJlIGEgdHJ1ZSBhbmQgZmFsc2UgZGF0YSBnZW5lcmF0aW5nIHByb2Nlc3Nlcy4KCmBgYHtyfQpOID0gMTAwMDAKWCA9IHJ0KE4sIDUpCmBgYAoKYGBge3J9CnJlcXVpcmUobG9vKQpgYGAKCkNvbXBhcmUgbW9kZWxzIHVzaW5nIGBXQUlDYAoKYGBge3J9CmZpdDEgPSBzdGFuKCcuLi9zdGFuTW9kZWxzL21vZGVsXzAuNS5zdGFuJywgaXRlcj0yMDAsIGNoYWlucz00LCBkYXRhPWxpc3QoTj1OLCBYPVgpKQpsb2dMaWtlbGlob29kMSA9IGV4dHJhY3RfbG9nX2xpayhmaXQxLCAnbG9nTGlrZWxpaG9vZCcpCldBSUMxID0gd2FpYyhsb2dMaWtlbGlob29kMSkKYGBgCmBgYHtyfQpXQUlDMQpgYGAKCmBgYHtyfQpmaXQyID0gc3RhbignLi4vc3Rhbk1vZGVscy9tb2RlbF8wLjYuc3RhbicsIGl0ZXI9MjAwLCBjaGFpbnM9NCwgZGF0YT1saXN0KE49TiwgWD1YKSkKbG9nTGlrZWxpaG9vZDIgPSBleHRyYWN0X2xvZ19saWsoZml0MiwgJ2xvZ0xpa2VsaWhvb2QnKQpXQUlDMiA9IHdhaWMobG9nTGlrZWxpaG9vZDIpCmBgYAoKYGBge3J9CldBSUMyCmBgYApEaWZmZXJlbmNlIGluIGBlbHBkYCBpcyBtdWNoIGdyZWF0ZXIgdGhhbiB0aGUgc3RhbmRhcmQgZXJyb3I7IGkuZS4gdGhlcmUgaXMgYSBzaWduaWZpY2FudCBkaWZmZXJlbmNlIGluIHBlcmZvcm1hbmNlIGJldHdlZW4gdGhlIHR3byBtb2RlbHMuCgpgYGB7cn0KbG9vX2NvbXBhcmUoV0FJQzEsIFdBSUMyKQpgYGAKCkNvbXBhcmUgbW9kZWxzIHVzaW5nIGBMT08tQ1ZgCgpgYGB7cn0KTE9PMSA9IGxvbyhsb2dMaWtlbGlob29kMSkKTE9PMQpgYGAKCmBgYHtyfQpMT08yID0gbG9vKGxvZ0xpa2VsaWhvb2QyKQpMT08yCmBgYAoKYGBge3J9Cmxvb19jb21wYXJlKExPTzEsIExPTzIpCmBgYAoKRXhwbGljaXQgY3Jvc3MgdmFsaWRhdGlvbgoKYGBge3J9CnJlcXVpcmUoY2FyZXQpCmBgYAoKYGBge3J9CnRlc3RJbmRpY2VzID0gY3JlYXRlRm9sZHMoWCwgaz01LCBsaXN0PVQsIHJldHVyblRyYWluPUYpCmBgYAoKYGBge3J9CmtGb2xkID0gZnVuY3Rpb24oYU1vZGVsLCB0ZXN0SW5kaWNlcywgWCl7CiAgbnVtRm9sZHMgPSBsZW5ndGgodGVzdEluZGljZXMpCiAgCiAgbFBvaW50TG9nTGlrZWxpaG9vZFRvdGFsID0gdmVjdG9yKCkKICAKICBmb3IoaSBpbiAxOm51bUZvbGRzKXsKICAgIFhUZXN0ID0gWFt0ZXN0SW5kaWNlc1tbaV1dXQogICAgWFRyYWluID0gWFstdGVzdEluZGljZXNbW2ldXV0KICAgIGZpdCA9IHNhbXBsaW5nKGFNb2RlbCwgaXRlcj0yMDAsIGNoYWlucz00LCBkYXRhPWxpc3QoTlRlc3Q9MjAwMCwgTlRyYWluPTgwMDAsIFhUcmFpbj1YVHJhaW4sIFhUZXN0PVhUZXN0KSkKICAgIGxvZ0xpa2VsaWhvb2QxID0gZXh0cmFjdF9sb2dfbGlrKGZpdCwgJ2xvZ0xpa2VsaWhvb2QnKQogICAgbFBvaW50TG9nTGlrZWxpaG9vZDEgPSBjb2xNZWFucyhsb2dMaWtlbGlob29kMSkKICAgIGxQb2ludExvZ0xpa2VsaWhvb2RUb3RhbCA9IGMobFBvaW50TG9nTGlrZWxpaG9vZFRvdGFsLCBsUG9pbnRMb2dMaWtlbGlob29kMSkKICB9CiAgCiAgcmV0dXJuKGxQb2ludExvZ0xpa2VsaWhvb2RUb3RhbCkKfQpgYGAKCmBgYHtyfQpNb2RlbDEgPSBzdGFuX21vZGVsKCcuLi9zdGFuTW9kZWxzLy9tb2RlbF8wLjcuc3RhbicpCk1vZGVsMiA9IHN0YW5fbW9kZWwoJy4uL3N0YW5Nb2RlbHMvL21vZGVsXzAuOC5zdGFuJykKYGBgCgpgYGB7cn0KbEVMUEQxID0ga0ZvbGQoTW9kZWwxLCB0ZXN0SW5kaWNlcywgWCkKbEVMUEQyID0ga0ZvbGQoTW9kZWwyLCB0ZXN0SW5kaWNlcywgWCkKYGBgCgpgYGB7cn0Kc3VtKGxFTFBEMSkKYGBgCgpgYGB7cn0Kc3VtKGxFTFBEMikKYGBgCgpUcmFuc2Zvcm1lZCBwYXJhbWV0ZXJzIGFuZCBKYWNvYmlhbnMKCkV4YW1wbGUgbW9kZWwgd2hlcmUgdGhlIGRlZmluZWQgcGFyYW1ldGVyIGBhbHBoYWAgZG9lcyBub3QgaGF2ZSBwcmlvciBkZWZpbmVkIGluIHRoZSBgbW9kZWxgIGJ1dCBpbnN0ZWFkIHdlIHNwZWNpZnkgYSBwYXJhbWV0ZXIgZm9yIHRoZSB0cmFuc2Zvcm1lZCBwYXJhbWV0ZXIgYHRoZXRhYC4gVGhpcyB3aWxsIGdpdmUgYSB3YXJuaW5nIGFuZCBhbiBpbmNvcnJlY3QgZXN0aW1hdGUgZm9yIGB0aGV0YWAgYmVjYXVzZSBub25pbG5lYXIgdHJhbnNmb3JtYXRpb25zIG9uIHBhcmFtZXRlcnMgdGhhdCBhcmUgdGhlbiB1c2VkIGZvciBzYW1wbGluZyByZXF1aXJlIHRoZSBkZWZpbml0aW9uIG9mIGEgSmFjb2JpYW4gKGkuZS4gdGhlIGRlc2NyaXB0aW9uIG9mIGhvdyB0aGUgbm9ubGluZWFyIHRyYW5zZm9ybSBjaGFuZ2VzIHRoZSBwcm9iYWJpbGl0eSBkZW5zaXR5IG9mIHRoZSB0cmFuc2Zvcm1lZCBwYXJhbWV0ZXIgY29tcGFyZWQgdG8gdGhlIG9yaWdpbmFsKQoKYGBge3J9Ck49NApZPWMoMCwwLDEsMCkKZml0ID0gc3RhbignLi4vc3Rhbk1vZGVscy9tb2RlbF8wLjkuc3RhbicsIGl0ZXI9MjAwLCBjaGFpbnM9NCwgZGF0YT1saXN0KE49TiwgWT1ZKSkKYGBgCgpgYGB7cn0KcHJpbnQoZml0LCBwcm9icz1jKC4yNSwuNSwuNzUpKQpgYGAKCgoKCgoK</div>
 
 
 

@@ -105,4 +105,124 @@ fit = stan('../stanModels/model_0.4.stan', iter = 200, chains = 4, data= list(N=
 print(fit, probs=c(.25,.5,.75))
 ```
 
+Using WAIC and LOO-CV
+
+Generate data from a t-distribution and compare two models that describe a true and false data generating processes.
+
+```{r}
+N = 10000
+X = rt(N, 5)
+```
+
+```{r}
+require(loo)
+```
+
+Compare models using `WAIC`
+
+```{r}
+fit1 = stan('../stanModels/model_0.5.stan', iter=200, chains=4, data=list(N=N, X=X))
+logLikelihood1 = extract_log_lik(fit1, 'logLikelihood')
+WAIC1 = waic(logLikelihood1)
+```
+```{r}
+WAIC1
+```
+
+```{r}
+fit2 = stan('../stanModels/model_0.6.stan', iter=200, chains=4, data=list(N=N, X=X))
+logLikelihood2 = extract_log_lik(fit2, 'logLikelihood')
+WAIC2 = waic(logLikelihood2)
+```
+
+```{r}
+WAIC2
+```
+Difference in `elpd` is much greater than the standard error; i.e. there is a significant difference in performance between the two models.
+
+```{r}
+loo_compare(WAIC1, WAIC2)
+```
+
+Compare models using `LOO-CV`
+
+```{r}
+LOO1 = loo(logLikelihood1)
+LOO1
+```
+
+```{r}
+LOO2 = loo(logLikelihood2)
+LOO2
+```
+
+```{r}
+loo_compare(LOO1, LOO2)
+```
+
+Explicit cross validation
+
+```{r}
+require(caret)
+```
+
+```{r}
+testIndices = createFolds(X, k=5, list=T, returnTrain=F)
+```
+
+```{r}
+kFold = function(aModel, testIndices, X){
+  numFolds = length(testIndices)
+  
+  lPointLogLikelihoodTotal = vector()
+  
+  for(i in 1:numFolds){
+    XTest = X[testIndices[[i]]]
+    XTrain = X[-testIndices[[i]]]
+    fit = sampling(aModel, iter=200, chains=4, data=list(NTest=2000, NTrain=8000, XTrain=XTrain, XTest=XTest))
+    logLikelihood1 = extract_log_lik(fit, 'logLikelihood')
+    lPointLogLikelihood1 = colMeans(logLikelihood1)
+    lPointLogLikelihoodTotal = c(lPointLogLikelihoodTotal, lPointLogLikelihood1)
+  }
+  
+  return(lPointLogLikelihoodTotal)
+}
+```
+
+```{r}
+Model1 = stan_model('../stanModels//model_0.7.stan')
+Model2 = stan_model('../stanModels//model_0.8.stan')
+```
+
+```{r}
+lELPD1 = kFold(Model1, testIndices, X)
+lELPD2 = kFold(Model2, testIndices, X)
+```
+
+```{r}
+sum(lELPD1)
+```
+
+```{r}
+sum(lELPD2)
+```
+
+Transformed parameters and Jacobians
+
+Example model where the defined parameter `alpha` does not have prior defined in the `model` but instead we specify a parameter for the transformed parameter `theta`. This will give a warning and an incorrect estimate for `theta` because nonilnear transformations on parameters that are then used for sampling require the definition of a Jacobian (i.e. the description of how the nonlinear transform changes the probability density of the transformed parameter compared to the original)
+
+```{r}
+N=4
+Y=c(0,0,1,0)
+fit = stan('../stanModels/model_0.9.stan', iter=200, chains=4, data=list(N=N, Y=Y))
+```
+
+```{r}
+print(fit, probs=c(.25,.5,.75))
+```
+
+
+
+
+
 
