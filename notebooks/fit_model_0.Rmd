@@ -240,5 +240,39 @@ print(fit, probs=c(.25,.5,.75))
 
 # Model_0.11: Discrete variables
 
+Estimating coin identity and head probability of two biased coins in 20 experiments with 10 coin flips each.  
+
+Generate fake data
+
+```{r}
+nStudy = 20
+N = 10
+Z = matrix(nrow=N, ncol=nStudy)
+theta = c(.1, .9)
+state = vector(length = nStudy)
+for (i in 1:nStudy){
+  if (runif(1)<.5){
+    Z[,i] = rbinom(N, 1, theta[1])
+    state[i] = 1
+  } else{
+    Z[,i] = rbinom(N, 1, theta[2])
+    state[i] = 0
+  }
+}
+
+X = colSums(Z)
+```
+
+```{r}
+state
+```
+
+```{r}
+fit = stan('../stanModels/model_0.11.stan', iter=200, chains=4, data=list(X=X, N=N, nStudy=nStudy))
+```
+
+```{r}
+print(fit, probs = c(.25,.5,.75), c('theta', 'pstate'))
+```
 
 
