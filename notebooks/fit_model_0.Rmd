@@ -1,5 +1,5 @@
 ---
-title: "Stan model_0"
+title: "Stan model_0: Basics"
 output: html_notebook
 ---
 
