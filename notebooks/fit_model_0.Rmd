@@ -3,6 +3,8 @@ title: "Stan model_0"
 output: html_notebook
 ---
 
+# Model_0: Basic model with predicted data
+
 Create fake data
 
 ```{r}
@@ -16,7 +18,7 @@ fit = stan('../stanModels/model_0.stan', iter=200, chains=4,
            data = list(Y=Y))
 ```
 
-Interpreting results
+Interpreting results (with added `generated quantities` block)
 
 ```{r}
 print(fit, probs=c(.25, .5, .75))
@@ -42,16 +44,7 @@ Interactive exploration in `shinystan`
 # launch_shinystan(aFit)
 ```
 
-Re run model with `generated quantities` block
-
-```{r}
-fit = stan('../stanModels/model_0.stan', iter=200, chains=4,
-           data = list(Y=Y))
-```
-
-```{r}
-print(fit, probs=c(.25,.5,.75))
-```
+# Model_0.1: Covariate model
 
 New model where height  `Y` is a function of weight `X`
 
@@ -69,6 +62,8 @@ fit = stan('../stanModels/model_0.1.stan', iter = 200, chains = 4,
 print(fit, probs=c(.25,.5,.75))
 ```
 
+# Model_0.2: Transformed parameters
+
 Fit new model with `transformed parameters` block
 
 ```{r}
@@ -79,6 +74,8 @@ fit = stan('../stanModels/model_0.2.stan', iter = 200, chains = 4, data= list(Y=
 ```{r}
 print(fit, probs=c(.25,.5,.75))
 ```
+
+# Model_0.3: Avoiding memory overload
 
 Creating posterior predictive check variable within `{}` to avoid memory overhead.
 
@@ -93,6 +90,8 @@ Note lack of `lSimData` variable in the output
 print(fit, probs=c(.25,.5,.75))
 ```
 
+# Model_0.4: Custom distributions
+
 Creating custom probability distributions.
 
 ```{r}
@@ -104,6 +103,8 @@ fit = stan('../stanModels/model_0.4.stan', iter = 200, chains = 4, data= list(N=
 ```{r}
 print(fit, probs=c(.25,.5,.75))
 ```
+
+# Model_0.5 and Model_0.6: WAIC and LOO-CV
 
 Using WAIC and LOO-CV
 
@@ -160,6 +161,8 @@ LOO2
 loo_compare(LOO1, LOO2)
 ```
 
+# Model_0.7 and Model_0.8: Explicit CV
+
 Explicit cross validation
 
 ```{r}
@@ -207,6 +210,8 @@ sum(lELPD1)
 sum(lELPD2)
 ```
 
+# Model_0.9: Transformed parameters
+
 Transformed parameters and Jacobians
 
 Example model where the defined parameter `alpha` does not have prior defined in the `model` but instead we specify a parameter for the transformed parameter `theta`. This will give a warning and an incorrect estimate for `theta` because nonilnear transformations on parameters that are then used for sampling require the definition of a Jacobian (i.e. the description of how the nonlinear transform changes the probability density of the transformed parameter compared to the original)
@@ -221,8 +226,19 @@ fit = stan('../stanModels/model_0.9.stan', iter=200, chains=4, data=list(N=N, Y=
 print(fit, probs=c(.25,.5,.75))
 ```
 
+# Model_0.10: Jacobians
 
+Corrected model where the log probability is correctly updated using the Jacobian
 
+```{r}
+fit = stan('../stanModels/model_0.10.stan', iter=200, chains=4, data=list(N=N, Y=Y))
+```
+
+```{r}
+print(fit, probs=c(.25,.5,.75))
+```
+
+# Model_0.11: Discrete variables
 
 
 
