@@ -1749,11 +1749,81 @@ summary {
 
 
 <!-- rnb-text-begin -->
+<p>Generating fake data to determine the number of polls needed (<code>K</code>) for an accurate estimation of the parameter of interest in the polling example in <code>model_1.4</code>.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuSyA9IDVcbmFOID0gMTBcbnRoZXRhID0gLjM1XG5ZID0gcmJpbm9tKEssIGFOLCB0aGV0YSlcbk4gPSByZXAoYU4sIEspXG5gYGAifQ== -->
+<pre class="r"><code>K = 5
+aN = 10
+theta = .35
+Y = rbinom(K, aN, theta)
+N = rep(aN, K)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Fit previously defined model</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYU1vZGVsID0gc3Rhbl9tb2RlbCgnLi4vc3Rhbk1vZGVscy9tb2RlbF8xLjQuc3RhbicpXG5gYGAifQ== -->
+<pre class="r"><code>aModel = stan_model(&#39;../stanModels/model_1.4.stan&#39;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiaW5jb21wbGV0ZSBmaW5hbCBsaW5lIGZvdW5kIG9uICcvVXNlcnMvemV5bmVwZW5rYXZpL0Ryb3Bib3gvUmFuZ2VsTGFiL0JheWVzaWFuU3RhdHMvc3Rhbk1vZGVscy9tb2RlbF8xLjQuc3RhbidcbiJ9 -->
+<pre><code>incomplete final line found on &#39;/Users/zeynepenkavi/Dropbox/RangelLab/BayesianStats/stanModels/model_1.4.stan&#39;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Look at the estimates to see if they are close to the ground truth defined above.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJpbnQoZml0LCBwcm9icz1jKC4yNSwuNSwuNzUpKVxuXG5gYGAifQ== -->
+<pre class="r"><code>print(fit, probs=c(.25,.5,.75))
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiSW5mZXJlbmNlIGZvciBTdGFuIG1vZGVsOiBtb2RlbF8xLlxuNCBjaGFpbnMsIGVhY2ggd2l0aCBpdGVyPTQ7IHdhcm11cD0yOyB0aGluPTE7IFxucG9zdC13YXJtdXAgZHJhd3MgcGVyIGNoYWluPTIsIHRvdGFsIHBvc3Qtd2FybXVwIGRyYXdzPTguXG5cbiAgICAgICAgICAgbWVhbiBzZV9tZWFuICAgc2QgICAgMjUlICAgIDUwJSAgICA3NSUgbl9lZmYgUmhhdFxuYWxwaGEgICAgICAwLjQ2ICAgICBOYU4gMC4xNCAgIDAuMzMgICAwLjQ1ICAgMC41MyAgIE5hTiAgSW5mXG5rYXBwYSAgICAgIDQuNzcgICAgIE5hTiA0LjEzICAgMS45NCAgIDMuMzIgICA1LjU2ICAgTmFOICBJbmZcbnRoZXRhWzFdICAgMC40OCAgICAgTmFOIDAuMTYgICAwLjQwICAgMC41MCAgIDAuNjAgICBOYU4gIEluZlxudGhldGFbMl0gICAwLjQ5ICAgICBOYU4gMC4xNiAgIDAuNDUgICAwLjQ5ICAgMC41NiAgIE5hTiAgSW5mXG50aGV0YVszXSAgIDAuNDAgICAgIE5hTiAwLjE4ICAgMC4yNSAgIDAuNDAgICAwLjUxICAgTmFOICBJbmZcbnRoZXRhWzRdICAgMC4yOCAgICAgTmFOIDAuMTQgICAwLjE3ICAgMC4yNSAgIDAuNDIgICBOYU4gIEluZlxudGhldGFbNV0gICAwLjQ0ICAgICBOYU4gMC4xMCAgIDAuMzYgICAwLjQ0ICAgMC41MSAgIE5hTiAgSW5mXG5hVGhldGEgICAgIDAuNDMgICAgIDAuMSAwLjI2ICAgMC4yNiAgIDAuMzYgICAwLjU0ICAgICA3ICBJbmZcbmxwX18gICAgIC00Ny42OCAgICAgTmFOIDQuOTAgLTUwLjA2IC00Ni40OCAtNDQuMTMgICBOYU4gIEluZlxuXG5TYW1wbGVzIHdlcmUgZHJhd24gdXNpbmcgTlVUUyhkaWFnX2UpIGF0IFR1ZSBTZXAgMjkgMTc6MTk6NTggMjAyMC5cbkZvciBlYWNoIHBhcmFtZXRlciwgbl9lZmYgaXMgYSBjcnVkZSBtZWFzdXJlIG9mIGVmZmVjdGl2ZSBzYW1wbGUgc2l6ZSxcbmFuZCBSaGF0IGlzIHRoZSBwb3RlbnRpYWwgc2NhbGUgcmVkdWN0aW9uIGZhY3RvciBvbiBzcGxpdCBjaGFpbnMgKGF0IFxuY29udmVyZ2VuY2UsIFJoYXQ9MSkuXG4ifQ== -->
+<pre><code>Inference for Stan model: model_1.
+4 chains, each with iter=4; warmup=2; thin=1; 
+post-warmup draws per chain=2, total post-warmup draws=8.
+
+           mean se_mean   sd    25%    50%    75% n_eff Rhat
+alpha      0.46     NaN 0.14   0.33   0.45   0.53   NaN  Inf
+kappa      4.77     NaN 4.13   1.94   3.32   5.56   NaN  Inf
+theta[1]   0.48     NaN 0.16   0.40   0.50   0.60   NaN  Inf
+theta[2]   0.49     NaN 0.16   0.45   0.49   0.56   NaN  Inf
+theta[3]   0.40     NaN 0.18   0.25   0.40   0.51   NaN  Inf
+theta[4]   0.28     NaN 0.14   0.17   0.25   0.42   NaN  Inf
+theta[5]   0.44     NaN 0.10   0.36   0.44   0.51   NaN  Inf
+aTheta     0.43     0.1 0.26   0.26   0.36   0.54     7  Inf
+lp__     -47.68     NaN 4.90 -50.06 -46.48 -44.13   NaN  Inf
+
+Samples were drawn using NUTS(diag_e) at Tue Sep 29 17:19:58 2020.
+For each parameter, n_eff is a crude measure of effective sample size,
+and Rhat is the potential scale reduction factor on split chains (at 
+convergence, Rhat=1).</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGVuZ3RoKGV4dHJhY3QoZml0LCAnYVRoZXRhJylbWzFdXSlcblxuYGBgIn0= -->
+<pre class="r"><code>length(extract(fit, &#39;aTheta&#39;)[[1]])
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDhcbiJ9 -->
+<pre><code>[1] 8</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGF0YS5mcmFtZShhVGhldGEgPWV4dHJhY3QoZml0LCAnYVRoZXRhJylbWzFdXSkgJT4lXG4gIGdncGxvdChhZXMoeD1hVGhldGEpKStcbiAgZ2VvbV9kZW5zaXR5KCkrXG4gIGdlb21fdmxpbmUoYWVzKHhpbnRlcmNlcHQ9LjM1KSlcbmBgYCJ9 -->
+<pre class="r"><code>data.frame(aTheta =extract(fit, &#39;aTheta&#39;)[[1]]) %&gt;%
+  ggplot(aes(x=aTheta))+
+  geom_density()+
+  geom_vline(aes(xintercept=.35))</code></pre>
+<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiU3RhbiBtb2RlbF8xOiBIaWVyYXJjaGljYWwgbW9kZWxzIgpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sKLS0tCgpgYGB7cn0KCmBgYAo=</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiU3RhbiBtb2RlbF8xOiBIaWVyYXJjaGljYWwgbW9kZWxzIgpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sKLS0tCgpHZW5lcmF0aW5nIGZha2UgZGF0YSB0byBkZXRlcm1pbmUgdGhlIG51bWJlciBvZiBwb2xscyBuZWVkZWQgKGBLYCkgZm9yIGFuIGFjY3VyYXRlIGVzdGltYXRpb24gb2YgdGhlIHBhcmFtZXRlciBvZiBpbnRlcmVzdCBpbiB0aGUgcG9sbGluZyBleGFtcGxlIGluIGBtb2RlbF8xLjRgLgoKYGBge3J9CksgPSA1CmFOID0gMTAKdGhldGEgPSAuMzUKWSA9IHJiaW5vbShLLCBhTiwgdGhldGEpCk4gPSByZXAoYU4sIEspCmBgYAoKRml0IHByZXZpb3VzbHkgZGVmaW5lZCBtb2RlbAoKYGBge3J9CmFNb2RlbCA9IHN0YW5fbW9kZWwoJy4uL3N0YW5Nb2RlbHMvbW9kZWxfMS40LnN0YW4nKQpmaXQgPSBzYW1wbGluZyhhTW9kZWwsIGRhdGEgPSBsaXN0KE49TiwgSz1LLCBZPVkpLCBpdGVyPTQwMCwgY2hhaW5zPTQpCmBgYAoKTG9vayBhdCB0aGUgZXN0aW1hdGVzIHRvIHNlZSBpZiB0aGV5IGFyZSBjbG9zZSB0byB0aGUgZ3JvdW5kIHRydXRoIGRlZmluZWQgYWJvdmUuCgpgYGB7cn0KcHJpbnQoZml0LCBwcm9icz1jKC4yNSwuNSwuNzUpKQpgYGAKCmBgYHtyfQpsZW5ndGgoZXh0cmFjdChmaXQsICdhVGhldGEnKVtbMV1dKQpgYGAKCmBgYGB7cn0KZGF0YS5mcmFtZShhVGhldGEgPWV4dHJhY3QoZml0LCAnYVRoZXRhJylbWzFdXSkgJT4lCiAgZ2dwbG90KGFlcyh4PWFUaGV0YSkpKwogIGdlb21fZGVuc2l0eSgpKwogIGdlb21fdmxpbmUoYWVzKHhpbnRlcmNlcHQ9LjM1KSkKYGBg</div>
 
 
 

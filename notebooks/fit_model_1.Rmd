@@ -3,6 +3,36 @@ title: "Stan model_1: Hierarchical models"
 output: html_notebook
 ---
 
-```{r}
+Generating fake data to determine the number of polls needed (`K`) for an accurate estimation of the parameter of interest in the polling example in `model_1.4`.
 
+```{r}
+K = 5
+aN = 10
+theta = .35
+Y = rbinom(K, aN, theta)
+N = rep(aN, K)
+```
+
+Fit previously defined model
+
+```{r}
+aModel = stan_model('../stanModels/model_1.4.stan')
+fit = sampling(aModel, data = list(N=N, K=K, Y=Y), iter=400, chains=4)
+```
+
+Look at the estimates to see if they are close to the ground truth defined above.
+
+```{r}
+print(fit, probs=c(.25,.5,.75))
+```
+
+```{r}
+length(extract(fit, 'aTheta')[[1]])
+```
+
+````{r}
+data.frame(aTheta =extract(fit, 'aTheta')[[1]]) %>%
+  ggplot(aes(x=aTheta))+
+  geom_density()+
+  geom_vline(aes(xintercept=.35))
 ```
