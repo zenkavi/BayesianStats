@@ -26,13 +26,36 @@ Look at the estimates to see if they are close to the ground truth defined above
 print(fit, probs=c(.25,.5,.75))
 ```
 
-```{r}
-length(extract(fit, 'aTheta')[[1]])
-```
-
 ````{r}
 data.frame(aTheta =extract(fit, 'aTheta')[[1]]) %>%
   ggplot(aes(x=aTheta))+
-  geom_density()+
-  geom_vline(aes(xintercept=.35))
+  geom_histogram()+
+  geom_vline(aes(xintercept=.35), linetype='dashed')
+```
+
+Repeat same thing with data from more polls
+
+```{r}
+K = 30
+aN = 10
+theta = .35
+Y = rbinom(K, aN, theta)
+N = rep(aN, K)
+```
+
+Fit previously defined model
+
+```{r}
+fit2 = sampling(aModel, data = list(N=N, K=K, Y=Y), iter=400, chains=4)
+```
+
+```{r}
+print(fit2, probs=c(.25,.5,.75))
+```
+
+````{r}
+data.frame(aTheta =extract(fit2, 'aTheta')[[1]]) %>%
+  ggplot(aes(x=aTheta))+
+  geom_histogram()+
+  geom_vline(aes(xintercept=.35), linetype='dashed')
 ```
