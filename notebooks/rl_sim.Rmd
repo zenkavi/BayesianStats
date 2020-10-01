@@ -1,0 +1,49 @@
+---
+title: "RL simulation and parameter recovery with Stan"
+output: html_notebook
+---
+
+Translating Deanizeau et al. (2014) Q-learning example
+
+Parameters  
+
+Calculate the learning rate used in Deanizeau et al. simulations. Not sure why, but they determine a value and then put it through an inverse sigmoid to convert it to a learning rate.
+
+```{r}
+x = 0.65
+
+center = 0
+scale = 1
+offset = 0
+slope = 1
+
+lx = scale * (1/(x - offset)) - 1
+y = center - (1/slope) * log (lx)
+y
+```
+
+Evolution equation: how the 'hidden states' in this example the (unobserved) expected value of an option changes through time (in response to action and feedback). In this case this is the delta rule; EV of an option is updated by a prediction error (difference between observed and expected) weighed by a learning rate.  
+
+Evolution equation parameter is the learning rate. To keep common notation `theta` is used instead of the standard in the RL literature `alpha`.
+
+```{r}
+theta = y
+```
+
+Observation equation maps the hidden state onto data that we can observe and measure. In this case observable data would be choice behavior. The sigmoid transforms the expected value to probabilities of each action.
+
+Observation equation parameter is the inverse temperature. It describes how much of the probability depends on the expected values of options versus random chance.
+
+```{r}
+phi = log(2.5)
+```
+
+
+
+Single arm bandit task with four bandits.
+
+Two groups of subjects: learner vs. non-learners.
+
+Observed data: Binary (1 play; 0 pass)
+
+Data generating process: Bernoulli with probability of Y=1 = theta

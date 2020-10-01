@@ -1,0 +1,5 @@
+---
+title: "Neural mass model simulation and parameter recovery with Stan"
+output: html_notebook
+---
+
