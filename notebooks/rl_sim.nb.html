@@ -1750,21 +1750,61 @@ summary {
 
 <!-- rnb-text-begin -->
 <p>Translating Deanizeau et al. (2014) Q-learning example</p>
-<p>Parameters</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZl9RbGVhcm5pbmcgPSBmdW5jdGlvbih4LCBQLCB1KXtcbiAgcmV0dXJuKGZ4KVxufVxuYGBgIn0= -->
+<pre class="r"><code>f_Qlearning = function(x, P, u){
+  return(fx)
+}</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZ19RbGVhcm5pbmcgPSBmdW5jdGlvbigpe1xuICByZXR1cm4oLi4uKVxufVxuYGBgIn0= -->
+<pre class="r"><code>g_Qlearning = function(){
+  return(...)
+}</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBwcm9iYWJpbGl0eSBvZiBhIHBvc2l0aXZlIHJld2FyZCBmb2xsb3dpbmcgYSAnY29ycmVjdCcgYWN0aW9uIFxucHJvYlJld2FyZEdvb2QgPSA3NS8xMDA7XG4jIGRyYXcgMjUgcmFuZG9tIGZlZWRiYWNrc1xuY29udEJsb2MgPSBydW5pZigyNSkgPCBwcm9iUmV3YXJkR29vZFxuIyBjcmVhdGUgNiBibG9jcyB3aXRoIHJldmVyc2Fsc1xuY29udGluZ2VuY2llcyA9IGMoY29udEJsb2MsIDEtY29udEJsb2MsY29udEJsb2MsIDEtY29udEJsb2MsIGNvbnRCbG9jLCAxLWNvbnRCbG9jKVxuYGBgIn0= -->
+<pre class="r"><code># probability of a positive reward following a &#39;correct&#39; action 
+probRewardGood = 75/100;
+# draw 25 random feedbacks
+contBloc = runif(25) &lt; probRewardGood
+# create 6 blocs with reversals
+contingencies = c(contBloc, 1-contBloc,contBloc, 1-contBloc, contBloc, 1-contBloc)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Feedback function. Not sure if it will be useful yet.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaF9mZWVkYmFjayA9IGZ1bmN0aW9uKHl0LCB0KXtcbiAgcmV0dXJuKGFzLm51bWVyaWMoeXQgPT0gY29udGluZ2VuY2llc1t0XSkpXG59XG5gYGAifQ== -->
+<pre class="r"><code>h_feedback = function(yt, t){
+  return(as.numeric(yt == contingencies[t]))
+}</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
 <p>Calculate the learning rate used in Deanizeau et al. simulations. Not sure why, but they determine a value and then put it through an inverse sigmoid to convert it to a learning rate.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxueCA9IDAuNjVcblxuY2VudGVyID0gMFxuc2NhbGUgPSAxXG5vZmZzZXQgPSAwXG5zbG9wZSA9IDFcblxubHggPSBzY2FsZSAqICgxLyh4IC0gb2Zmc2V0KSkgLSAxXG55ID0gY2VudGVyIC0gKDEvc2xvcGUpICogbG9nIChseClcbnlcbmBgYCJ9 -->
-<pre class="r"><code>x = 0.65
-
-center = 0
-scale = 1
-offset = 0
-slope = 1
-
-lx = scale * (1/(x - offset)) - 1
-y = center - (1/slope) * log (lx)
-y</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI3NpbXBsaWZpZWQgdmVyc2lvblxuVkJBX3NpZ21vaWQgPSBmdW5jdGlvbih4LCBpbnZlcnNlPUZBTFNFLCBjZW50ZXIgPSAwLCBzY2FsZSA9IDEsIG9mZnNldCA9IDAsIHNsb3BlID0gMSl7XG4gIFxuICBpZihpbnZlcnNlKXtcbiAgICBseCA9IHNjYWxlICogKDEvKHggLSBvZmZzZXQpKSAtIDFcbiAgICB5ID0gY2VudGVyIC0gKDEvc2xvcGUpICogbG9nIChseClcbiAgfSBlbHNle1xuICAgIHkgPSBvZmZzZXQgKyBzY2FsZSAqIDEgLyAoMSArIGV4cCgtIHNsb3BlICogKHggLSBjZW50ZXIpKSlcbiAgfVxuICByZXR1cm4oeSlcbn1cbmBgYCJ9 -->
+<pre class="r"><code>#simplified version
+VBA_sigmoid = function(x, inverse=FALSE, center = 0, scale = 1, offset = 0, slope = 1){
+  
+  if(inverse){
+    lx = scale * (1/(x - offset)) - 1
+    y = center - (1/slope) * log (lx)
+  } else{
+    y = offset + scale * 1 / (1 + exp(- slope * (x - center)))
+  }
+  return(y)
+}</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -1772,18 +1812,41 @@ y</code></pre>
 <p>Evolution equation parameter is the learning rate. To keep common notation <code>theta</code> is used instead of the standard in the RL literature <code>alpha</code>.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGhldGEgPSB5XG5gYGAifQ== -->
-<pre class="r"><code>theta = y</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGhldGEgPSBWQkFfc2lnbW9pZCguNjUsIGludmVyc2U9VFJVRSlcbnRoZXRhXG5gYGAifQ== -->
+<pre class="r"><code>theta = VBA_sigmoid(.65, inverse=TRUE)
+theta</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Observation equation maps the hidden state onto data that we can observe and measure. In this case observable data would be choice behavior. The sigmoid transforms the expected value to probabilities of each action.</p>
+<p>Observation equation maps the hidden state onto data that we can observe and measure. In this case observable data would be choice behavior. The softmax transforms the expected value to probabilities of each action.</p>
 <p>Observation equation parameter is the inverse temperature. It describes how much of the probability depends on the expected values of options versus random chance.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGhpID0gbG9nKDIuNSlcbmBgYCJ9 -->
-<pre class="r"><code>phi = log(2.5)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGhpID0gbG9nKDIuNSlcbnBoaVxuYGBgIn0= -->
+<pre class="r"><code>phi = log(2.5)
+phi</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDAuOTE2MjkwN1xuIn0= -->
+<pre><code>[1] 0.9162907</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxueDAgPSBjKC41LCAuNSlcbmBgYCJ9 -->
+<pre class="r"><code>x0 = c(.5, .5)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGVuZ3RoKGNvbnRpbmdlbmNpZXMpXG5cbmBgYCJ9 -->
+<pre class="r"><code>length(contingencies)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDE1MFxuIn0= -->
+<pre><code>[1] 150</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Single arm bandit task with four bandits.</p>
@@ -1792,7 +1855,7 @@ y</code></pre>
 <p>Data generating process: Bernoulli with probability of Y=1 = theta</p>
 <!-- rnb-text-end -->
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiUkwgc2ltdWxhdGlvbiBhbmQgcGFyYW1ldGVyIHJlY292ZXJ5IHdpdGggU3RhbiIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKVHJhbnNsYXRpbmcgRGVhbml6ZWF1IGV0IGFsLiAoMjAxNCkgUS1sZWFybmluZyBleGFtcGxlCgpQYXJhbWV0ZXJzICAKCkNhbGN1bGF0ZSB0aGUgbGVhcm5pbmcgcmF0ZSB1c2VkIGluIERlYW5pemVhdSBldCBhbC4gc2ltdWxhdGlvbnMuIE5vdCBzdXJlIHdoeSwgYnV0IHRoZXkgZGV0ZXJtaW5lIGEgdmFsdWUgYW5kIHRoZW4gcHV0IGl0IHRocm91Z2ggYW4gaW52ZXJzZSBzaWdtb2lkIHRvIGNvbnZlcnQgaXQgdG8gYSBsZWFybmluZyByYXRlLgoKYGBge3J9CnggPSAwLjY1CgpjZW50ZXIgPSAwCnNjYWxlID0gMQpvZmZzZXQgPSAwCnNsb3BlID0gMQoKbHggPSBzY2FsZSAqICgxLyh4IC0gb2Zmc2V0KSkgLSAxCnkgPSBjZW50ZXIgLSAoMS9zbG9wZSkgKiBsb2cgKGx4KQp5CmBgYAoKRXZvbHV0aW9uIGVxdWF0aW9uOiBob3cgdGhlICdoaWRkZW4gc3RhdGVzJyBpbiB0aGlzIGV4YW1wbGUgdGhlICh1bm9ic2VydmVkKSBleHBlY3RlZCB2YWx1ZSBvZiBhbiBvcHRpb24gY2hhbmdlcyB0aHJvdWdoIHRpbWUgKGluIHJlc3BvbnNlIHRvIGFjdGlvbiBhbmQgZmVlZGJhY2spLiBJbiB0aGlzIGNhc2UgdGhpcyBpcyB0aGUgZGVsdGEgcnVsZTsgRVYgb2YgYW4gb3B0aW9uIGlzIHVwZGF0ZWQgYnkgYSBwcmVkaWN0aW9uIGVycm9yIChkaWZmZXJlbmNlIGJldHdlZW4gb2JzZXJ2ZWQgYW5kIGV4cGVjdGVkKSB3ZWlnaGVkIGJ5IGEgbGVhcm5pbmcgcmF0ZS4gIAoKRXZvbHV0aW9uIGVxdWF0aW9uIHBhcmFtZXRlciBpcyB0aGUgbGVhcm5pbmcgcmF0ZS4gVG8ga2VlcCBjb21tb24gbm90YXRpb24gYHRoZXRhYCBpcyB1c2VkIGluc3RlYWQgb2YgdGhlIHN0YW5kYXJkIGluIHRoZSBSTCBsaXRlcmF0dXJlIGBhbHBoYWAuCgpgYGB7cn0KdGhldGEgPSB5CmBgYAoKT2JzZXJ2YXRpb24gZXF1YXRpb24gbWFwcyB0aGUgaGlkZGVuIHN0YXRlIG9udG8gZGF0YSB0aGF0IHdlIGNhbiBvYnNlcnZlIGFuZCBtZWFzdXJlLiBJbiB0aGlzIGNhc2Ugb2JzZXJ2YWJsZSBkYXRhIHdvdWxkIGJlIGNob2ljZSBiZWhhdmlvci4gVGhlIHNpZ21vaWQgdHJhbnNmb3JtcyB0aGUgZXhwZWN0ZWQgdmFsdWUgdG8gcHJvYmFiaWxpdGllcyBvZiBlYWNoIGFjdGlvbi4KCk9ic2VydmF0aW9uIGVxdWF0aW9uIHBhcmFtZXRlciBpcyB0aGUgaW52ZXJzZSB0ZW1wZXJhdHVyZS4gSXQgZGVzY3JpYmVzIGhvdyBtdWNoIG9mIHRoZSBwcm9iYWJpbGl0eSBkZXBlbmRzIG9uIHRoZSBleHBlY3RlZCB2YWx1ZXMgb2Ygb3B0aW9ucyB2ZXJzdXMgcmFuZG9tIGNoYW5jZS4KCmBgYHtyfQpwaGkgPSBsb2coMi41KQpgYGAKCgoKU2luZ2xlIGFybSBiYW5kaXQgdGFzayB3aXRoIGZvdXIgYmFuZGl0cy4KClR3byBncm91cHMgb2Ygc3ViamVjdHM6IGxlYXJuZXIgdnMuIG5vbi1sZWFybmVycy4KCk9ic2VydmVkIGRhdGE6IEJpbmFyeSAoMSBwbGF5OyAwIHBhc3MpCgpEYXRhIGdlbmVyYXRpbmcgcHJvY2VzczogQmVybm91bGxpIHdpdGggcHJvYmFiaWxpdHkgb2YgWT0xID0gdGhldGEK</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiUkwgc2ltdWxhdGlvbiBhbmQgcGFyYW1ldGVyIHJlY292ZXJ5IHdpdGggU3RhbiIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKVHJhbnNsYXRpbmcgRGVhbml6ZWF1IGV0IGFsLiAoMjAxNCkgUS1sZWFybmluZyBleGFtcGxlCgpgYGB7cn0KZl9RbGVhcm5pbmcgPSBmdW5jdGlvbih4LCBQLCB1KXsKICByZXR1cm4oZngpCn0KYGBgCgpgYGB7cn0KZ19RbGVhcm5pbmcgPSBmdW5jdGlvbigpewogIHJldHVybiguLi4pCn0KYGBgCgpgYGB7cn0KIyBwcm9iYWJpbGl0eSBvZiBhIHBvc2l0aXZlIHJld2FyZCBmb2xsb3dpbmcgYSAnY29ycmVjdCcgYWN0aW9uIApwcm9iUmV3YXJkR29vZCA9IDc1LzEwMDsKIyBkcmF3IDI1IHJhbmRvbSBmZWVkYmFja3MKY29udEJsb2MgPSBydW5pZigyNSkgPCBwcm9iUmV3YXJkR29vZAojIGNyZWF0ZSA2IGJsb2NzIHdpdGggcmV2ZXJzYWxzCmNvbnRpbmdlbmNpZXMgPSBjKGNvbnRCbG9jLCAxLWNvbnRCbG9jLGNvbnRCbG9jLCAxLWNvbnRCbG9jLCBjb250QmxvYywgMS1jb250QmxvYykKYGBgCgpGZWVkYmFjayBmdW5jdGlvbi4gTm90IHN1cmUgaWYgaXQgd2lsbCBiZSB1c2VmdWwgeWV0LiAgIAoKYGBge3J9CmhfZmVlZGJhY2sgPSBmdW5jdGlvbih5dCwgdCl7CiAgcmV0dXJuKGFzLm51bWVyaWMoeXQgPT0gY29udGluZ2VuY2llc1t0XSkpCn0KYGBgCgpDYWxjdWxhdGUgdGhlIGxlYXJuaW5nIHJhdGUgdXNlZCBpbiBEZWFuaXplYXUgZXQgYWwuIHNpbXVsYXRpb25zLiBOb3Qgc3VyZSB3aHksIGJ1dCB0aGV5IGRldGVybWluZSBhIHZhbHVlIGFuZCB0aGVuIHB1dCBpdCB0aHJvdWdoIGFuIGludmVyc2Ugc2lnbW9pZCB0byBjb252ZXJ0IGl0IHRvIGEgbGVhcm5pbmcgcmF0ZS4KCmBgYHtyfQojc2ltcGxpZmllZCB2ZXJzaW9uClZCQV9zaWdtb2lkID0gZnVuY3Rpb24oeCwgaW52ZXJzZT1GQUxTRSwgY2VudGVyID0gMCwgc2NhbGUgPSAxLCBvZmZzZXQgPSAwLCBzbG9wZSA9IDEpewogIAogIGlmKGludmVyc2UpewogICAgbHggPSBzY2FsZSAqICgxLyh4IC0gb2Zmc2V0KSkgLSAxCiAgICB5ID0gY2VudGVyIC0gKDEvc2xvcGUpICogbG9nIChseCkKICB9IGVsc2V7CiAgICB5ID0gb2Zmc2V0ICsgc2NhbGUgKiAxIC8gKDEgKyBleHAoLSBzbG9wZSAqICh4IC0gY2VudGVyKSkpCiAgfQogIHJldHVybih5KQp9CmBgYAoKRXZvbHV0aW9uIGVxdWF0aW9uOiBob3cgdGhlICdoaWRkZW4gc3RhdGVzJyBpbiB0aGlzIGV4YW1wbGUgdGhlICh1bm9ic2VydmVkKSBleHBlY3RlZCB2YWx1ZSBvZiBhbiBvcHRpb24gY2hhbmdlcyB0aHJvdWdoIHRpbWUgKGluIHJlc3BvbnNlIHRvIGFjdGlvbiBhbmQgZmVlZGJhY2spLiBJbiB0aGlzIGNhc2UgdGhpcyBpcyB0aGUgZGVsdGEgcnVsZTsgRVYgb2YgYW4gb3B0aW9uIGlzIHVwZGF0ZWQgYnkgYSBwcmVkaWN0aW9uIGVycm9yIChkaWZmZXJlbmNlIGJldHdlZW4gb2JzZXJ2ZWQgYW5kIGV4cGVjdGVkKSB3ZWlnaGVkIGJ5IGEgbGVhcm5pbmcgcmF0ZS4gIAoKRXZvbHV0aW9uIGVxdWF0aW9uIHBhcmFtZXRlciBpcyB0aGUgbGVhcm5pbmcgcmF0ZS4gVG8ga2VlcCBjb21tb24gbm90YXRpb24gYHRoZXRhYCBpcyB1c2VkIGluc3RlYWQgb2YgdGhlIHN0YW5kYXJkIGluIHRoZSBSTCBsaXRlcmF0dXJlIGBhbHBoYWAuCgpgYGB7cn0KdGhldGEgPSBWQkFfc2lnbW9pZCguNjUsIGludmVyc2U9VFJVRSkKdGhldGEKYGBgCgpPYnNlcnZhdGlvbiBlcXVhdGlvbiBtYXBzIHRoZSBoaWRkZW4gc3RhdGUgb250byBkYXRhIHRoYXQgd2UgY2FuIG9ic2VydmUgYW5kIG1lYXN1cmUuIEluIHRoaXMgY2FzZSBvYnNlcnZhYmxlIGRhdGEgd291bGQgYmUgY2hvaWNlIGJlaGF2aW9yLiBUaGUgc29mdG1heCB0cmFuc2Zvcm1zIHRoZSBleHBlY3RlZCB2YWx1ZSB0byBwcm9iYWJpbGl0aWVzIG9mIGVhY2ggYWN0aW9uLgoKT2JzZXJ2YXRpb24gZXF1YXRpb24gcGFyYW1ldGVyIGlzIHRoZSBpbnZlcnNlIHRlbXBlcmF0dXJlLiBJdCBkZXNjcmliZXMgaG93IG11Y2ggb2YgdGhlIHByb2JhYmlsaXR5IGRlcGVuZHMgb24gdGhlIGV4cGVjdGVkIHZhbHVlcyBvZiBvcHRpb25zIHZlcnN1cyByYW5kb20gY2hhbmNlLgoKYGBge3J9CnBoaSA9IGxvZygyLjUpCnBoaQpgYGAKCmBgYHtyfQp4MCA9IGMoLjUsIC41KQpgYGAKCmBgYHtyfQpuX3QgPSBsZW5ndGgoY29udGluZ2VuY2llcykKYGBgCgpTaW5nbGUgYXJtIGJhbmRpdCB0YXNrIHdpdGggZm91ciBiYW5kaXRzLgoKVHdvIGdyb3VwcyBvZiBzdWJqZWN0czogbGVhcm5lciB2cy4gbm9uLWxlYXJuZXJzLgoKT2JzZXJ2ZWQgZGF0YTogQmluYXJ5ICgxIHBsYXk7IDAgcGFzcykKCkRhdGEgZ2VuZXJhdGluZyBwcm9jZXNzOiBCZXJub3VsbGkgd2l0aCBwcm9iYWJpbGl0eSBvZiBZPTEgPSB0aGV0YQo=</div>
 
 
 
