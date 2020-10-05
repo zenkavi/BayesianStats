@@ -6,18 +6,6 @@ output: html_notebook
 Translating Deanizeau et al. (2014) Q-learning example
 
 ```{r}
-f_Qlearning = function(x, P, u){
-  return(fx)
-}
-```
-
-```{r}
-g_Qlearning = function(){
-  return(...)
-}
-```
-
-```{r}
 # probability of a positive reward following a 'correct' action 
 probRewardGood = 75/100;
 # draw 25 random feedbacks
@@ -35,20 +23,6 @@ h_feedback = function(yt, t){
 ```
 
 Calculate the learning rate used in Deanizeau et al. simulations. Not sure why, but they determine a value and then put it through an inverse sigmoid to convert it to a learning rate.
-
-```{r}
-#simplified version
-VBA_sigmoid = function(x, inverse=FALSE, center = 0, scale = 1, offset = 0, slope = 1){
-  
-  if(inverse){
-    lx = scale * (1/(x - offset)) - 1
-    y = center - (1/slope) * log (lx)
-  } else{
-    y = offset + scale * 1 / (1 + exp(- slope * (x - center)))
-  }
-  return(y)
-}
-```
 
 Evolution equation: how the 'hidden states' in this example the (unobserved) expected value of an option changes through time (in response to action and feedback). In this case this is the delta rule; EV of an option is updated by a prediction error (difference between observed and expected) weighed by a learning rate.  
 
