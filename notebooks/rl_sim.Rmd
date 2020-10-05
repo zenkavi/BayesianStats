@@ -5,50 +5,15 @@ output: html_notebook
 
 Translating Deanizeau et al. (2014) Q-learning example
 
-```{r}
-# probability of a positive reward following a 'correct' action 
-probRewardGood = 75/100;
-# draw 25 random feedbacks
-contBloc = runif(25) < probRewardGood
-# create 6 blocs with reversals
-contingencies = c(contBloc, 1-contBloc,contBloc, 1-contBloc, contBloc, 1-contBloc)
-```
-
-Feedback function. Not sure if it will be useful yet.   
-
-```{r}
-h_feedback = function(yt, t){
-  return(as.numeric(yt == contingencies[t]))
-}
-```
-
-Calculate the learning rate used in Deanizeau et al. simulations. Not sure why, but they determine a value and then put it through an inverse sigmoid to convert it to a learning rate.
-
-Evolution equation: how the 'hidden states' in this example the (unobserved) expected value of an option changes through time (in response to action and feedback). In this case this is the delta rule; EV of an option is updated by a prediction error (difference between observed and expected) weighed by a learning rate.  
+**Evolution equation:** how the 'hidden states' in this example the (unobserved) expected value of an option changes through time (in response to action and feedback). In this case this is the delta rule; EV of an option is updated by a prediction error (difference between observed and expected) weighed by a learning rate.  
 
 Evolution equation parameter is the learning rate. To keep common notation `theta` is used instead of the standard in the RL literature `alpha`.
 
-```{r}
-theta = VBA_sigmoid(.65, inverse=TRUE)
-theta
-```
-
-Observation equation maps the hidden state onto data that we can observe and measure. In this case observable data would be choice behavior. The softmax transforms the expected value to probabilities of each action.
+**Observation equation** maps the hidden state onto data that we can observe and measure. In this case observable data would be choice behavior. The softmax transforms the expected value to probabilities of each action.
 
 Observation equation parameter is the inverse temperature. It describes how much of the probability depends on the expected values of options versus random chance.
 
-```{r}
-phi = log(2.5)
-phi
-```
 
-```{r}
-x0 = c(.5, .5)
-```
-
-```{r}
-n_t = length(contingencies)
-```
 
 Single arm bandit task with four bandits.
 
