@@ -1,16 +1,17 @@
 
 data {
-  int<lower=1> N;
-  int<lower=1> T;
-  int<lower=1, upper=T> Tsubj[N];
-  int<lower=-1, upper=2> choice[N, T];
-  real outcome[N, T];  // no lower and upper bounds
+  int<lower=1> N; // number of subjects
+  int<lower=1> T; // number of trials per subject
+  int<lower=1, upper=T> Tsubj[N]; // subject ids
+  int<lower=-1, upper=2> choice[N, T]; // choices cast for each trial in columns
+  real outcome[N, T];  // no lower and upper bounds; outcomes cast for each trial in columns
 }
 
 transformed data {
   vector[2] initV;  // initial values for EV
   initV = rep_vector(0.0, 2);
 }
+
 parameters {
 // Declare all parameters as vectors for vectorizing
   // Hyper(group)-parameters
@@ -21,6 +22,7 @@ parameters {
   vector[N] A_pr;    // learning rate
   vector[N] tau_pr;  // inverse temperature
 }
+
 transformed parameters {
   // subject-level parameters
   vector<lower=0, upper=1>[N] A;
@@ -31,6 +33,8 @@ transformed parameters {
     tau[i] = Phi_approx(mu_pr[2] + sigma[2] * tau_pr[i]) * 5;
   }
 }
+
+
 model {
   // Hyperparameters
   mu_pr  ~ normal(0, 1);

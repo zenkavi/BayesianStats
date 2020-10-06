@@ -41,14 +41,49 @@ outcome = as.matrix(outcome)
 
 ```
 
+Parameter estimation with NUTS sampler
+
 ```{r}
 fit = stan('../stanModels/bandit2arm_delta.stan', iter=200, chains=4, 
            data=list(N = N, T = TN, Tsubj = Tsubj, choice = choice, outcome = outcome))
 ```
 
+Examine posteriors
+
+Group level learning rate and inverse temperature
+
 ```{r}
-print(fit, probs=c(.25,.5,.75))
+data.frame(extract(fit, c("mu_A", "mu_tau"))) %>%
+  gather(key, value) %>%
+  ggplot(aes(x = value))+
+  geom_histogram()+
+  facet_grid(~key, scales='free')
 ```
 
+Subject level posteriors
 
+For learning rates
 
+```{r}
+data.frame(extract(fit, 'A')) %>%
+  gather(key, value) %>%
+  ggplot(aes(x=value))+
+  geom_histogram()+
+  facet_wrap(~key)
+```
+
+For inverse temperatures
+
+```{r}
+data.frame(extract(fit, 'tau')) %>%
+  gather(key, value) %>%
+  ggplot(aes(x=value))+
+  geom_histogram()+
+  facet_wrap(~key)
+```
+
+Parameter recovery with VI
+
+```{r}
+
+```
