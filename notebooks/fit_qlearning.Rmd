@@ -1,0 +1,105 @@
+---
+title: "RL simulation and parameter recovery with Stan"
+---
+
+Translating Deanizeau et al. (2014) Q-learning example
+
+```{r}
+source('/Users/zeynepenkavi/Dropbox/RangelLab/BayesianStats/helpers/demo_QlearningSimulation.R')
+```
+
+Generate simulated data
+
+```{r}
+sim_data = demo_QlearningSimulation()
+```
+
+True learning rate
+
+```{r}
+sim_data$simulation$evolution
+```
+
+True inverse temperature
+
+```{r}
+sim_data$simulation$observation
+```
+
+Figure 1: Simulated Q-learning behavior (from [demo_Qlearning.m](https://github.com/MBB-team/VBA-toolbox/blob/master/demos/3_behavioural/demo_Qlearning.m))
+
+```{r}
+df = data.frame(choices = c(sim_data$y), 
+                tendency = c(sim_data$y - sim_data$e))
+```
+
+```{r}
+df %>%
+  mutate(trial_n = 1:n()) %>%
+  ggplot(aes(x=trial_n))+
+  geom_point(aes(y=choices, color="choices"))+
+  geom_line(aes(y=tendency, color="p(y=1|theta,phi,m): behavioural tendency"))+
+  scale_colour_manual(name="",values=c("choices" = "black", "p(y=1|theta,phi,m): behavioural tendency" = "red"))+
+  theme(legend.position = "bottom")
+```
+
+Now that you have the data invert it using Stan to get parameters.
+
+```{r}
+TN = length(sim_data$choice)
+choice = sim_data$choices+1
+outcome = sim_data$feedback
+m_data = list(T = TN, choice = choice, outcome = outcome)
+```
+
+```{r}
+m = stan_model('../stanModels/QLearning.stan')
+```
+
+```{r}
+fit_nuts = sampling(m, iter=200, chains=4, data=m_data)
+```
+
+```{r}
+fit_vb = vb(m, data=m_data)
+```
+
+```{r}
+data.frame(extract(fit_nuts, c("A", "tau"))) %>%
+  mutate(alg = "NUTS") %>%
+  rbind(data.frame(extract(fit_vb, c("A", "tau"))) %>%
+  mutate(alg = "ADVI")) %>%
+  gather(key, value, -alg) %>%
+  ggplot(aes(x = value, fill=alg))+
+  geom_histogram(position="identity", alpha = .5)+
+  facet_wrap(~key, scales='free')+
+  scale_fill_manual(name="", values=c("NUTS" = "purple", "ADVI" = "dark green"))+
+  theme(legend.position="bottom")+
+  xlab("")+
+  ylab("")
+```
+
+
+```{r}
+summary(fit_nuts, pars = c('A', 'tau', 'log_lik'))$summary
+```
+
+```{r}
+summary(fit_vb, pars = c('A', 'tau', 'log_lik'))$summary
+```
+
+Log likelihood with pair plot
+
+```{r}
+data.frame(extract(fit_nuts, c('A', 'tau', 'log_lik'))) %>%
+  mutate(alg = "NUTS") %>%
+  rbind(data.frame(extract(fit_vb, c('A', 'tau', 'log_lik'))) %>%
+  mutate(alg = "ADVI"))%>%
+  ggplot(aes(x=A, y=tau, color=log_lik))+
+  geom_point() +
+  facet_grid(~alg)+
+  theme(legend.position = "bottom")+
+  ylab("Inverse temperature")+
+  xlab("Learning rate")
+```
+

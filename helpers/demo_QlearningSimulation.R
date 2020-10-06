@@ -19,9 +19,9 @@ demo_QlearningSimulation = function(){
   }
   
   theta = VBA_sigmoid(.65, inverse=TRUE)
-  
+
   phi = log(2.5)
-  
+
   x0 = c(.5, .5)
   
   n_t = length(contingencies)
