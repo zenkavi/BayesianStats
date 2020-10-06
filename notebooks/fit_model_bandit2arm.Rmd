@@ -1,21 +1,19 @@
 ---
 title: "2 armed bandit parameter recovery in Stan"
 output: html_notebook
+toc: True
 ---
+
+Comparison of NUTS and ADVI on 2 armed bandit task model from the [hBayesDM package](https://ccs-lab.github.io/hBayesDM/articles/getting_started.html) developed by Woo-Young Ahn et al. 
+
+## Data
+
+2 armed bandit task with 100 trials for 20 subjects.
 
 ```{r}
 data = read.table('../stanModels/bandit2arm_exampleData.txt', header = T)
 data
 ```
-
-data {
-  int<lower=1> N;
-  int<lower=1> T;
-  int<lower=1, upper=T> Tsubj[N];
-  int<lower=-1, upper=2> choice[N, T];
-  real outcome[N, T];  // no lower and upper bounds
-}
-
 ```{r}
 N = length(unique(data$subjID))
 
@@ -41,49 +39,74 @@ outcome = as.matrix(outcome)
 
 ```
 
-Parameter estimation with NUTS sampler
+## Parameter estimation 
+
+### NUTS sampler
 
 ```{r}
 fit = stan('../stanModels/bandit2arm_delta.stan', iter=200, chains=4, 
            data=list(N = N, T = TN, Tsubj = Tsubj, choice = choice, outcome = outcome))
 ```
 
-Examine posteriors
+### ADVI
 
-Group level learning rate and inverse temperature
+```{r}
+m = stan_model('../stanModels/bandit2arm_delta.stan')
+```
+
+```{r}
+fit_vb = vb(m, data=list(N = N, T = TN, Tsubj = Tsubj, choice = choice, outcome = outcome))
+```
+
+### Posteriors
+
+#### Group level learning rate and inverse temperature
 
 ```{r}
 data.frame(extract(fit, c("mu_A", "mu_tau"))) %>%
-  gather(key, value) %>%
-  ggplot(aes(x = value))+
-  geom_histogram()+
-  facet_grid(~key, scales='free')
+  mutate(alg = "NUTS") %>%
+  rbind(data.frame(extract(fit_vb, c("mu_A", "mu_tau"))) %>%
+  mutate(alg = "ADVI")) %>%
+  gather(key, value, -alg) %>%
+  ggplot(aes(x = value, fill=alg))+
+  geom_histogram(position="identity", alpha = .5)+
+  facet_wrap(~key, scales='free')+
+  scale_fill_manual(name="", values=c("NUTS" = "purple", "ADVI" = "dark green"))+
+  theme(legend.position="bottom")+
+  xlab("")+
+  ylab("")
 ```
-
-Subject level posteriors
+#### Subject level posteriors
 
 For learning rates
 
 ```{r}
-data.frame(extract(fit, 'A')) %>%
-  gather(key, value) %>%
-  ggplot(aes(x=value))+
-  geom_histogram()+
-  facet_wrap(~key)
+data.frame(extract(fit, "A")) %>%
+  mutate(alg = "NUTS") %>%
+  rbind(data.frame(extract(fit_vb, "A")) %>%
+  mutate(alg = "ADVI")) %>%
+  gather(key, value, -alg) %>%
+  ggplot(aes(x = value, fill=alg))+
+  geom_histogram(position="identity", alpha = .5)+
+  facet_wrap(~key)+
+  scale_fill_manual(name="", values=c("NUTS" = "purple", "ADVI" = "dark green"))+
+  theme(legend.position="bottom")+
+  xlab("")+
+  ylab("")
 ```
-
 For inverse temperatures
 
 ```{r}
-data.frame(extract(fit, 'tau')) %>%
-  gather(key, value) %>%
-  ggplot(aes(x=value))+
-  geom_histogram()+
-  facet_wrap(~key)
-```
-
-Parameter recovery with VI
-
-```{r}
-
+data.frame(extract(fit, "tau")) %>%
+  mutate(alg = "NUTS") %>%
+  rbind(data.frame(extract(fit_vb, "tau")) %>%
+  mutate(alg = "ADVI")) %>%
+  gather(key, value, -alg) %>%
+  ggplot(aes(x = value, fill=alg))+
+  geom_histogram(position="identity", alpha = .5)+
+  facet_wrap(~key)+
+  scale_fill_manual(name="", values=c("NUTS" = "purple", "ADVI" = "dark green"))+
+  theme(legend.position="bottom")+
+  xlab("")+
+  ylab("")
 ```
