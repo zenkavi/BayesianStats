@@ -1,6 +1,5 @@
 ---
 title: "Neural mass model simulation and parameter recovery with Stan"
-output: html_notebook
 ---
 
 Are the posteriors unimodal in VI vs MCMC? Are we losing important information when making assumptions like the Laplace approximation?

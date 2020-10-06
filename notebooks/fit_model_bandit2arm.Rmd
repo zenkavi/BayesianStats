@@ -1,8 +1,5 @@
 ---
 title: "2 armed bandit parameter recovery in Stan"
-output: html_notebook
-toc: yes
-toc_float: yes
 ---
 
 Comparison of NUTS and ADVI on 2 armed bandit task model from the [hBayesDM package](https://ccs-lab.github.io/hBayesDM/articles/getting_started.html) developed by Woo-Young Ahn et al. 

@@ -1,6 +1,5 @@
 ---
 title: "RL simulation and parameter recovery with Stan"
-output: html_notebook
 ---
 
 Translating Deanizeau et al. (2014) Q-learning example

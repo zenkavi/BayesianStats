@@ -1,6 +1,5 @@
 ---
 title: "Stan model_1: Hierarchical models"
-output: html_notebook
 ---
 
 Generating fake data to determine the number of polls needed (`K`) for an accurate estimation of the parameter of interest in the polling example in `model_1.4`.

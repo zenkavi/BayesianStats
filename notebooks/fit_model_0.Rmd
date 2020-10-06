@@ -1,6 +1,5 @@
 ---
 title: "Stan model_0: Basics"
-output: html_notebook
 ---
 
 # Model_0: Basic model with predicted data
