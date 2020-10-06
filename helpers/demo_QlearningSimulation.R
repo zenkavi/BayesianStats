@@ -1,5 +1,5 @@
-files.sources = list.files(dirname(rstudioapi::getSourceEditorContext()$path))
-files.sources = files.sources[files.sources != 'demo_QlearningSimulation.R']
+files.sources = list.files('/Users/zeynepenkavi/Dropbox/RangelLab/BayesianStats/helpers', full.names = T)
+files.sources = files.sources[files.sources != '/Users/zeynepenkavi/Dropbox/RangelLab/BayesianStats/helpers/demo_QlearningSimulation.R']
 sapply(files.sources, source)
 
 demo_QlearningSimulation = function(){
@@ -49,7 +49,7 @@ demo_QlearningSimulation = function(){
   choices = sim_out$u[1,2:end]
   feedback = sim_out$u[2,2:end]
   
-  out = list('choices' = choices, 'feedback'= feedback, 'simulation' = simulation)
+  out = list('choices' = choices, 'feedback'= feedback, 'simulation' = simulation, 'eta'=sim_out$eta, 'e'=sim_out$e, 'y'=sim_out$y)
   
   return(out)
 }
