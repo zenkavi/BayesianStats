@@ -47,7 +47,7 @@ Now that you have the data invert it using Stan to get parameters.
 
 ```{r}
 TN = length(sim_data$choice)
-choice = sim_data$choices+1
+choice = sim_data$choices+1 #adding 1 bc categorical_logit has support over [1,2]
 outcome = sim_data$feedback
 m_data = list(T = TN, choice = choice, outcome = outcome)
 ```
