@@ -1,13 +1,9 @@
 # Observation function
-g_Qlearning = function(x, P, u, idx){
+g_Qlearning = function(x, P){
   # IN:
-  #    - x: Q-values
+  #    - x: Q-values (expected value for each action)
   #    - P: (1) inverse (log-) temperature 
   #         (2) bias
-  #    - u: (idx(1)) index of 0 coded cue
-  #         (idx(2)) index of 1 coded cue
-  #    - in: 
-  #        - idx: position of inputs indicating Q-values to use
   #  OUT:
   #    - gx : P(y = 1|x)
   

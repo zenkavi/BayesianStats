@@ -1,5 +1,6 @@
-source('f_Qlearning.R')
-source('g_Qlearning.R')
+files.sources = list.files(dirname(rstudioapi::getSourceEditorContext()$path))
+files.sources = files.sources[files.sources != 'demo_QlearningSimulation.R']
+sapply(files.sources, source)
 
 demo_QlearningSimulation = function(){
   
@@ -25,18 +26,28 @@ demo_QlearningSimulation = function(){
   
   n_t = length(contingencies)
   
-  sim_out = VBA_simulate(n_t+1,
-                          ...., #after writing this function see if you should use string or get(string) to use the function itself as the input
-                          ....,
-                          )
+  u = matrix(NaN, nrow=2, ncol=length(contingencies)-1)
+  # instead of a 'skipf' option setting the initial input to the initial state
+  u = cbind(x0, u)
   
-  simulation = list('state' = x[,-ncol(x)], #x(:,1:end-1)
+  sim_out = VBA_simulate(n_t,
+                         f_fname,
+                         g_fname,
+                         theta,
+                         phi,
+                         u,
+                         Inf, Inf, #deterministic evolution and observation
+                         x0,
+                         h_feedback)
+  
+  simulation = list('state' = sim_out$x[,-ncol(sim_out$x)], #x(:,1:end-1)
                     'initial'= x0,
                     'evolution' = theta,
                     'observation' = phi)
   
-  choices = sim_out$u[...]
-  feedback = sim_out$u[...]
+  end = dim(u)[2]
+  choices = sim_out$u[1,2:end]
+  feedback = sim_out$u[2,2:end]
   
   out = list('choices' = choices, 'feedback'= feedback, 'simulation' = simulation)
   

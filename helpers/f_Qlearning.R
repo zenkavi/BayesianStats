@@ -8,8 +8,8 @@ f_Qlearning = function(x, P, u){
   # Note this is evaluated at a single time point. So e.g. u only has two values: the previous choice and the feedback for that time point only.
   alpha = VBA_sigmoid(P)
   
-  prevActionIdx = u[1,1]+1
-  feedback = u[2,1]
+  prevActionIdx = u[1]+1
+  feedback = u[2]
   
   fx = x
   
