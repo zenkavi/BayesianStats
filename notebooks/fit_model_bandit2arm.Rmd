@@ -1,0 +1,54 @@
+---
+title: "2 armed bandit parameter recovery in Stan"
+output: html_notebook
+---
+
+```{r}
+data = read.table('../stanModels/bandit2arm_exampleData.txt', header = T)
+data
+```
+
+data {
+  int<lower=1> N;
+  int<lower=1> T;
+  int<lower=1, upper=T> Tsubj[N];
+  int<lower=-1, upper=2> choice[N, T];
+  real outcome[N, T];  // no lower and upper bounds
+}
+
+```{r}
+N = length(unique(data$subjID))
+
+TN = length(unique(data$trial))
+
+Tsubj = unique(data$subjID)
+
+choice = data %>%
+  select(-outcome) %>%
+  group_by(subjID) %>%
+  spread(key = trial, value = choice) %>%
+  ungroup()%>%
+  select(-subjID)
+choice = as.matrix(choice)
+
+outcome = data %>%
+  select(-choice) %>%
+  group_by(subjID) %>%
+  spread(key = trial, value = outcome) %>%
+  ungroup()%>%
+  select(-subjID)
+outcome = as.matrix(outcome)
+
+```
+
+```{r}
+fit = stan('../stanModels/bandit2arm_delta.stan', iter=200, chains=4, 
+           data=list(N = N, T = TN, Tsubj = Tsubj, choice = choice, outcome = outcome))
+```
+
+```{r}
+print(fit, probs=c(.25,.5,.75))
+```
+
+
+
