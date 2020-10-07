@@ -2,6 +2,8 @@
 title: "RL simulation and parameter recovery with Stan"
 ---
 
+## Data
+
 Translating Deanizeau et al. (2014) Q-learning example
 
 ```{r}
@@ -26,6 +28,12 @@ True inverse temperature
 sim_data$simulation$observation
 ```
 
+exp inverse temperature
+
+```{r}
+exp(sim_data$simulation$observation)
+```
+
 Figure 1: Simulated Q-learning behavior (from [demo_Qlearning.m](https://github.com/MBB-team/VBA-toolbox/blob/master/demos/3_behavioural/demo_Qlearning.m))
 
 ```{r}
@@ -42,6 +50,8 @@ df %>%
   scale_colour_manual(name="",values=c("choices" = "black", "p(y=1|theta,phi,m): behavioural tendency" = "red"))+
   theme(legend.position = "bottom")
 ```
+
+## Parameter estimation
 
 Now that you have the data invert it using Stan to get parameters.
 
@@ -64,6 +74,8 @@ fit_nuts = sampling(m, iter=200, chains=4, data=m_data)
 fit_vb = vb(m, data=m_data)
 ```
 
+### Comparison of posteriors
+
 ```{r}
 data.frame(extract(fit_nuts, c("A", "tau"))) %>%
   mutate(alg = "NUTS") %>%
@@ -84,11 +96,14 @@ data.frame(extract(fit_nuts, c("A", "tau"))) %>%
 summary(fit_nuts, pars = c('A', 'tau', 'log_lik'))$summary
 ```
 
+According to [Yao et al. (2018)](http://www.stat.columbia.edu/~gelman/research/published/Evaluating_Variational_Inference.pdf) `khat` "provide[s] the desired diagnostic measurement between the true posterior 
+and the VI approximation"
+
 ```{r}
 summary(fit_vb, pars = c('A', 'tau', 'log_lik'))$summary
 ```
 
-Log likelihood with pair plot
+### Pair plots colored by log likelihood
 
 ```{r}
 data.frame(extract(fit_nuts, c('A', 'tau', 'log_lik'))) %>%
@@ -102,4 +117,57 @@ data.frame(extract(fit_nuts, c('A', 'tau', 'log_lik'))) %>%
   ylab("Inverse temperature")+
   xlab("Learning rate")
 ```
+## Binomial likelihood
 
+```{r}
+choice_bin = sim_data$choices
+m_bin_data = list(T = TN, choice = choice_bin, outcome = outcome)
+```
+
+```{r}
+m_bin = stan_model('../stanModels/QLearning_binom.stan')
+```
+
+```{r}
+fit_nuts_bin = sampling(m_bin, iter=200, chains=4, data=m_bin_data)
+```
+
+```{r}
+fit_vb_bin = vb(m_bin, data=m_bin_data)
+```
+
+```{r}
+summary(fit_nuts_bin, pars = c('A', 'tau', 'log_lik'))$summary
+```
+
+```{r}
+summary(fit_vb_bin, pars = c('A', 'tau', 'log_lik'))$summary
+```
+
+```{r}
+data.frame(extract(fit_nuts_bin, c("A", "tau"))) %>%
+  mutate(alg = "NUTS") %>%
+  rbind(data.frame(extract(fit_vb_bin, c("A", "tau"))) %>%
+  mutate(alg = "ADVI")) %>%
+  gather(key, value, -alg) %>%
+  ggplot(aes(x = value, fill=alg))+
+  geom_histogram(position="identity", alpha = .5)+
+  facet_wrap(~key, scales='free')+
+  scale_fill_manual(name="", values=c("NUTS" = "purple", "ADVI" = "dark green"))+
+  theme(legend.position="bottom")+
+  xlab("")+
+  ylab("")
+```
+
+```{r}
+data.frame(extract(fit_nuts_bin, c('A', 'tau', 'log_lik'))) %>%
+  mutate(alg = "NUTS") %>%
+  rbind(data.frame(extract(fit_vb_bin, c('A', 'tau', 'log_lik'))) %>%
+  mutate(alg = "ADVI"))%>%
+  ggplot(aes(x=A, y=tau, color=log_lik))+
+  geom_point() +
+  facet_grid(~alg)+
+  theme(legend.position = "bottom")+
+  ylab("Inverse temperature")+
+  xlab("Learning rate")
+```
