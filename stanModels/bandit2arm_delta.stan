@@ -29,7 +29,8 @@ transformed parameters {
   vector<lower=0, upper=5>[N] tau;
 
   for (i in 1:N) {
-    // built-in approximation to Phi (inverse CDF of unit normal) that approximates with a scaled logistic function
+    // built-in approximation to Phi (inverse CDF of unit normal; aka Wald) 
+    // that approximates with a scaled logistic function
     A[i]   = Phi_approx(mu_pr[1]  + sigma[1]  * A_pr[i]);
     tau[i] = Phi_approx(mu_pr[2] + sigma[2] * tau_pr[i]) * 5;
   }

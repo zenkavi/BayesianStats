@@ -12,20 +12,8 @@ transformed data {
 
 parameters {
 // Declare all parameters as vectors for vectorizing
-  vector[2] mu_pr;
-  vector<lower=0>[2] sigma;
-
-  real A_pr;    // learning rate
-  real tau_pr;  // inverse temperature
-}
-
-transformed parameters {
-  // subject-level parameters
-  real<lower=0, upper=1> A;
-  real<lower=0, upper=5> tau;
-
-  A   = Phi_approx(mu_pr[1]  + sigma[1]  * A_pr);
-  tau = Phi_approx(mu_pr[2] + sigma[2] * tau_pr) * 5;
+  real<lower=0, upper=1> alpha;
+  real<lower=0, upper=5> beta;
 }
 
 
@@ -38,21 +26,18 @@ model {
     for (t in 1:T) {
       // compute action probabilities
     //choice[t] ~ categorical_logit(tau * ev);
-    choice[t] ~ bernoulli_logit(tau * (ev[2]-ev[1]));
+    choice[t] ~ bernoulli_logit(beta * (ev[2]-ev[1]));
 
       // prediction error
     PE = outcome[t] - ev[choice[t]+1];
 
       // value updating (learning)
-    ev[choice[t]+1] += A * PE;
+    ev[choice[t]+1] += alpha * PE;
   }
-  // Hyperparameters
-  mu_pr  ~ normal(0, 1);
-  sigma ~ normal(0, 0.2);
 
   // individual parameters
-  A_pr   ~ normal(0, 1);
-  tau_pr ~ normal(0, 1);
+  alpha ~ beta(1, 1);
+  beta ~ gamma(1, 2);
 }
 
 generated quantities {
@@ -79,17 +64,17 @@ generated quantities {
     for (t in 1:T) {
         // compute log likelihood of current trial
       //log_lik += categorical_logit_lpmf(choice[t] | tau * ev);
-      log_lik += bernoulli_logit_lpmf(choice[t] | tau * (ev[2]-ev[1]));
+      log_lik += bernoulli_logit_lpmf(choice[t] | beta * (ev[2]-ev[1]));
 
         // generate posterior prediction for current trial
       //y_pred[t] = categorical_rng(softmax(tau * ev));
-      y_pred[t] = bernoulli_rng(inv_logit(tau * (ev[2]-ev[1])));
+      y_pred[t] = bernoulli_rng(inv_logit(beta * (ev[2]-ev[1])));
 
         // prediction error
       PE = outcome[t] - ev[choice[t]+1];
 
         // value updating (learning)
-      ev[choice[t]+1] += A * PE;
+      ev[choice[t]+1] += alpha * PE;
     }
   }
 }

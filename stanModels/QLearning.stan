@@ -12,21 +12,24 @@ transformed data {
 
 parameters {
 // Declare all parameters as vectors for vectorizing
-  vector[2] mu_pr;
-  vector<lower=0>[2] sigma;
+  //vector[2] mu_pr;
+  //vector<lower=0>[2] sigma;
 
-  real A_pr;    // learning rate
-  real tau_pr;  // inverse temperature
-}
-
-transformed parameters {
-  // subject-level parameters
+  //real A_pr;    // learning rate
+  //real tau_pr;  // inverse temperature
+  
   real<lower=0, upper=1> A;
   real<lower=0, upper=5> tau;
-
-  A   = Phi_approx(mu_pr[1]  + sigma[1]  * A_pr);
-  tau = Phi_approx(mu_pr[2] + sigma[2] * tau_pr) * 5;
 }
+
+//transformed parameters {
+  // subject-level parameters
+  //real<lower=0, upper=1> A;
+  //real<lower=0, upper=5> tau;
+
+  //A   = Phi_approx(mu_pr[1]  + sigma[1]  * A_pr);
+  //tau = Phi_approx(mu_pr[2] + sigma[2] * tau_pr) * 5;
+//}
 
 
 model {
@@ -46,12 +49,15 @@ model {
     ev[choice[t]] += A * PE;
   }
   // Hyperparameters
-  mu_pr  ~ normal(0, 1);
-  sigma ~ normal(0, 0.2);
+  //mu_pr  ~ normal(0, 1);
+  //sigma ~ normal(0, 0.2);
 
   // individual parameters
-  A_pr   ~ normal(0, 1);
-  tau_pr ~ normal(0, 1);
+  //A_pr   ~ normal(0, 1);
+  //tau_pr ~ normal(0, 1);
+  
+  A ~ beta(1,1);
+  tau ~ gamma(1, 2);
 }
 
 generated quantities {
