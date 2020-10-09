@@ -13,7 +13,8 @@ transformed data {
 parameters {
 // Declare all parameters as vectors for vectorizing
   real<lower=0, upper=1> alpha;
-  real<lower=0, upper=5> beta;
+  //real<lower=0, upper=5> beta;
+  real<lower=0, upper=1> beta;
 }
 
 
@@ -37,7 +38,9 @@ model {
 
   // individual parameters
   alpha ~ beta(1, 1);
-  beta ~ gamma(1, 2);
+  //beta ~ gamma(1, 2);
+  beta ~ beta(1, 1);
+
 }
 
 generated quantities {

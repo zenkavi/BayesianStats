@@ -28,6 +28,17 @@ True inverse temperature
 sim_data$simulation$observation
 ```
 
+What is the likelihood of data?
+
+```{r}
+beta = sim_data$simulation$observation
+data.frame(ev1 = sim_data$simulation$state[1,], ev2 = sim_data$simulation$state[2,]) %>%
+  mutate(value_diff = ev2 - ev1) %>%
+  mutate(inv_logit = 1/(1+ exp(-(beta*value_diff)))) %>%
+  mutate(log_lik = log(inv_logit)) %>%
+  summarise(sum(log_lik))
+```
+
 Figure 1: Simulated Q-learning behavior (from [demo_Qlearning.m](https://github.com/MBB-team/VBA-toolbox/blob/master/demos/3_behavioural/demo_Qlearning.m))
 
 ```{r}
@@ -115,11 +126,18 @@ summary(fit_vb, pars = c('alpha', 'beta', 'log_lik'))$summary
 
 ```{r}
 data.frame(extract(fit_nuts, c('alpha', 'beta', 'log_lik'))) %>%
-  mutate(alg = "NUTS") %>%
+  mutate(alg = "NUTS",
+         est_alpha = median(alpha),
+         est_beta = median(beta)) %>%
   rbind(data.frame(extract(fit_vb, c('alpha', 'beta', 'log_lik'))) %>%
-  mutate(alg = "ADVI"))%>%
-  ggplot(aes(x=A, y=tau, color=log_lik))+
-  geom_point() +
+  mutate(alg = "ADVI",
+         est_alpha = median(alpha),
+         est_beta = median(beta)))%>%
+  mutate(true_alpha = sim_data$simulation$evolution, true_beta = sim_data$simulation$observation)%>%
+  ggplot()+
+  geom_point(aes(x=alpha, y=beta, color=log_lik)) +
+  geom_point(aes(x=true_alpha, y = true_beta), color="red", shape = 13)+
+  geom_point(aes(x=est_alpha, y = est_beta), color =  "black", shape=4)+
   facet_grid(~alg)+
   theme(legend.position = "bottom")+
   ylab("Inverse temperature")+
