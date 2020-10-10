@@ -2,4 +2,8 @@
 title: "RL simulation and parameter recovery with Stan III"
 ---
 
-Can we get better group level parameter estimates if we had more data and used a hierarchical model?
+Even if we can't do a good with estimating the exact parameters can we distinguish between (cognitive) models?
+
+```{r}
+
+```

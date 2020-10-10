@@ -2,4 +2,8 @@
 title: "RL simulation and parameter recovery with Stan IV"
 ---
 
-Even if we can't do a good with estimating the exact parameters can we distinguish between (cognitive) models?
+Can we get better parameter estimates if we were data that we feed into the model had more variance? 
+
+Using expected values (which are 'hidden') instead of choices.
+
+Punting on this until I understand the value fitting procedure described in Deanizeau et al. (2014) better.

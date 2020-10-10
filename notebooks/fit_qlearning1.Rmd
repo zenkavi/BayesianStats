@@ -2,41 +2,20 @@
 title: "RL simulation and parameter recovery with Stan I"
 ---
 
-## Data
-
 Translating Deanizeau et al. (2014) Q-learning example
 
 ```{r}
 source('/Users/zeynepenkavi/Dropbox/RangelLab/BayesianStats/helpers/demo_QlearningSimulation.R')
 ```
 
-Generate simulated data using a model with a single learning `alpha` and inverse temperature parameter `beta`.
+## Example 1: Nice true parameter values
+
+### Data
+
+Generate simulated data using a model with a single learning `alpha` and inverse temperature parameter `beta`. For this example using `alpha = .65` and `beta = 2.5`.
 
 ```{r}
 sim_data = demo_QlearningSimulation()
-```
-
-True learning rate `alpha`
-
-```{r}
-sim_data$simulation$evolution
-```
-
-True inverse temperature `beta`
-
-```{r}
-sim_data$simulation$observation
-```
-
-Log likelihood of data
-
-```{r}
-beta = sim_data$simulation$observation
-data.frame(ev1 = sim_data$simulation$state[1,], ev2 = sim_data$simulation$state[2,]) %>%
-  mutate(value_diff = ev2 - ev1) %>%
-  mutate(inv_logit = 1/(1+ exp(-(beta*value_diff)))) %>% #Bernoulli probability mass of y given chance of success (i.e. likelihood)
-  mutate(log_lik = log(inv_logit)) %>% 
-  summarise(sum(log_lik))
 ```
 
 Figure 1: Simulated Q-learning behavior (from [demo_Qlearning.m](https://github.com/MBB-team/VBA-toolbox/blob/master/demos/3_behavioural/demo_Qlearning.m)) for 2 armed bandit task with .75 reward probability and changing contingencies every 25 trials.
@@ -56,7 +35,23 @@ df %>%
   theme(legend.position = "bottom")
 ```
 
-## Parameter estimation
+### Parameter estimation
+
+Parameters for this dataset:  
+
+True learning rate `alpha`
+
+```{r}
+true_alpha = VBA_sigmoid(sim_data$simulation$evolution, inverse=FALSE)
+true_alpha
+```
+
+True inverse temperature `beta`
+
+```{r}
+true_beta = exp(sim_data$simulation$observation)
+true_beta
+```
 
 Now that you have the data invert it using Stan to get parameters.
 
@@ -66,8 +61,6 @@ choice = sim_data$choices #adding 1 bc categorical_logit has support over [1,2]
 outcome = sim_data$feedback
 m_data = list(T = TN, choice = choice, outcome = outcome)
 ```
-
-### Model 1
 
 Priors: `beta(1,1)` for `alpha` and `gamma(1,2)` for `beta`
 
@@ -85,7 +78,7 @@ fit_vb = vb(m, data=m_data)
 
 #### Comparison of posteriors
 
-Both inversion methods overestimate `beta` and are not great for `alpha` either. 
+Neither inversion method recovers parameters perfectly (but much better than my previous simulation attempts using MLE).
 
 ```{r}
 data.frame(extract(fit_nuts, c("alpha", "beta"))) %>%
@@ -93,14 +86,14 @@ data.frame(extract(fit_nuts, c("alpha", "beta"))) %>%
   gather(key, value, -alg) %>%
   group_by(key) %>%
   mutate(med_est = median(value),
-         true_val = ifelse(key == "alpha", sim_data$simulation$evolution, sim_data$simulation$observation)) %>%
+         true_val = ifelse(key == "alpha", true_alpha, true_beta)) %>%
   
   rbind(data.frame(extract(fit_vb, c("alpha", "beta"))) %>%
           mutate(alg = "ADVI") %>%
           gather(key, value, -alg) %>%
           group_by(key) %>%
           mutate(med_est = median(value),
-                 true_val = ifelse(key == "alpha", sim_data$simulation$evolution, sim_data$simulation$observation))) %>%
+                 true_val = ifelse(key == "alpha", true_alpha, true_beta))) %>%
   gather(est_type, estimate, -alg, -key, -value) %>%
   
   ggplot(aes(x = value, fill=alg))+
@@ -129,13 +122,7 @@ summary(fit_vb, pars = c('alpha', 'beta', 'log_lik'))$summary
 
 #### Pair plots colored by log likelihood
 
-Pair plots show:
-
-1. Due to the independence assumption and Laplace approximation built into ADVI the parameter estimates are uncorrelated and normally distributed. The NUTS samples show that the independence assumption is violated and that the parameters are negatively correlated. This dependency leads to unidentifiability (i.e. there are multiple combinations of the parameters that are equally likely to generate the observed data).  
-
-2. The median of the posteriors for both inversion algorithms (black x) is far from the true values for the parameters (red circle). The true parameter combination (see above) has a lower likelihood than the estimated values. The region of the true values does not even make it into the final samples in the posterior.   
-
-Since `beta` is consistently and largely overestimated in a second model I tried adjusting the prior for it to constrain it more. This is unlikely to solve the issue that is primarily due to the dependency between the parameters but I wanted to see how it might change the posteriors.
+Pair plots show that Dde to the independence assumption built into ADVI the posteriors of parameter estimates are uncorrelated. The NUTS samples show that the independence assumption is violated and that the parameters are negatively correlated. This dependency leads to unidentifiability (i.e. there are multiple combinations of the parameters that are equally likely to generate the observed data).  
 
 ```{r}
 data.frame(extract(fit_nuts, c('alpha', 'beta', 'log_lik'))) %>%
@@ -146,23 +133,48 @@ data.frame(extract(fit_nuts, c('alpha', 'beta', 'log_lik'))) %>%
   mutate(alg = "ADVI",
          est_alpha = median(alpha),
          est_beta = median(beta)))%>%
-  mutate(true_alpha = sim_data$simulation$evolution, true_beta = sim_data$simulation$observation)%>%
+  mutate(true_alpha = true_alpha, true_beta = true_beta)%>%
   ggplot()+
   geom_point(aes(x=alpha, y=beta, color=log_lik)) +
-  geom_point(aes(x=true_alpha, y = true_beta), color="red", shape = 13)+
-  geom_point(aes(x=est_alpha, y = est_beta), color =  "black", shape=4)+
+  geom_point(aes(x=true_alpha, y = true_beta), color="red", shape = 13, size=6)+
+  geom_point(aes(x=est_alpha, y = est_beta), color =  "black", shape=4, size=6)+
   facet_grid(~alg)+
   theme(legend.position = "bottom")+
   ylab("Inverse temperature")+
   xlab("Learning rate")
 ```
 
-### Model 2
+## Example 2: High learning rate lower beta
 
-Priors: `beta(1,1)` for both parameters.
+### Data
 
 ```{r}
-m = stan_model('../stanModels/QLearning_binom_betaPriors.stan')
+sim_data = demo_QlearningSimulation(alpha = .9, beta = .7)
+```
+
+### Parameter estimation
+
+True learning rate `alpha`
+
+```{r}
+true_alpha = VBA_sigmoid(sim_data$simulation$evolution, inverse=FALSE)
+true_alpha
+```
+
+True inverse temperature `beta`
+
+```{r}
+true_beta = exp(sim_data$simulation$observation)
+true_beta
+```
+
+Now that you have the data invert it using Stan to get parameters.
+
+```{r}
+TN = length(sim_data$choice)
+choice = sim_data$choices #adding 1 bc categorical_logit has support over [1,2]
+outcome = sim_data$feedback
+m_data = list(T = TN, choice = choice, outcome = outcome)
 ```
 
 ```{r}
@@ -170,12 +182,78 @@ fit_nuts = sampling(m, iter=1000, chains=4, data=m_data)
 ```
 
 ```{r}
-fit_vb = vb(m, data=m_data)
+data.frame(extract(fit_nuts, c("alpha", "beta"))) %>%
+  mutate(alg = "NUTS") %>%
+  gather(key, value, -alg) %>%
+  group_by(key) %>%
+  mutate(med_est = median(value),
+         true_val = ifelse(key == "alpha", true_alpha, true_beta)) %>%
+
+  gather(est_type, estimate, -alg, -key, -value) %>%
+  
+  ggplot(aes(x = value, fill=alg))+
+  geom_histogram(position="identity", alpha = .5)+
+  facet_grid(alg~key, scales='free')+
+  geom_vline(aes(xintercept=estimate, linetype = est_type)) +
+  scale_linetype_manual(name="", values=c("med_est" = "solid", "true_val" = "dashed"),
+                        labels = c("med_est" = "median estimate", "true_val" = "true value"))+
+  scale_fill_manual(name="", values=c("NUTS" = "purple"))+
+  theme(legend.position="bottom")+
+  xlab("")+
+  ylab("")
 ```
 
-#### Comparison of posteriors
+```{r}
+data.frame(extract(fit_nuts, c('alpha', 'beta', 'log_lik'))) %>%
+  mutate(alg = "NUTS",
+         est_alpha = median(alpha),
+         est_beta = median(beta)) %>%
+  mutate(true_alpha = true_alpha, true_beta = true_beta)%>%
+  ggplot()+
+  geom_point(aes(x=alpha, y=beta, color=log_lik)) +
+  geom_point(aes(x=true_alpha, y = true_beta), color="red", shape = 13, size=6)+
+  geom_point(aes(x=est_alpha, y = est_beta), color =  "black", shape=4, size=6)+
+  theme(legend.position = "bottom")+
+  ylab("Inverse temperature")+
+  xlab("Learning rate")
+```
 
-The overestimation of `beta` is now less severe but the posterior looks wonky because it'd prefer that `beta` were larger than what it is constrained to be. This artificial constraint does not improve the `alpha` estimate either.
+## Example 3: Low learning rate high beta
+
+### Data
+
+```{r}
+sim_data = demo_QlearningSimulation(alpha = .15, beta = 3)
+```
+
+### Parameter estimation
+
+True learning rate `alpha`
+
+```{r}
+true_alpha = VBA_sigmoid(sim_data$simulation$evolution, inverse=FALSE)
+true_alpha
+```
+
+True inverse temperature `beta`
+
+```{r}
+true_beta = exp(sim_data$simulation$observation)
+true_beta
+```
+
+Now that you have the data invert it using Stan to get parameters.
+
+```{r}
+TN = length(sim_data$choice)
+choice = sim_data$choices #adding 1 bc categorical_logit has support over [1,2]
+outcome = sim_data$feedback
+m_data = list(T = TN, choice = choice, outcome = outcome)
+```
+
+```{r}
+fit_nuts = sampling(m, iter=1000, chains=4, data=m_data)
+```
 
 ```{r}
 data.frame(extract(fit_nuts, c("alpha", "beta"))) %>%
@@ -183,22 +261,17 @@ data.frame(extract(fit_nuts, c("alpha", "beta"))) %>%
   gather(key, value, -alg) %>%
   group_by(key) %>%
   mutate(med_est = median(value),
-         true_val = ifelse(key == "alpha", sim_data$simulation$evolution, sim_data$simulation$observation)) %>%
-  
-  rbind(data.frame(extract(fit_vb, c("alpha", "beta"))) %>%
-          mutate(alg = "ADVI") %>%
-          gather(key, value, -alg) %>%
-          group_by(key) %>%
-          mutate(med_est = median(value),
-                 true_val = ifelse(key == "alpha", sim_data$simulation$evolution, sim_data$simulation$observation))) %>%
+         true_val = ifelse(key == "alpha", true_alpha, true_beta)) %>%
+
   gather(est_type, estimate, -alg, -key, -value) %>%
   
   ggplot(aes(x = value, fill=alg))+
   geom_histogram(position="identity", alpha = .5)+
   facet_grid(alg~key, scales='free')+
   geom_vline(aes(xintercept=estimate, linetype = est_type)) +
-  scale_linetype_manual(name="", values=c("med_est" = "solid", "true_val" = "dashed"))+
-  scale_fill_manual(name="", values=c("NUTS" = "purple", "ADVI" = "dark green"))+
+  scale_linetype_manual(name="", values=c("med_est" = "solid", "true_val" = "dashed"),
+                        labels = c("med_est" = "median estimate", "true_val" = "true value"))+
+  scale_fill_manual(name="", values=c("NUTS" = "purple"))+
   theme(legend.position="bottom")+
   xlab("")+
   ylab("")
@@ -206,35 +279,15 @@ data.frame(extract(fit_nuts, c("alpha", "beta"))) %>%
 
 
 ```{r}
-summary(fit_nuts, pars = c('alpha', 'beta', 'log_lik'))$summary
-```
-
-According to [Yao et al. (2018)](http://www.stat.columbia.edu/~gelman/research/published/Evaluating_Variational_Inference.pdf) `khat` "provide[s] the desired diagnostic measurement between the true posterior 
-and the VI approximation"
-
-```{r}
-summary(fit_vb, pars = c('alpha', 'beta', 'log_lik'))$summary
-```
-
-#### Pair plots colored by log likelihood
-
-Now the true values are within the posteriors but this model fits worse generally.
-
-```{r}
 data.frame(extract(fit_nuts, c('alpha', 'beta', 'log_lik'))) %>%
   mutate(alg = "NUTS",
          est_alpha = median(alpha),
          est_beta = median(beta)) %>%
-  rbind(data.frame(extract(fit_vb, c('alpha', 'beta', 'log_lik'))) %>%
-  mutate(alg = "ADVI",
-         est_alpha = median(alpha),
-         est_beta = median(beta)))%>%
-  mutate(true_alpha = sim_data$simulation$evolution, true_beta = sim_data$simulation$observation)%>%
+  mutate(true_alpha = true_alpha, true_beta = true_beta)%>%
   ggplot()+
   geom_point(aes(x=alpha, y=beta, color=log_lik)) +
-  geom_point(aes(x=true_alpha, y = true_beta), color="red", shape = 13)+
-  geom_point(aes(x=est_alpha, y = est_beta), color =  "black", shape=4)+
-  facet_grid(~alg)+
+  geom_point(aes(x=true_alpha, y = true_beta), color="red", shape = 13, size=6)+
+  geom_point(aes(x=est_alpha, y = est_beta), color =  "black", shape=4, size=6)+
   theme(legend.position = "bottom")+
   ylab("Inverse temperature")+
   xlab("Learning rate")

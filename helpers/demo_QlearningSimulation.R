@@ -2,7 +2,7 @@ files.sources = list.files('/Users/zeynepenkavi/Dropbox/RangelLab/BayesianStats/
 files.sources = files.sources[files.sources != '/Users/zeynepenkavi/Dropbox/RangelLab/BayesianStats/helpers/demo_QlearningSimulation.R']
 sapply(files.sources, source)
 
-demo_QlearningSimulation = function(){
+demo_QlearningSimulation = function(alpha=.65, beta=2.5){
   
   f_fname = 'f_Qlearning'
   g_fname = 'g_Qlearning'
@@ -18,9 +18,9 @@ demo_QlearningSimulation = function(){
     return(as.numeric(yt == contingencies[t]))
   }
   
-  theta = VBA_sigmoid(.65, inverse=TRUE)
+  theta = VBA_sigmoid(alpha, inverse=TRUE) #will be transformed back in f_Qlearning
 
-  phi = log(2.5)
+  phi = log(beta) #will be transformed back in g-Qlearning
 
   x0 = c(.5, .5)
   

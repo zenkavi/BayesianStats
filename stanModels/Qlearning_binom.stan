@@ -7,7 +7,8 @@ data {
 
 transformed data {
   vector[2] initV;  // initial values for EV
-  initV = rep_vector(0.0, 2);
+  //initV = rep_vector(0.0, 2);
+  initV = rep_vector(0.5, 2);
 }
 
 parameters {

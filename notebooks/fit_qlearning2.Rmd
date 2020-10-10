@@ -2,8 +2,62 @@
 title: "RL simulation and parameter recovery with Stan II"
 ---
 
-Can we get better parameter estimates if we were data that we feed into the model had more variance? 
+**Can we get better group level parameter estimates if we had more data with a larger sample size and used a hierarchical model?**
 
-Using expected values (which are 'hidden') instead of choices.
+## Data
 
-Punting on this until I understand the value fitting procedure described in Deanizeau et al. (2014) better.
+```{r}
+source('/Users/zeynepenkavi/Dropbox/RangelLab/BayesianStats/helpers/demo_QlearningSimulation.R')
+```
+
+Generate simulated data using a model with a single learning `alpha` and inverse temperature parameter `beta` for 50 subjects.
+
+```{r}
+N = 50
+sim_data = list()
+for (i in 1:N){
+  cur_alpha = rnorm(1, mean=.65, sd=.1)
+  cur_beta = rnorm(1, mean = 2.5, sd = .5)
+  sim_data[[i]] = demo_QlearningSimulation(alpha = cur_alpha, beta = cur_beta)
+}
+```
+
+View distribution of parameters
+
+```{r}
+df = data.frame(alphas=rep(NA, N), betas=rep(NA, N))
+
+for (i in 1:N){
+  df$alphas[i]=  VBA_sigmoid(sim_data[[i]]$simulation$evolution, inverse=FALSE)
+  df$betas[i]= exp(sim_data[[i]]$simulation$observation)
+}
+```
+
+```{r}
+df %>% 
+  gather(key, value) %>%
+  ggplot(aes(x=value))+
+  geom_histogram()+
+  facet_wrap(~key, scales='free')
+```
+
+```{r}
+TN = length(sim_data[[1]]$choice)
+choice = matrix(nrow=N, ncol = TN)
+outcome = matrix(nrow=N, ncol = TN)
+
+for(i in 1:N){
+  choice[i,] = sim_data[[i]]$choice
+  outcome[i,] = sim_data[[i]]$feedback
+}
+
+m_data = list(N = N, T = TN, choice = choice, outcome = outcome)
+```
+
+```{r}
+m = stan_model('../stanModels/QLearning_hierarchical.stan')
+```
+
+```{r}
+fit_nuts = sampling(m, iter=1000, chains=4, data=m_data)
+```
