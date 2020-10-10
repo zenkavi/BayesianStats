@@ -1,37 +1,40 @@
 
 data {
   int<lower=1> T; // number of trials per subject
-  int<lower=-1, upper=2> choice[T]; // choices cast for each trial in columns
+  real ev[2, T]; // expected value cast for each trial in columns
   real outcome[T];  // no lower and upper bounds; outcomes cast for each trial in columns
 }
 
-transformed data {
-  vector[2] initV;  // initial values for EV
-  initV = rep_vector(0.0, 2);
+transformed data{
+  real val_diff[T];
+  real PE[t];
+  
+  for(t in 1:T){
+    val_diff[t] = ev[2,t] - ev[1,t];
+    PE[t] = max(ev[,t]) - outcome[t];
+  }
+
 }
 
 parameters {
-// Declare all parameters as vectors for vectorizing
   real<lower=0, upper=1> alpha;
   real<lower=0, upper=5> beta;
 }
 
 
 model {
-  vector[2] ev; // expected value
+  int choice[T];
   real PE;      // prediction error
-
-  ev = initV;
 
     for (t in 1:T) {
       // compute action probabilities
-    choice[t] ~ bernoulli_logit(beta * (ev[2]-ev[1]));
+    choice[t] ~ bernoulli_logit(beta * (ev[2,t]-ev[1,t]));
 
       // prediction error
-    PE = outcome[t] - ev[choice[t]+1];
+    PE = outcome[t] - ev[choice[t]+1,t];
 
       // value updating (learning)
-    ev[choice[t]+1] += alpha * PE;
+    ev[choice[t]+1,t] += alpha * PE;
   }
 
   // individual parameters

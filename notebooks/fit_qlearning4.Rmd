@@ -1,0 +1,5 @@
+---
+title: "RL simulation and parameter recovery with Stan IV"
+---
+
+Even if we can't do a good with estimating the exact parameters can we distinguish between (cognitive) models?

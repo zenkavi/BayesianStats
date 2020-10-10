@@ -11,7 +11,7 @@ demo_QlearningSimulation = function(){
   probRewardGood = 75/100;
   # draw 25 random feedbacks
   contBloc = runif(25) < probRewardGood
-  # create 6 blocs with reversals
+  # create 6 blocks with reversals
   contingencies = c(contBloc, 1-contBloc,contBloc, 1-contBloc, contBloc, 1-contBloc)
   
   h_feedback = function(yt, t){

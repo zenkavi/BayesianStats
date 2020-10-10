@@ -1,0 +1,5 @@
+---
+title: "RL simulation and parameter recovery with Stan III"
+---
+
+Can we get better group level parameter estimates if we had more data and used a hierarchical model?

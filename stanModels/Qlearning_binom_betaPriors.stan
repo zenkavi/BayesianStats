@@ -13,7 +13,8 @@ transformed data {
 parameters {
 // Declare all parameters as vectors for vectorizing
   real<lower=0, upper=1> alpha;
-  real<lower=0, upper=5> beta;
+  //real<lower=0, upper=5> beta;
+  real<lower=0, upper=1> beta;
 }
 
 
@@ -25,6 +26,7 @@ model {
 
     for (t in 1:T) {
       // compute action probabilities
+    //choice[t] ~ categorical_logit(tau * ev);
     choice[t] ~ bernoulli_logit(beta * (ev[2]-ev[1]));
 
       // prediction error
@@ -36,7 +38,8 @@ model {
 
   // individual parameters
   alpha ~ beta(1, 1);
-  beta ~ gamma(1, 2);
+  //beta ~ gamma(1, 2);
+  beta ~ beta(1, 1);
 
 }
 
@@ -63,9 +66,11 @@ generated quantities {
 
     for (t in 1:T) {
         // compute log likelihood of current trial
+      //log_lik += categorical_logit_lpmf(choice[t] | tau * ev);
       log_lik += bernoulli_logit_lpmf(choice[t] | beta * (ev[2]-ev[1]));
 
         // generate posterior prediction for current trial
+      //y_pred[t] = categorical_rng(softmax(tau * ev));
       y_pred[t] = bernoulli_rng(inv_logit(beta * (ev[2]-ev[1])));
 
         // prediction error
