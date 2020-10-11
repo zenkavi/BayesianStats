@@ -14,15 +14,17 @@ Generate simulated data using a model with a single learning `alpha` and inverse
 
 ```{r}
 N = 50
+true_g_alpha = .65
+true_g_beta = 2.5
 sim_data = list()
 for (i in 1:N){
-  cur_alpha = rnorm(1, mean=.65, sd=.1)
-  cur_beta = rnorm(1, mean = 2.5, sd = .5)
+  cur_alpha = rnorm(1, mean = true_g_alpha, sd=.1)
+  cur_beta = rnorm(1, mean = true_g_beta, sd = .5)
   sim_data[[i]] = demo_QlearningSimulation(alpha = cur_alpha, beta = cur_beta)
 }
 ```
 
-View distribution of parameters
+## Distribution of subject parameters
 
 ```{r}
 df = data.frame(alphas=rep(NA, N), betas=rep(NA, N))
@@ -40,6 +42,7 @@ df %>%
   geom_histogram()+
   facet_wrap(~key, scales='free')
 ```
+## Model fit
 
 ```{r}
 TN = length(sim_data[[1]]$choice)
@@ -60,4 +63,80 @@ m = stan_model('../stanModels/QLearning_hierarchical.stan')
 
 ```{r}
 fit_nuts = sampling(m, iter=1000, chains=4, data=m_data)
+```
+
+## Posteriors
+
+### Group parameters
+
+```{r}
+data.frame(extract(fit_nuts, c("g_alpha", "g_beta"))) %>%
+  mutate(alg = "NUTS") %>%
+  gather(key, value, -alg) %>%
+  group_by(key) %>%
+  mutate(med_est = median(value),
+         true_val = ifelse(key == "g_alpha", true_g_alpha, true_g_beta)) %>%
+
+  gather(est_type, estimate, -alg, -key, -value) %>%
+  
+  ggplot(aes(x = value, fill=alg))+
+  geom_histogram(position="identity", alpha = .5)+
+  facet_grid(alg~key, scales='free')+
+  geom_vline(aes(xintercept=estimate, linetype = est_type)) +
+  scale_linetype_manual(name="", values=c("med_est" = "solid", "true_val" = "dashed"),
+                        labels = c("med_est" = "median estimate", "true_val" = "true value"))+
+  scale_fill_manual(name="", values=c("NUTS" = "purple"))+
+  theme(legend.position="bottom")+
+  xlab("")+
+  ylab("")
+```
+
+### Subject parameters
+
+#### Alphas
+
+```{r}
+for(i in 1:N){
+  df$key[i] = paste("alpha.", i, sep="")
+}
+data.frame(extract(fit_nuts, c("alpha"))) %>%
+  gather(key, value) %>%
+  full_join(df %>% select(alphas, key), by='key') %>%
+  group_by(key) %>% 
+  mutate(med_est = median(value)) %>%
+  rename(true_val=alphas) %>%
+  gather(est_type, estimate, -key, -value) %>%
+  ggplot(aes(value)) +
+  geom_histogram(alpha = .5, fill="purple")+
+  geom_vline(aes(xintercept = estimate, linetype=est_type))+
+  scale_linetype_manual(name="", values=c("med_est" = "solid", "true_val" = "dashed"),
+                        labels = c("med_est" = "median estimate", "true_val" = "true value"))+
+    theme(legend.position="bottom")+
+  facet_wrap(~key)+
+  xlab("")
+
+```
+
+#### Betas
+
+```{r}
+for(i in 1:N){
+  df$key[i] = paste("beta.", i, sep="")
+}
+data.frame(extract(fit_nuts, c("beta"))) %>%
+  gather(key, value) %>%
+  full_join(df %>% select(betas, key), by='key') %>%
+  group_by(key) %>% 
+  mutate(med_est = median(value)) %>%
+  rename(true_val=betas) %>%
+  gather(est_type, estimate, -key, -value) %>%
+  ggplot(aes(value)) +
+  geom_histogram(alpha = .5, fill="purple")+
+  geom_vline(aes(xintercept = estimate, linetype=est_type))+
+  scale_linetype_manual(name="", values=c("med_est" = "solid", "true_val" = "dashed"),
+                        labels = c("med_est" = "median estimate", "true_val" = "true value"))+
+    theme(legend.position="bottom")+
+  facet_wrap(~key)+
+  xlab("")
+
 ```
