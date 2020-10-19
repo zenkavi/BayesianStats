@@ -2,13 +2,161 @@
 title: "RL simulation and parameter recovery with Stan II"
 ---
 
-**Can we get better group level parameter estimates if we had more data with a larger sample size and used a hierarchical model?**
-
-## Data
+**Can we get better group level parameter estimates if we had more data?**
 
 ```{r}
 source('/Users/zeynepenkavi/Dropbox/RangelLab/BayesianStats/helpers/demo_QlearningSimulation.R')
 ```
+
+## More trials per subject
+
+### Example 1: Nice true parameter values
+
+Increasing number of trials from 150 to 450.
+
+```{r}
+sim_data = demo_QlearningSimulation(alpha = .65, beta = 2.5, numBlocks = 18)
+```
+
+True learning rate `alpha`
+
+```{r}
+true_alpha = VBA_sigmoid(sim_data$simulation$evolution, inverse=FALSE)
+true_alpha
+```
+
+True inverse temperature `beta`
+
+```{r}
+true_beta = exp(sim_data$simulation$observation)
+true_beta
+```
+
+Use Stan to get parameters that generated simulated data.
+
+```{r}
+TN = length(sim_data$choice)
+choice = sim_data$choices #adding 1 bc categorical_logit has support over [1,2]
+outcome = sim_data$feedback
+m_data = list(T = TN, choice = choice, outcome = outcome)
+```
+
+```{r}
+m = stan_model('../stanModels/QLearning_binom.stan')
+```
+
+```{r}
+fit_nuts = sampling(m, iter=1000, chains=4, data=m_data)
+```
+
+```{r}
+data.frame(extract(fit_nuts, c("alpha", "beta"))) %>%
+  mutate(alg = "NUTS") %>%
+  gather(key, value, -alg) %>%
+  group_by(key) %>%
+  mutate(med_est = median(value),
+         true_val = ifelse(key == "alpha", true_alpha, true_beta)) %>%
+
+  gather(est_type, estimate, -alg, -key, -value) %>%
+  
+  ggplot(aes(x = value, fill=alg))+
+  geom_histogram(position="identity", alpha = .5)+
+  facet_grid(alg~key, scales='free')+
+  geom_vline(aes(xintercept=estimate, linetype = est_type)) +
+  scale_linetype_manual(name="", values=c("med_est" = "solid", "true_val" = "dashed"),
+                        labels = c("med_est" = "median estimate", "true_val" = "true value"))+
+  scale_fill_manual(name="", values=c("NUTS" = "purple"))+
+  theme(legend.position="bottom")+
+  xlab("")+
+  ylab("")
+```
+
+```{r}
+data.frame(extract(fit_nuts, c('alpha', 'beta', 'log_lik'))) %>%
+  mutate(alg = "NUTS",
+         est_alpha = median(alpha),
+         est_beta = median(beta)) %>%
+  mutate(true_alpha = true_alpha, true_beta = true_beta)%>%
+  ggplot()+
+  geom_point(aes(x=alpha, y=beta, color=log_lik)) +
+  geom_point(aes(x=true_alpha, y = true_beta), color="red", shape = 13, size=6)+
+  geom_point(aes(x=est_alpha, y = est_beta), color =  "black", shape=4, size=6)+
+  theme(legend.position = "bottom")+
+  ylab("Inverse temperature")+
+  xlab("Learning rate")
+```
+
+### Example 2: High learning rate lower beta
+
+```{r}
+sim_data = demo_QlearningSimulation(alpha = .9, beta = .7, numBlocks = 18)
+```
+
+True learning rate `alpha`
+
+```{r}
+true_alpha = VBA_sigmoid(sim_data$simulation$evolution, inverse=FALSE)
+true_alpha
+```
+
+True inverse temperature `beta`
+
+```{r}
+true_beta = exp(sim_data$simulation$observation)
+true_beta
+```
+
+Use Stan to get parameters that generated simulated data.
+
+```{r}
+TN = length(sim_data$choice)
+choice = sim_data$choices #adding 1 bc categorical_logit has support over [1,2]
+outcome = sim_data$feedback
+m_data = list(T = TN, choice = choice, outcome = outcome)
+```
+
+```{r}
+fit_nuts = sampling(m, iter=1000, chains=4, data=m_data)
+```
+
+```{r}
+data.frame(extract(fit_nuts, c("alpha", "beta"))) %>%
+  mutate(alg = "NUTS") %>%
+  gather(key, value, -alg) %>%
+  group_by(key) %>%
+  mutate(med_est = median(value),
+         true_val = ifelse(key == "alpha", true_alpha, true_beta)) %>%
+
+  gather(est_type, estimate, -alg, -key, -value) %>%
+  
+  ggplot(aes(x = value, fill=alg))+
+  geom_histogram(position="identity", alpha = .5)+
+  facet_grid(alg~key, scales='free')+
+  geom_vline(aes(xintercept=estimate, linetype = est_type)) +
+  scale_linetype_manual(name="", values=c("med_est" = "solid", "true_val" = "dashed"),
+                        labels = c("med_est" = "median estimate", "true_val" = "true value"))+
+  scale_fill_manual(name="", values=c("NUTS" = "purple"))+
+  theme(legend.position="bottom")+
+  xlab("")+
+  ylab("")
+```
+
+```{r}
+data.frame(extract(fit_nuts, c('alpha', 'beta', 'log_lik'))) %>%
+  mutate(alg = "NUTS",
+         est_alpha = median(alpha),
+         est_beta = median(beta)) %>%
+  mutate(true_alpha = true_alpha, true_beta = true_beta)%>%
+  ggplot()+
+  geom_point(aes(x=alpha, y=beta, color=log_lik)) +
+  geom_point(aes(x=true_alpha, y = true_beta), color="red", shape = 13, size=6)+
+  geom_point(aes(x=est_alpha, y = est_beta), color =  "black", shape=4, size=6)+
+  theme(legend.position = "bottom")+
+  ylab("Inverse temperature")+
+  xlab("Learning rate")
+```
+
+## Larger sample (and hierarchical model)
 
 Generate simulated data using a model with a single learning `alpha` and inverse temperature parameter `beta` for 50 subjects.
 
@@ -24,7 +172,7 @@ for (i in 1:N){
 }
 ```
 
-## Distribution of subject parameters
+### Distribution of subject parameters
 
 ```{r}
 df = data.frame(alphas=rep(NA, N), betas=rep(NA, N))
@@ -42,7 +190,7 @@ df %>%
   geom_histogram()+
   facet_wrap(~key, scales='free')
 ```
-## Model fit
+### Model fit
 
 ```{r}
 TN = length(sim_data[[1]]$choice)
@@ -65,11 +213,13 @@ m = stan_model('../stanModels/QLearning_hierarchical.stan')
 fit_nuts = sampling(m, iter=1000, chains=4, data=m_data)
 ```
 
-## Posteriors
+### Posteriors
 
-### Group parameters
+#### Group parameters
 
 ```{r}
+labels <- c(g_alpha = "group alpha", g_beta = "group beta")
+
 data.frame(extract(fit_nuts, c("g_alpha", "g_beta"))) %>%
   mutate(alg = "NUTS") %>%
   gather(key, value, -alg) %>%
@@ -81,7 +231,7 @@ data.frame(extract(fit_nuts, c("g_alpha", "g_beta"))) %>%
   
   ggplot(aes(x = value, fill=alg))+
   geom_histogram(position="identity", alpha = .5)+
-  facet_grid(alg~key, scales='free')+
+  facet_grid(alg~key, scales='free', labeller=labeller(key=labels))+
   geom_vline(aes(xintercept=estimate, linetype = est_type)) +
   scale_linetype_manual(name="", values=c("med_est" = "solid", "true_val" = "dashed"),
                         labels = c("med_est" = "median estimate", "true_val" = "true value"))+
@@ -91,16 +241,17 @@ data.frame(extract(fit_nuts, c("g_alpha", "g_beta"))) %>%
   ylab("")
 ```
 
-### Subject parameters
+#### Subject parameters
 
-#### Alphas
+**Alphas**
 
 ```{r}
 for(i in 1:N){
-  df$key[i] = paste("alpha.", i, sep="")
+  df$key[i] = paste("Subj ", i, sep="")
 }
 data.frame(extract(fit_nuts, c("alpha"))) %>%
   gather(key, value) %>%
+  mutate(key = gsub("alpha.", "Subj ", key)) %>%
   full_join(df %>% select(alphas, key), by='key') %>%
   group_by(key) %>% 
   mutate(med_est = median(value)) %>%
@@ -113,16 +264,15 @@ data.frame(extract(fit_nuts, c("alpha"))) %>%
                         labels = c("med_est" = "median estimate", "true_val" = "true value"))+
     theme(legend.position="bottom")+
   facet_wrap(~key)+
-  xlab("")
+  xlab("")+
+  ggtitle("Subject alphas")
 
 ```
 
-#### Betas
+**Betas**
 
 ```{r}
-for(i in 1:N){
-  df$key[i] = paste("beta.", i, sep="")
-}
+
 data.frame(extract(fit_nuts, c("beta"))) %>%
   gather(key, value) %>%
   full_join(df %>% select(betas, key), by='key') %>%

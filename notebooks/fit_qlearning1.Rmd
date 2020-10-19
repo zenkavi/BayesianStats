@@ -122,7 +122,7 @@ summary(fit_vb, pars = c('alpha', 'beta', 'log_lik'))$summary
 
 #### Pair plots colored by log likelihood
 
-Pair plots show that Dde to the independence assumption built into ADVI the posteriors of parameter estimates are uncorrelated. The NUTS samples show that the independence assumption is violated and that the parameters are negatively correlated. This dependency leads to unidentifiability (i.e. there are multiple combinations of the parameters that are equally likely to generate the observed data).  
+Pair plots show that due to the independence assumption built into ADVI the posteriors of parameter estimates are uncorrelated. The NUTS samples show that the independence assumption is violated and that the parameters are negatively correlated. This dependency leads to unidentifiability (i.e. there are multiple combinations of the parameters that are equally likely to generate the observed data).  
 
 ```{r}
 data.frame(extract(fit_nuts, c('alpha', 'beta', 'log_lik'))) %>%
@@ -168,7 +168,7 @@ true_beta = exp(sim_data$simulation$observation)
 true_beta
 ```
 
-Now that you have the data invert it using Stan to get parameters.
+Use Stan to get parameters that generated simulated data.
 
 ```{r}
 TN = length(sim_data$choice)
