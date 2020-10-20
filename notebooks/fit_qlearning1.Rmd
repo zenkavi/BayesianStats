@@ -1,5 +1,5 @@
 ---
-title: "RL simulation and parameter recovery with Stan I"
+title: "RL simulation and parameter recovery with Stan I: Single subject parameter recovery"
 ---
 
 Translating Deanizeau et al. (2014) Q-learning example

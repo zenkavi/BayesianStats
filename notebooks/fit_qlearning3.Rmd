@@ -1,9 +1,59 @@
 ---
-title: "RL simulation and parameter recovery with Stan III"
+title: "RL simulation and parameter recovery with Stan III: Model comparison"
 ---
 
-Even if we can't do a good with estimating the exact parameters can we distinguish between (cognitive) models?
+**Even if we can't do a good job with estimating the exact parameters for subjects can we distinguish between (cognitive) models and reliably identify the correct data generating process?**
 
 ```{r}
-
+source('/Users/zeynepenkavi/Dropbox/RangelLab/BayesianStats/helpers/demo_QlearningSimulation.R')
+library(loo)
+library(caret)
 ```
+
+```{r}
+sim_data = demo_QlearningSimulation(alpha = .65, beta = 2.5)
+```
+
+True learning rate `alpha`
+
+```{r}
+true_alpha = VBA_sigmoid(sim_data$simulation$evolution, inverse=FALSE)
+true_alpha
+```
+
+True inverse temperature `beta`
+
+```{r}
+true_beta = exp(sim_data$simulation$observation)
+true_beta
+```
+
+Use Stan to get parameters that generated simulated data.
+
+```{r}
+k_fold = function()
+```
+
+```{r}
+TN = length(sim_data$choice)
+choice = sim_data$choices #adding 1 bc categorical_logit has support over [1,2]
+outcome = sim_data$feedback
+m_data = list(T = TN, choice = choice, outcome = outcome)
+```
+
+```{r}
+m_true = stan_model('../stanModels/QLearning_trueModel.stan')
+```
+
+```{r}
+m_false = stan_model('../stanModels/QLearning_falseModel.stan')
+```
+
+```{r}
+fit_true = sampling(m_true, iter=1000, chains=4, data=m_data)
+```
+
+```{r}
+fit_false = sampling(m_false, iter=1000, chains=4, data=m_data)
+```
+

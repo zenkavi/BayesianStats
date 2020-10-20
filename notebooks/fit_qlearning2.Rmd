@@ -1,5 +1,5 @@
 ---
-title: "RL simulation and parameter recovery with Stan II"
+title: "RL simulation and parameter recovery with Stan II: More data"
 ---
 
 **Can we get better group level parameter estimates if we had more data?**
@@ -118,6 +118,8 @@ m_data = list(T = TN, choice = choice, outcome = outcome)
 ```{r}
 fit_nuts = sampling(m, iter=1000, chains=4, data=m_data)
 ```
+
+Having more trials does not help much if true parameter values are extreme.
 
 ```{r}
 data.frame(extract(fit_nuts, c("alpha", "beta"))) %>%
@@ -272,9 +274,9 @@ data.frame(extract(fit_nuts, c("alpha"))) %>%
 **Betas**
 
 ```{r}
-
 data.frame(extract(fit_nuts, c("beta"))) %>%
   gather(key, value) %>%
+  mutate(key = gsub("beta.", "Subj ", key)) %>%
   full_join(df %>% select(betas, key), by='key') %>%
   group_by(key) %>% 
   mutate(med_est = median(value)) %>%
@@ -285,8 +287,9 @@ data.frame(extract(fit_nuts, c("beta"))) %>%
   geom_vline(aes(xintercept = estimate, linetype=est_type))+
   scale_linetype_manual(name="", values=c("med_est" = "solid", "true_val" = "dashed"),
                         labels = c("med_est" = "median estimate", "true_val" = "true value"))+
-    theme(legend.position="bottom")+
+  theme(legend.position="bottom")+
   facet_wrap(~key)+
-  xlab("")
+  xlab("")+
+  ggtitle("Subject betas")
 
 ```
