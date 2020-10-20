@@ -42,7 +42,7 @@ m_data = list(T = TN, choice = choice, outcome = outcome)
 ```
 
 ```{r}
-m = stan_model('../stanModels/QLearning_binom.stan')
+m = stan_model('../stanModels/qLearning/QLearning_singleSubject.stan')
 ```
 
 ```{r}
@@ -208,7 +208,7 @@ m_data = list(N = N, T = TN, choice = choice, outcome = outcome)
 ```
 
 ```{r}
-m = stan_model('../stanModels/QLearning_hierarchical.stan')
+m = stan_model('../stanModels/qLearning/QLearning_hierarchical.stan')
 ```
 
 ```{r}

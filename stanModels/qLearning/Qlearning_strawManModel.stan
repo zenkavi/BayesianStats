@@ -16,26 +16,16 @@ transformed data {
 
 parameters {
   // Declare all parameters as vectors for vectorizing
-  real<lower=0, upper=1> alpha;
-  real<lower=0, upper=5> beta;
+  real<lower=0, upper=1> gamma;
 }
 
 
 model {
-  vector[2] ev; // expected value
-  real PE;      // prediction error
-  
-  ev = initV;
+
   
   for (t in 1:T_train) {
     // compute action probabilities
     choice_train[t] ~ bernoulli_logit(beta * (ev[2]-ev[1]));
-    
-    // prediction error
-    PE = outcome_train[t] - ev[choice_train[t]+1];
-    
-    // value updating (learning)
-    ev[choice_train[t]+1] += alpha * PE;
   }
   
   // individual parameters
