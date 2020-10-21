@@ -71,11 +71,11 @@ k_fold = function(aModel, testIndices, simData){
 ```
 
 ```{r}
-m_true = stan_model('../stanModels/QLearning_trueModel.stan')
+m_true = stan_model('../stanModels/qLearning/QLearning_trueModel.stan')
 ```
 
 ```{r}
-m_false = stan_model('../stanModels/QLearning_falseModel.stan')
+m_false = stan_model('../stanModels/qLearning/QLearning_falseModel.stan')
 ```
 
 ```{r}
@@ -94,17 +94,17 @@ sum(lELPD1)
 sum(lELPD2)
 ```
 
-Are they indistinguishable because the model estimates the same value for the two learning rates since there is no constraint on them?
+Are they indistinguishable because the model estimates the same value for the two learning rates since there is no constraint on them? Yes.
 
 ```{r}
-TN = length(sim_data$choice)
+T_train = length(sim_data$choice)
 choice = sim_data$choices #adding 1 bc categorical_logit has support over [1,2]
 outcome = sim_data$feedback
-m_data = list(T = TN, choice = choice, outcome = outcome)
+m_data = list(T_train = T_train, choice_train = choice, outcome_train = outcome)
 ```
 
 ```{r}
-m = stan_model('../stanModels/qLearning/QLearning_.stan')
+m = stan_model('../stanModels/qLearning/QLearning_allData_falseModel.stan')
 ```
 
 ```{r}
@@ -118,7 +118,39 @@ summary(fit_nuts, pars = c('alpha_pos', 'alpha_neg', 'beta', 'log_lik'))$summary
 Is model comparison more successful against a straw man model of random choosing?
 
 ```{r}
+m_straw = stan_model('../stanModels/qLearning/QLearning_strawManModel.stan')
+```
 
+```{r}
+lELPD3 = k_fold(m_straw, testIndices, sim_data)
+```
+
+```{r}
+sum(lELPD1)
+```
+
+```{r}
+sum(lELPD3)
+```
+
+Can it distinguish it significantly from the random choosing model? No.
+
+```{r}
+difference = sum(lELPD1) - sum(lELPD3)
+sd = sqrt(149)*sd(lELPD1 - lELPD3)
+1-pnorm(difference/sd)
 ```
 
 What if you constrain the learning rates to be different from each other? (see model on p 403 for an example use of the `ordered` class)
+
+```{r}
+m_diffAlphas = stan_model('../stanModels/qLearning/QLearning_cv_diffAlphas.stan')
+```
+
+```{r}
+lELPD4 = k_fold(m_diffAlphas, testIndices, sim_data)
+```
+
+```{r}
+sum(lELPD4)
+```
