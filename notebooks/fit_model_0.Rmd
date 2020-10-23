@@ -187,14 +187,32 @@ kFold = function(aModel, testIndices, X){
     lPointLogLikelihoodTotal = c(lPointLogLikelihoodTotal, lPointLogLikelihood1)
   }
   
-  return(lPointLogLikelihoodTotal)
+  #return(lPointLogLikelihoodTotal)
+  return(list(lPointLogLikelihoodTotal=lPointLogLikelihoodTotal, last_fit=fit))
 }
 ```
 
 ```{r}
-Model1 = stan_model('../stanModels//model_0.7.stan')
-Model2 = stan_model('../stanModels//model_0.8.stan')
+Model1 = stan_model('../stanModels/LambertTextbookExamples/model_0.7.stan')
+Model2 = stan_model('../stanModels/LambertTextbookExamples/model_0.8.stan')
 ```
+
+```{r}
+out = kFold(Model1, testIndices, X)
+```
+
+```{r}
+str(extract_log_lik(out$last_fit, 'logLikelihood'))
+```
+
+```{r}
+str(colMeans(extract_log_lik(out$last_fit, 'logLikelihood')))
+```
+
+```{r}
+str(out$lPointLogLikelihoodTotal)
+```
+
 
 ```{r}
 lELPD1 = kFold(Model1, testIndices, X)
@@ -202,11 +220,11 @@ lELPD2 = kFold(Model2, testIndices, X)
 ```
 
 ```{r}
-sum(lELPD1)
+sum(lELPD1$lPointLogLikelihoodTotal)
 ```
 
 ```{r}
-sum(lELPD2)
+sum(lELPD2$lPointLogLikelihoodTotal)
 ```
 
 # Model_0.9: Transformed parameters

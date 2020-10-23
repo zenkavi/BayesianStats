@@ -34,7 +34,7 @@ Use `caret` to make folds for cross validation.
 testIndices = createFolds(sim_data$choices, k = 5, list=TRUE, returnTrain = FALSE)
 ```
 
-Use `stan` to get parameters that generated simulated data.
+
 
 ```{r}
 ## Adapted from Lambert textbook p. 397
@@ -62,21 +62,46 @@ k_fold = function(aModel, testIndices, simData){
     
     fit = sampling(aModel, iter=1000, chains=4, data=m_data)
     
-    logLikelihood1 = extract_log_lik(fit, 'log_lik')
-    lPointLogLikelihood1 = colMeans(logLikelihood1)
+    logLikelihood1 = extract_log_lik(fit, 'log_lik') #log likelihood for each sample (1000) in this fold
+    lPointLogLikelihood1 = colMeans(logLikelihood1) # mean log likelihood for this fold
     lPointLogLikelihoodTotal = c(lPointLogLikelihoodTotal, lPointLogLikelihood1)
   }
-  return(lPointLogLikelihoodTotal)
+  #return(lPointLogLikelihoodTotal) #vector of mean log likelihoods of each fold
+  return(list(lPointLogLikelihoodTotal=lPointLogLikelihoodTotal, last_fit=fit))
 }
 ```
 
+Use `stan` to get parameters that generated simulated data.
+
 ```{r}
-m_true = stan_model('../stanModels/qLearning/QLearning_trueModel.stan')
+m_true = stan_model('../stanModels/qLearning/QLearning_cv_trueModel.stan')
 ```
 
 ```{r}
-m_false = stan_model('../stanModels/qLearning/QLearning_falseModel.stan')
+m_false = stan_model('../stanModels/qLearning/QLearning_cv_falseModel.stan')
 ```
+
+
+```{r}
+out = k_fold(m_true, testIndices, sim_data)
+```
+
+```{r}
+sum(extract_log_lik(out$last_fit, "log_lik"))
+```
+
+```{r}
+out2 = k_fold(m_true, testIndices, sim_data)
+```
+
+```{r}
+sum(extract_log_lik(out2$last_fit, "log_lik"))
+```
+
+See page 227 of Lambert textbook for definition of `elpd` (expected log predictive density) - "quantifies how close the estimated posterior predictive distribution, p(y_new|y) is to the true distribution f(y)." So larger is better (see page 228 for visual).  
+`p(y_new | y)` = estimated posterior predictive distribution
+`elpd` = single number resulting from summing the product of true density and the posterior predictive density for each value of y_new.
+`elppd` = expected log pointwise predictive density `elpd` for `n` new data points
 
 ```{r}
 lELPD1 = k_fold(m_true, testIndices, sim_data)

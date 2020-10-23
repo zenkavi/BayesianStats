@@ -46,15 +46,8 @@ model {
 
 generated quantities {
   // For log likelihood calculation
+  //vector[T_test] log_lik;
   real log_lik;
-  
-  // For posterior predictive check
-  real y_pred[T_test];
-  
-  // Set all posterior predictions to 0 (avoids NULL values)
-  for (t in 1:T_test) {
-    y_pred[t] = -1;
-  }
   
   { // local section, this saves time and space
   vector[2] ev; // expected value
@@ -67,11 +60,9 @@ generated quantities {
   
   for (t in 1:T_test) {
     // compute log likelihood of current trial
+    //log_lik[t] = bernoulli_logit_lpmf(choice_test[t] | beta * (ev[2]-ev[1]));
     log_lik += bernoulli_logit_lpmf(choice_test[t] | beta * (ev[2]-ev[1]));
-    
-    // generate posterior prediction for current trial
-    y_pred[t] = bernoulli_rng(inv_logit(beta * (ev[2]-ev[1])));
-    
+   
     // prediction error
     PE = outcome_test[t] - ev[choice_test[t]+1];
     
