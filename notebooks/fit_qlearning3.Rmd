@@ -28,12 +28,11 @@ true_beta = exp(sim_data$simulation$observation)
 true_beta
 ```
 
-Use `caret` to make folds for cross validation.
+Using `caret` to make folds for cross validation.
 
 ```{r}
 testIndices = createFolds(sim_data$choices, k = 5, list=TRUE, returnTrain = FALSE)
 ```
-
 
 
 ```{r}
@@ -50,11 +49,11 @@ k_fold = function(aModel, testIndices, simData){
     T_train = length(sim_data$choices) - length(cur_ind)
     T_test = length(cur_ind)
   
-    choice_train = sim_data$choices[-cur_ind] #adding 1 bc categorical_logit has support over [1,2]
-    choice_test = sim_data$choices[cur_ind]
+    choice_train = simData$choices[-cur_ind] #adding 1 bc categorical_logit has support over [1,2]
+    choice_test = simData$choices[cur_ind]
     
-    outcome_train = sim_data$feedback[-cur_ind] 
-    outcome_test = sim_data$feedback[cur_ind] 
+    outcome_train = simData$feedback[-cur_ind] 
+    outcome_test = simData$feedback[cur_ind] 
     
     m_data = list(T_train = T_train, T_test = T_test, 
                   choice_train = choice_train, choice_test = choice_test, 
@@ -78,32 +77,9 @@ m_true = stan_model('../stanModels/qLearning/QLearning_cv_trueModel.stan')
 ```
 
 ```{r}
-m_false = stan_model('../stanModels/qLearning/QLearning_cv_falseModel.stan')
-```
-
-
-```{r}
-out = k_fold(m_true, testIndices, sim_data)
-```
-
-```{r}
-sum(extract_log_lik(out$last_fit, "log_lik"))
-```
-
-```{r}
-str(extract_log_lik(out$last_fit, "log_lik"))
-```
-
-```{r}
-out2 = k_fold(m_true, testIndices, sim_data)
-```
-
-```{r}
-str(extract_log_lik(out2$last_fit, "log_lik"))
-```
-
-```{r}
-sum(extract_log_lik(out2$last_fit, "log_lik"))
+m_twoAlphas = stan_model('../stanModels/qLearning/QLearning_cv_twoAlphas.stan')
+m_diffAlphas = stan_model('../stanModels/qLearning/QLearning_cv_diffAlphas.stan')
+m_strawMan = stan_model('../stanModels/qLearning/QLearning_cv_strawMan.stan')
 ```
 
 See page 227 of Lambert textbook for definition of `elpd` (expected log predictive density) - "quantifies how close the estimated posterior predictive distribution, p(y_new|y) is to the true distribution f(y)." So larger is better (see page 228 for visual).  
@@ -112,59 +88,26 @@ See page 227 of Lambert textbook for definition of `elpd` (expected log predicti
 `elppd` = expected log pointwise predictive density `elpd` for `n` new data points
 
 ```{r}
-lELPD1 = k_fold(m_true, testIndices, sim_data)
+ELPD_true = k_fold(m_true, testIndices, sim_data)
 ```
 
 ```{r}
-lELPD2 = k_fold(m_false, testIndices, sim_data)
+ELPD_twoAlphas = k_fold(m_twoAlphas, testIndices, sim_data)
 ```
 
 ```{r}
-sum(lELPD1)
+ELPD_diffAlphas = k_fold(m_diffAlphas, testIndices, sim_data)
 ```
 
 ```{r}
-sum(lELPD2)
+ELPD_strawMan = k_fold(m_strawMan, testIndices, sim_data)
 ```
 
-Are they indistinguishable because the model estimates the same value for the two learning rates since there is no constraint on them? Yes.
-
-```{r}
-T_train = length(sim_data$choice)
-choice = sim_data$choices #adding 1 bc categorical_logit has support over [1,2]
-outcome = sim_data$feedback
-m_data = list(T_train = T_train, choice_train = choice, outcome_train = outcome)
-```
-
-```{r}
-m = stan_model('../stanModels/qLearning/QLearning_allData_falseModel.stan')
-```
-
-```{r}
-fit_nuts = sampling(m, iter=1000, chains=4, data=m_data)
-```
-
-```{r}
-summary(fit_nuts, pars = c('alpha_pos', 'alpha_neg', 'beta', 'log_lik'))$summary
-```
-
-Is model comparison more successful against a straw man model of random choosing?
-
-```{r}
-m_straw = stan_model('../stanModels/qLearning/QLearning_strawManModel.stan')
-```
-
-```{r}
-lELPD3 = k_fold(m_straw, testIndices, sim_data)
-```
 
 ```{r}
 sum(lELPD1)
 ```
 
-```{r}
-sum(lELPD3)
-```
 
 Can it distinguish it significantly from the random choosing model? No.
 
@@ -172,18 +115,4 @@ Can it distinguish it significantly from the random choosing model? No.
 difference = sum(lELPD1) - sum(lELPD3)
 sd = sqrt(149)*sd(lELPD1 - lELPD3)
 1-pnorm(difference/sd)
-```
-
-What if you constrain the learning rates to be different from each other? (see model on p 403 for an example use of the `ordered` class)
-
-```{r}
-m_diffAlphas = stan_model('../stanModels/qLearning/QLearning_cv_diffAlphas.stan')
-```
-
-```{r}
-lELPD4 = k_fold(m_diffAlphas, testIndices, sim_data)
-```
-
-```{r}
-sum(lELPD4)
 ```
