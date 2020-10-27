@@ -29,7 +29,9 @@ true_beta = exp(sim_data$simulation$observation)
 true_beta
 ```
 
-Using `caret` to make folds for cross validation.
+## Predictive accuracy with CV
+
+Using `caret` to make 5 folds for cross validation.
 
 ```{r}
 testIndices = createFolds(sim_data$choices, k = 5, list=TRUE, returnTrain = FALSE)
@@ -122,7 +124,9 @@ data.frame(ELPD_strawMan) %>%
   ylab("ELPD")
 ```
 
-Bridge sampling to calculate marginal likelihood and compute $p(m|y)$ for each model
+## Full Bayesian model comparison
+
+Bridge sampling to calculate marginal likelihood and compute $p(m|y)$ for each model. Based on this [vignette](https://cran.r-project.org/web/packages/bridgesampling/vignettes/bridgesampling_example_stan.html).
 
 ```{r}
 m_true = stan_model('../stanModels/qLearning/QLearning_full_trueModel.stan')
@@ -144,19 +148,19 @@ m_data = list(T_train = T_train,
 ```
 
 ```{r}
-f_true = sampling(m_true, iter=1000, chains=4, data=m_data, show_messages=FALSE, verbose=FALSE, refresh= 0)
+f_true = sampling(m_true, iter = 50000, warmup = 1000, chains = 3, data=m_data, show_messages=FALSE, verbose=FALSE, refresh= 0)
 ```
 
 ```{r}
-f_twoAlphas = sampling(m_twoAlphas, iter=1000, chains=4, data=m_data, show_messages=FALSE, verbose=FALSE, refresh= 0)
+f_twoAlphas = sampling(m_twoAlphas, iter = 50000, warmup = 1000, chains = 3, data=m_data, show_messages=FALSE, verbose=FALSE, refresh= 0)
 ```
 
 ```{r}
-f_diffAlphas = sampling(m_diffAlphas, iter=1000, chains=4, data=m_data, show_messages=FALSE, verbose=FALSE, refresh= 0)
+f_diffAlphas = sampling(m_diffAlphas,iter = 50000, warmup = 1000, chains = 3, data=m_data, show_messages=FALSE, verbose=FALSE, refresh= 0)
 ```
 
 ```{r}
-f_strawMan = sampling(m_strawMan, iter=1000, chains=4, data=m_data, show_messages=FALSE, verbose=FALSE, refresh= 0)
+f_strawMan = sampling(m_strawMan, iter = 50000, warmup = 1000, chains = 3, data=m_data, show_messages=FALSE, verbose=FALSE, refresh= 0)
 ```
 
 ```{r}
@@ -173,6 +177,10 @@ b_diffAlphas <- bridge_sampler(f_diffAlphas, silent = TRUE)
 
 ```{r}
 b_strawMan <- bridge_sampler(f_strawMan, silent = TRUE)
+```
+
+```{r}
+post_prob(b_true, b_twoAlphas, b_diffAlphas, b_strawMan)
 ```
 
 ```{r}
