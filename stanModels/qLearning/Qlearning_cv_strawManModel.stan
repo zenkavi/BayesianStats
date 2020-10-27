@@ -27,14 +27,12 @@ model {
 
 generated quantities {
   // For log likelihood calculation
-  real log_lik;
+  vector[T_test] log_lik;
   
   { // local section, this saves time and space
-  log_lik = 0;
-  
   for (t in 1:T_test) {
     // compute log likelihood of current trial
-    log_lik += bernoulli_lpmf(choice_test[t] | theta);
+    log_lik[t] = bernoulli_lpmf(choice_test[t] | theta);
     
   }
   }

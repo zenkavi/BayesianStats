@@ -46,9 +46,8 @@ model {
 
 generated quantities {
   // For log likelihood calculation
-  //vector[T_test] log_lik;
-  real log_lik;
-  
+  vector[T_test] log_lik;
+
   { // local section, this saves time and space
   vector[2] ev; // expected value
   real PE;      // prediction error
@@ -56,20 +55,17 @@ generated quantities {
   // Initialize values
   ev = initV;
   
-  log_lik = 0;
+  //log_lik = 0;
   
   for (t in 1:T_test) {
     // compute log likelihood of current trial
-    //log_lik[t] = bernoulli_logit_lpmf(choice_test[t] | beta * (ev[2]-ev[1]));
-    log_lik += bernoulli_logit_lpmf(choice_test[t] | beta * (ev[2]-ev[1]));
-   
+    log_lik[t] = bernoulli_logit_lpmf(choice_test[t] | beta * (ev[2]-ev[1]));
+
     // prediction error
     PE = outcome_test[t] - ev[choice_test[t]+1];
     
     // value updating (learning)
     ev[choice_test[t]+1] += alpha * PE;
-    
-    
   }
   }
 }

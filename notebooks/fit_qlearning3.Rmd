@@ -91,7 +91,15 @@ sum(extract_log_lik(out$last_fit, "log_lik"))
 ```
 
 ```{r}
+str(extract_log_lik(out$last_fit, "log_lik"))
+```
+
+```{r}
 out2 = k_fold(m_true, testIndices, sim_data)
+```
+
+```{r}
+str(extract_log_lik(out2$last_fit, "log_lik"))
 ```
 
 ```{r}
