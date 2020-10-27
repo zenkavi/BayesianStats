@@ -176,9 +176,9 @@ b_strawMan <- bridge_sampler(f_strawMan, silent = TRUE)
 ```
 
 ```{r}
-data.frame(p_y_m = c(b_true$logml, b_twoAlphas$logml, b_diffAlphas$logml, b_strawMan$logml),
+data.frame(log_p_y_m = c(b_true$logml, b_twoAlphas$logml, b_diffAlphas$logml, b_strawMan$logml),
            model = c("true", "two Alphas", "diff Alphas", "play all")) %>%
-  mutate(p_y_m = exp(p_y_m),
+  mutate(p_y_m = exp(log_p_y_m),
          denom = sum(p_y_m),
          p_m_y = p_y_m/denom,
          model = factor(model, levels = c("true", "two Alphas", "diff Alphas", "play all"))) %>%

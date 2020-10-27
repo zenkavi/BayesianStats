@@ -15,7 +15,8 @@ model {
 
   for (t in 1:T_train) {
     // compute action probabilities
-    choice_train[t] ~ bernoulli(theta);
+    // choice_train[t] ~ bernoulli(theta);
+    target += bernoulli_logit_lpmf(choice_train[t] | theta);
   }
   
   // individual parameters

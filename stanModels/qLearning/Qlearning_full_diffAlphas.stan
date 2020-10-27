@@ -33,7 +33,8 @@ model {
   
   for (t in 1:T_train) {
     // compute action probabilities
-    choice_train[t] ~ bernoulli_logit(beta * (ev[2]-ev[1]));
+    // choice_train[t] ~ bernoulli_logit(beta * (ev[2]-ev[1]));
+    target += bernoulli_logit_lpmf(choice_train[t] | beta * (ev[2]-ev[1]));
     
     // prediction error
     PE = outcome_train[t] - ev[choice_train[t]+1];
