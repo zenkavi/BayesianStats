@@ -28,3 +28,6 @@ fit <- mod$sample(
 )
 ```
 
+```{r}
+fit$summary()
+```
