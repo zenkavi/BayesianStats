@@ -1,14 +1,16 @@
 
 functions {
   
-  vector phi(){
-    return out
+  real phi(real a){
+    real out = (exp(2*a)-1)/(exp(2*a)+1);
+    return out;
   }
   
   vector dx_dt(real t,       // time
                vector x,     // system state {1 x N - network activity for each time point}
                int N,
                vector W,
+               real I,
                real s,
                real g,
                real beta, 
@@ -17,9 +19,8 @@ functions {
     vector[N] dx_dt;
     
     for (i in 1:N){
-      dx_dt[i] = -x[i] + s * phi(x[i])
+      dx_dt[i] = (-x[i] + s * phi(x[i]) + g * sum(W[i,] * x[i]) + beta * I )/tau;
     }
-    
     
     return  dx_dt;
   }
@@ -31,7 +32,8 @@ data {
   real ts[N_TS];                 // measurement times > 0
   vector[N] y_init;             // initial measured activity level
   vector<lower = 0>[N] y[N_TS];    // measured activity level with nodes in cols and timepoints in rows
-  vector[N] W_mat[N]; // adjacency matrix
+  vector[N] W[N]; // adjacency matrix
+  vector[N_TS] I; // task stimulation
 }
 
 parameters {
@@ -44,7 +46,7 @@ parameters {
 }
 
 transformed parameters {
-  vector[N] z[N_TS] = ode_rk45(dx_dt, x_init, 0, ts, N, s, g, beta, tau);
+  vector[N] z[N_TS] = ode_rk45(dx_dt, x_init, 0, ts, N, W, I, s, g, beta, tau);
 }
 
 model {
