@@ -2,4 +2,28 @@
 title: "Neural mass model simulation and parameter recovery with Stan"
 ---
 
-Are the posteriors unimodal in VI vs MCMC? Are we losing important information when making assumptions like the Laplace approximation?
+
+Suppose we have a three node network that looks like:
+
+```{r}
+
+```
+
+Suppose we have a task that looks like:
+
+```{r}
+
+```
+
+The task stimulates *only* node 1 directly and propogates within the network based on the following Eq:
+
+$$\frac{dx_i}{dt}\tau_i = -x_i(t) + s\phi\big(x_i(t)\big) + g\Bigg(\sum_{j\neq i}^{N} W_{ij}\phi\big(x_j(t)\big)\Bigg) + I_i(t)$$
+Activity in each node at each time point would look like:
+
+```{r}
+
+```
+
+------
+
+Question re estimation methods: Are the posteriors unimodal in VI vs MCMC? Are we losing important information when making assumptions like the Laplace approximation?
