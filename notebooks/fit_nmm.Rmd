@@ -2,11 +2,40 @@
 title: "Neural mass model simulation and parameter recovery with Stan"
 ---
 
+```{r}
+library(tidygraph)
+library(ggraph)
+```
 
 Suppose we have a three node network that looks like:
 
 ```{r}
+edges = data.frame(from = c(1, 1, 2, 2, 3), to = c(2, 3, 1, 3, 2), weight = c(.4, .4, .2, .3, .2))
+nodes = data.frame(id = c(1,2,3), label = c("1", "2", "3"))
+```
 
+```{r}
+min_net = tbl_graph(nodes=nodes, edges=edges, directed=T)
+min_net
+```
+
+```{r}
+ggraph(min_net, layout="tree")+
+  geom_edge_parallel(aes(width=weight, label=weight), 
+                 alpha=.8,
+                 arrow = arrow(length = unit(4, 'mm')),
+                 end_cap = circle(5, 'mm'),
+                 start_cap = circle(5, 'mm'),
+                 label_dodge=unit(-4.0,"mm"),
+                 # label_push=unit(4,"mm"),
+                 position="identity",angle_calc="along",force_flip=T)+
+  scale_edge_width(range=c(.2,2))+
+  geom_node_point(size=7)+
+  geom_node_label(aes(label=label), 
+                 repel=T, 
+                 nudge_y = .1)+
+  theme_graph()+
+  theme(legend.position = "none")
 ```
 
 Suppose we have a task that looks like:
