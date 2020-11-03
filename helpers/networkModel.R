@@ -3,6 +3,36 @@ phi = function(a){
   return(out)
 }
 
+default_args_dict = list('bottomup'= FALSE, 
+                 'dt'=.5,  
+                 'ea'=200,
+                 'g'=1, 
+                 'hubnetwork_dsity'= .25,
+                 'I'= NULL,
+                 'innetwork_dsity'= .60,
+                 'iv'= 400,
+                 'local_com'= 1, 
+                 'ncommunities'= 3,
+                 'noise'= NULL,
+                 'noise_loc'= 0, 
+                 'noise_scale'= 0,
+                 'nodespercommunity'= 35,
+                 'outnetwork_dsity'=.08,
+                 'plot_network'= FALSE,
+                 'plot_task'= FALSE, 
+                 's'=1,
+                 'sa'=100,
+                 'showplot'=FALSE,
+                 'standardize'=FALSE,
+                 'stim_mag'=.5,
+                 'stimsize'= 3, 
+                 'taskdata'=NULL,
+                 'tasktiming'=NULL,
+                 'tau'=1, 
+                 'Tmax'=1000,
+                 'topdown'=TRUE,
+                 'W'= NULL)
+
 networkModel = function(W, args_dict){
   
   Tmax=args_dict$Tmax

@@ -72,7 +72,10 @@ $$\frac{dx_i}{dt}\tau_i = -x_i(t) + s\phi\big(x_i(t)\big) + g\Bigg(\sum_{j\neq i
 Activity in each node at each time point would look like:
 
 ```{r}
-
+default_args_dict$Tmax = max(task$time)
+default_args_dict$I = matrix(c(task$stim, rep(0, max(task$time)), rep(0, max(task$time))), 
+                             nrow(nodes), max(task$time), byrow=TRUE)
+networkModel(W, default_args_dict)
 ```
 
 ------
