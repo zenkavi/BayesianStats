@@ -42,10 +42,17 @@ ggraph(min_net, layout="tree")+
 Suppose we have a task that looks like:
 
 ```{r}
-
+task = data.frame(time = rep(1:15), stim = c(0,0,0,1,1,1,0,0,0,1,1,1,0,0,0))
+task %>%
+  ggplot(aes(x=time, y=stim))+
+  geom_line()+
+  xlab("")+
+  ylab("")+
+  scale_x_continuous(breaks = seq(1,15,1))+
+  scale_y_continuous(breaks = c(0,1))
 ```
 
-The task stimulates *only* node 1 directly and propogates within the network based on the following Eq:
+The task stimulates *only* node 1 directly and propagates within the network based on the following Eq:
 
 $$\frac{dx_i}{dt}\tau_i = -x_i(t) + s\phi\big(x_i(t)\big) + g\Bigg(\sum_{j\neq i}^{N} W_{ij}\phi\big(x_j(t)\big)\Bigg) + I_i(t)$$
 Activity in each node at each time point would look like:
