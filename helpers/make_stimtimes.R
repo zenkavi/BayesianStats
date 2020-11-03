@@ -40,6 +40,22 @@ make_stimtimes = function(stim_nodes, args_dict){
         tasktiming[t] = 1.0
       }
     }
+  }else if(length(tasktiming) != length(TT)){
+    print("tasktiming not in same time resolution as sampling rate")
+    
+    short_tasktiming = tasktiming
+    tasktiming = rep(NA, length(TT))
+    cur_t = 1
+    
+    for(i in 1:length(short_tasktiming)){
+      while(floor(cur_t)<length(short_tasktiming)){
+        cur_stim = short_tasktiming[floor(cur_t)]
+        first_na_index = which(is.na(tasktiming))[1]
+        tasktiming[first_na_index] = cur_stim
+        cur_t = cur_t + dt
+      }
+    }
+    tasktiming[which(is.na(tasktiming))] = 0
   }
   
   stimtimes = matrix(0, totalnodes, length(TT))
