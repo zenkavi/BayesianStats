@@ -38,6 +38,20 @@ ggraph(min_net, layout="tree")+
   theme(legend.position = "none",
         plot.margin = margin(-.5, 1, .5, 1, "cm"))
 ```
+Adjacency matrix for the above minimal network looks like:
+
+```{r}
+W<-matrix(0, 3, 3)
+W[as.matrix(edges[,1:2])] <- edges$weight
+W
+```
+
+```{r}
+edges %>%
+  rbind(data.frame(from = c(1,2,3,3), to = c(1,2,3,1), weight = c(0,0,0,0))) %>%
+  ggplot(aes(x=to, y=from, fill=weight))+
+  geom_tile()
+```
 
 Suppose we have a task that looks like:
 
