@@ -35,7 +35,8 @@ ggraph(min_net, layout="tree")+
                  repel=T, 
                  nudge_y = .1)+
   theme_graph()+
-  theme(legend.position = "none")
+  theme(legend.position = "none",
+        plot.margin = margin(-.5, 1, .5, 1, "cm"))
 ```
 
 Suppose we have a task that looks like:
