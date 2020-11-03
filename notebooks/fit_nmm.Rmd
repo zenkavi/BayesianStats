@@ -42,14 +42,14 @@ Adjacency matrix for the above minimal network looks like:
 
 ```{r}
 W<-matrix(0, 3, 3)
-W[as.matrix(edges[,1:2])] <- edges$weight
+W[as.matrix(edges[,2:1])] <- edges$weight
 W
 ```
 
 ```{r}
 edges %>%
   rbind(data.frame(from = c(1,2,3,3), to = c(1,2,3,1), weight = c(0,0,0,0))) %>%
-  ggplot(aes(x=to, y=from, fill=weight))+
+  ggplot(aes(x=from, y=to, fill=weight))+
   geom_tile()
 ```
 
@@ -103,6 +103,7 @@ cur_args_dict = list('bottomup'= FALSE,
                  'W'= W)
 
 cur_args_dict$I = make_stimtimes(1, cur_args_dict)$stimtimes
+networkModel(W, cur_args_dict)
 
 ```
 
