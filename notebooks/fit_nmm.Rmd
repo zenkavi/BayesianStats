@@ -7,6 +7,11 @@ library(tidygraph)
 library(ggraph)
 ```
 
+```{r}
+source('~/Dropbox/RangelLab/BayesianStats/helpers/networkModel.R')
+source('~/Dropbox/RangelLab/BayesianStats/helpers/make_stimtimes.R')
+```
+
 Suppose we have a three node network that looks like:
 
 ```{r}
@@ -73,7 +78,7 @@ Activity in each node at each time point would look like:
 
 ```{r}
 cur_args_dict = list('bottomup'= FALSE, 
-                 'dt'=.5,  
+                 'dt'=1,  
                  'ea'=0,
                  'g'=1, 
                  'hubnetwork_dsity'= .25,
@@ -103,8 +108,11 @@ cur_args_dict = list('bottomup'= FALSE,
                  'W'= W)
 
 cur_args_dict$I = make_stimtimes(1, cur_args_dict)$stimtimes
-networkModel(W, cur_args_dict)
+cur_args_dict$I
+```
 
+```{r}
+networkModel(W, cur_args_dict)
 ```
 
 ------

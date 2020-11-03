@@ -28,7 +28,7 @@ make_stimtimes = function(stim_nodes, args_dict){
   iv = args_dict$iv
   
   totalnodes = nodespercommunity*ncommunities
-  TT = seq(0,Tmax,dt)
+  TT = seq(1,Tmax,dt)
   
   # Construct timing array for convolution 
   # This timing is irrespective of the task being performed

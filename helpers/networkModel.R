@@ -45,7 +45,7 @@ networkModel = function(W, args_dict){
   noise_loc = args_dict$noise_loc
   noise_scale = args_dict$noise_scale
   
-  TT = seq(0, Tmax, dt)
+  TT = seq(1, Tmax, dt)
   totalnodes = dim(W)[1]
   
   # External input (or task-evoked input) && noise input
@@ -77,9 +77,11 @@ networkModel = function(W, args_dict){
   
   for (t in 1:(length(TT)-1)){
     ## Solve using Runge-Kutta Order 2 Method
+    ## End point form: https://lpsa.swarthmore.edu/NumInt/NumIntSecond.html##section17
     # With auto-correlation
     spont_act = noise[,t] + I[,t]
-    k1e = -Enodes[,t] + g*(W %*% phi(spont_act)) # Coupling
+    # k1e = -Enodes[,t] + g*(W %*% phi(spont_act)) # Coupling
+    k1e = -Enodes[,t] + g*(W %*% phi(Enodes[,t])) 
     k1e = k1e + s*phi(Enodes[,t]) + spont_act# Local processing
     k1e = k1e/tau
     # 
@@ -87,7 +89,8 @@ networkModel = function(W, args_dict){
     #
     # With auto-correlation
     spont_act = noise[,t+1] + I[,t+1]
-    k2e = -ave + g*(W %*% phi(spont_act)) # Coupling
+    # k2e = -ave + g*(W %*% phi(spont_act)) # Coupling
+    k2e = -ave + g*(W %*% phi(ave))
     k2e = k2e + s*phi(ave) + spont_act # Local processing
     k2e = k2e/tau
     
