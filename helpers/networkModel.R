@@ -1,3 +1,8 @@
+phi = function(a){
+  out = (exp(2*a)-1)/(exp(2*a)+1)
+  return(out)
+}
+
 networkModel = function(W, args_dict){
   
   Tmax=args_dict$Tmax
@@ -23,6 +28,40 @@ networkModel = function(W, args_dict){
     noise = matrix(0, totalnodes, length(TT))
   } else {
     noise = matrix(rnorm(totalnodes*length(TT), mean = noise_loc, sd = noise_scale), totalnodes, length(TT))
+  }
+  
+  # Initial conditions and empty arrays
+  Enodes = matrix(0, totalnodes, length(TT))
+  # Initial conditions
+  # AZE: changing initial conditions to 0 if there is a task simulation
+  if (!is.null(I)){
+    Einit = matrix(0, totalnodes, 1)
+  } else {
+    Enit  = matrix(rnorm(totalnodes), totalnodes, 1)
+  }
+  
+  #Assign initial values to first time point of all nodes
+  Enodes[,1] = Einit
+  
+  spont_act = matrix(0, totalnodes, 1)
+  
+  for (t in 1:(length(TT)-1)){
+    ## Solve using Runge-Kutta Order 2 Method
+    # With auto-correlation
+    spont_act = noise[,t] + I[,t]
+    k1e = -Enodes[,t] + g*(W %*% phi(spont_act)) # Coupling
+    k1e = k1e + s*phi(Enodes[,t]) + spont_act# Local processing
+    k1e = k1e/tau
+    # 
+    ave = Enodes[,t] + k1e*dt
+    #
+    # With auto-correlation
+    spont_act = noise[,t+1] + I[,t+1]
+    k2e = -ave + g*(W %*% phi(spont_act)) # Coupling
+    k2e = k2e + s*phi(ave) + spont_act # Local processing
+    k2e = k2e/tau
+    
+    Enodes[,t+1] = Enodes[,t] + (.5*(k1e+k2e))*dt
   }
   
   return(Enodes)
