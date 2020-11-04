@@ -81,7 +81,7 @@ networkModel = function(W, args_dict){
     # With auto-correlation
     spont_act = noise[,t] + I[,t]
     # k1e = -Enodes[,t] + g*(W %*% phi(spont_act)) # Coupling
-    k1e = -Enodes[,t] + g*(W %*% phi(Enodes[,t])) 
+    k1e = -Enodes[,t] + g*(W %*% phi(Enodes[,t]))
     k1e = k1e + s*phi(Enodes[,t]) + spont_act# Local processing
     k1e = k1e/tau
     # 
