@@ -33,7 +33,7 @@ default_args_dict = list('bottomup'= FALSE,
                  'topdown'=TRUE,
                  'W'= NULL)
 
-networkModel = function(W, args_dict){
+networkModel = function(W, args_dict, old=FALSE){
   
   Tmax=args_dict$Tmax
   dt=args_dict$dt
@@ -75,27 +75,58 @@ networkModel = function(W, args_dict){
   
   spont_act = matrix(0, totalnodes, 1)
   
+  int_out = list(spont_act1 = matrix(NA, totalnodes, length(TT)),
+                 net_act1 = matrix(NA, totalnodes, length(TT)),
+                 k1e = matrix(NA, totalnodes, length(TT)),
+                 ave =  matrix(NA, totalnodes, length(TT)),
+                 spont_act2  = matrix(NA, totalnodes, length(TT)),
+                 net_act2 = matrix(NA, totalnodes, length(TT)),
+                 k2e = matrix(NA, totalnodes, length(TT)))
+  
   for (t in 1:(length(TT)-1)){
     ## Solve using Runge-Kutta Order 2 Method
     ## End point form: https://lpsa.swarthmore.edu/NumInt/NumIntSecond.html##section17
     # With auto-correlation
     spont_act = noise[,t] + I[,t]
-    # k1e = -Enodes[,t] + g*(W %*% phi(spont_act)) # Coupling
-    k1e = -Enodes[,t] + g*(W %*% phi(Enodes[,t]))
+    
+    if(old){
+      net_act = g*(W %*% phi(spont_act)) # Coupling
+    } else{
+      net_act = g*(W %*% phi(Enodes[,t]))
+    }
+  
+    k1e = -Enodes[,t] + net_act
     k1e = k1e + s*phi(Enodes[,t]) + spont_act# Local processing
     k1e = k1e/tau
+    
+    int_out$spont_act1[,t] = spont_act
+    int_out$net_act1[,t] = net_act
+    int_out$k1e[,t] = k1e
+  
     # 
     ave = Enodes[,t] + k1e*dt
     #
     # With auto-correlation
     spont_act = noise[,t+1] + I[,t+1]
-    # k2e = -ave + g*(W %*% phi(spont_act)) # Coupling
-    k2e = -ave + g*(W %*% phi(ave))
+    
+    if(old){
+      net_act = g*(W %*% phi(spont_act)) # Coupling
+    } else {
+      net_act = g*(W %*% phi(ave))
+    }
+    
+    k2e = -ave + net_act
     k2e = k2e + s*phi(ave) + spont_act # Local processing
     k2e = k2e/tau
     
+    int_out$ave[,t] = ave
+    int_out$net_act2[,t] = net_act
+    int_out$spont_act2[,t] = spont_act
+    int_out$k2e[,t] = k2e
+    
     Enodes[,t+1] = Enodes[,t] + (.5*(k1e+k2e))*dt
+    
   }
   
-  return(Enodes)
+  return(list(Enodes = Enodes, int_out = int_out))
 }

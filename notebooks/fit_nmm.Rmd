@@ -60,7 +60,7 @@ edges %>%
 Suppose we have a task that looks like:
 
 ```{r}
-task = data.frame(time = rep(1:15), stim = c(0,0,0,1,1,1,0,0,0,1,1,1,0,0,0))
+task = data.frame(time = rep(1:15), stim = c(0,0,1,0,0,0,0,0,0,0,0,0,0,0,0))
 task %>%
   ggplot(aes(x=time, y=stim))+
   geom_line()+
@@ -113,6 +113,8 @@ cur_args_dict$I = make_stimtimes(1, cur_args_dict)$stimtimes
 make_stimtimes(1, cur_args_dict)$tasktiming
 ```
 
+Problem after changing network propogation: not going back down to 0.
+
 ```{r}
 net_dat = networkModel(W, cur_args_dict)
 
@@ -125,6 +127,91 @@ data.frame(net_dat) %>%
   ggplot(aes(x=sampling, y=value, color = node))+
   geom_line()
 ```
+
+Is it not going down bc the task it too short? Try longer task.
+
+```{r}
+test = default_args_dict
+test$W = W
+test$I = make_stimtimes(1, test)$stimtimes
+
+net_dat = networkModel(W, test)
+
+data.frame(net_dat) %>%
+  mutate(node = c(1,2,3)) %>%
+  gather(sampling, value, -node) %>%
+  mutate(sampling = gsub("X", "", sampling),
+         sampling = as.numeric(sampling),
+         node = as.factor(node)) %>%
+  ggplot(aes(x=sampling, y=value, color = node))+
+  geom_line()
+```
+Does it go down to zero with a longer period of no stimulation after? No.
+
+```{r}
+tmp = make_stimtimes(1, test)$tasktiming
+tmp[-1:-213] = 0
+test$tasktiming = tmp
+test$I = make_stimtimes(1, test)$stimtimes
+
+net_dat = networkModel(W, test)
+
+data.frame(net_dat) %>%
+  mutate(node = c(1,2,3)) %>%
+  gather(sampling, value, -node) %>%
+  mutate(sampling = gsub("X", "", sampling),
+         sampling = as.numeric(sampling),
+         node = as.factor(node)) %>%
+  ggplot(aes(x=sampling, y=value, color = node))+
+  geom_line()
+```
+Does it go back to 0 with the old system? Yes. But then node 3 is always at 0.
+
+```{r}
+net_dat = networkModel(W, test, old=T)
+
+data.frame(net_dat) %>%
+  mutate(node = c(1,2,3)) %>%
+  gather(sampling, value, -node) %>%
+  mutate(sampling = gsub("X", "", sampling),
+         sampling = as.numeric(sampling),
+         node = as.factor(node)) %>%
+  ggplot(aes(x=sampling, y=value, color = node))+
+  geom_line()
+```
+
+```{r}
+test$tasktiming = NULL
+test$I = make_stimtimes(1, test)$stimtimes
+
+net_dat = networkModel(W, test, old=T)
+
+data.frame(net_dat) %>%
+  mutate(node = c(1,2,3)) %>%
+  gather(sampling, value, -node) %>%
+  mutate(sampling = gsub("X", "", sampling),
+         sampling = as.numeric(sampling),
+         node = as.factor(node)) %>%
+  ggplot(aes(x=sampling, y=value, color = node))+
+  geom_line()
+```
+
+So two things to understand:
+
+1. Why doesn't activity go back to 0 in the new way?
+
+What happens at task comes on at time t? At t+1? At t+2?
+
+```{r}
+int_out = networkModel(W, test, old=F)$int_out
+int_out
+```
+
+What happens when a task goes off at time t? At t+1? At t+2?
+
+2. Why doesn't a node that isn't directly connected to a stim node be activated in the old way?
+
+
 
 ------
 
