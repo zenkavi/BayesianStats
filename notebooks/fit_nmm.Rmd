@@ -56,11 +56,11 @@ edges %>%
   ggplot(aes(x=from, y=to, fill=weight))+
   geom_tile()
 ```
-
 Suppose we have a task that looks like:
 
 ```{r}
-task = data.frame(time = rep(1:100), stim = c(0,0,1,rep(0, 97)))
+task = data.frame(stim = rep(c(0,0,0,1,0,0,0),3))
+task$time = rep(1:nrow(task))
 task %>%
   ggplot(aes(x=time, y=stim))+
   geom_line()+
@@ -76,34 +76,17 @@ $$\frac{dx_i}{dt}\tau_i = -x_i(t) + s\phi\big(x_i(t)\big) + g\Bigg(\sum_{j\neq i
 Activity in each node at each time point would look like:
 
 ```{r}
-cur_args_dict = list('bottomup'= FALSE, 
-                 'dt'=.5,  
-                 'ea'=0,
+cur_args_dict = list('dt'=.5,  
                  'g'=1, 
-                 'hubnetwork_dsity'= .25,
-                 'I'= NULL,
-                 'innetwork_dsity'= .60,
-                 'iv'= 4,
-                 'local_com'= 1, 
-                 'ncommunities'= 3,
                  'noise'= NULL,
                  'noise_loc'= 0, 
                  'noise_scale'= 0,
-                 'nodespercommunity'= 1,
-                 'outnetwork_dsity'=.08,
-                 'plot_network'= FALSE,
-                 'plot_task'= FALSE, 
                  's'=.7,
-                 'sa'=1,
-                 'showplot'=FALSE,
-                 'standardize'=FALSE,
                  'stim_mag'=.5,
-                 'stimsize'= 3, 
                  'taskdata'=NULL,
                  'tasktiming'=task$stim,
                  'tau'=1, 
                  'Tmax'=max(task$time),
-                 'topdown'=TRUE,
                  'W'= W)
 
 cur_args_dict$I = make_stimtimes(1, cur_args_dict)$stimtimes
@@ -112,8 +95,6 @@ cur_args_dict$I = make_stimtimes(1, cur_args_dict)$stimtimes
 ```{r}
 make_stimtimes(1, cur_args_dict)$tasktiming
 ```
-
-Problem after changing network propogation: not going back down to 0.
 
 ```{r}
 net_dat = networkModel(W, cur_args_dict)
@@ -127,110 +108,6 @@ data.frame(net_dat$Enodes) %>%
   ggplot(aes(x=sampling, y=value, color = node))+
   geom_line()
 ```
-
-Is it not going down bc the task it too short? Try longer task.
-
-```{r}
-test = default_args_dict
-test$s = 0.7
-test$W = W
-test$I = make_stimtimes(1, test)$stimtimes
-
-net_dat = networkModel(W, test)
-
-data.frame(net_dat$Enodes) %>%
-  mutate(node = c(1,2,3)) %>%
-  gather(sampling, value, -node) %>%
-  mutate(sampling = gsub("X", "", sampling),
-         sampling = as.numeric(sampling),
-         node = as.factor(node)) %>%
-  ggplot(aes(x=sampling, y=value, color = node))+
-  geom_line()
-```
-Does it go down to zero with a longer period of no stimulation after? No.
-
-```{r}
-tmp = make_stimtimes(1, test)$tasktiming
-tmp[-1:-213] = 0
-test$tasktiming = tmp
-test$I = make_stimtimes(1, test)$stimtimes
-
-net_dat = networkModel(W, test)
-
-data.frame(net_dat$Enodes) %>%
-  mutate(node = c(1,2,3)) %>%
-  gather(sampling, value, -node) %>%
-  mutate(sampling = gsub("X", "", sampling),
-         sampling = as.numeric(sampling),
-         node = as.factor(node)) %>%
-  ggplot(aes(x=sampling, y=value, color = node))+
-  geom_line()
-```
-
-So two things to understand:
-
-1. Why doesn't activity go back to 0 in the new way?
-
-What happens at task comes on at time t? At t+1? At t+2?
-
-```{r}
-test$stim_mag = .5
-tmp = make_stimtimes(1, test)$stimtimes
-tmp[1,-1:-200] = 0
-test$I = tmp
-net_dat = networkModel(matrix(0, nrow=3, ncol = 3), test, old=F)
-
-data.frame(net_dat$Enodes) %>%
-  mutate(node = c(1,2,3)) %>%
-  gather(sampling, value, -node) %>%
-  mutate(sampling = gsub("X", "", sampling),
-         sampling = as.numeric(sampling),
-         node = as.factor(node)) %>%
-  ggplot(aes(x=sampling, y=value, color = node))+
-  geom_line()
-```
-
-```{r}
-test$stim_mag = .5
-net_dat = networkModel(W, test, old=F)
-
-data.frame(net_dat$Enodes) %>%
-  mutate(node = c(1,2,3)) %>%
-  gather(sampling, value, -node) %>%
-  mutate(sampling = gsub("X", "", sampling),
-         sampling = as.numeric(sampling),
-         node = as.factor(node)) %>%
-  ggplot(aes(x=sampling, y=value, color = node))+
-  geom_line()
-```
-
-Task activity change at the same time point as task turn on is driven NOT by k1e but k2e ONLY. Activity takes 32 steps to satiate
-
-```{r}
-round(net_dat$Enodes[,100:110], 3)
-```
-
-Each column below determines each column above.
-
-```{r}
-lapply(net_dat$int_out, function(x){round(x[,100:110], 3)})
-```
-
-What happens when a task goes off at time t? At t+1? At t+2? It takes 32 steps again to come back to lowest point. But **why isn't the largest drop after task turn off isn't larger**?
-
-```{r}
-round(net_dat$Enodes[,198:239], 3)
-```
-
-Each column below determines each column above.
-
-How can k1e and k2e be 0 while net_act is != 0? Bc the subtraction of raw self activity and addition of transformed self activity.
-
-```{r}
-lapply(net_dat$int_out, function(x){round(x[,198:209], 3)})
-```
-
-2. Why doesn't a node that isn't directly connected to a stim node be activated in the old way?
 
 
 
