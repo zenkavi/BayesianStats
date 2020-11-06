@@ -97,6 +97,7 @@ networkModel = function(W, args_dict, old=FALSE){
   
     k1e = -Enodes[,t] + net_act
     k1e = k1e + s*phi(Enodes[,t]) + spont_act# Local processing
+    # k1e = k1e + spont_act
     k1e = k1e/tau
     
     int_out$spont_act1[,t] = spont_act
@@ -117,6 +118,7 @@ networkModel = function(W, args_dict, old=FALSE){
     
     k2e = -ave + net_act
     k2e = k2e + s*phi(ave) + spont_act # Local processing
+    # k2e = k2e + spont_act 
     k2e = k2e/tau
     
     int_out$ave[,t] = ave

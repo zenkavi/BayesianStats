@@ -60,13 +60,13 @@ edges %>%
 Suppose we have a task that looks like:
 
 ```{r}
-task = data.frame(time = rep(1:15), stim = c(0,0,1,0,0,0,0,0,0,0,0,0,0,0,0))
+task = data.frame(time = rep(1:100), stim = c(0,0,1,rep(0, 97)))
 task %>%
   ggplot(aes(x=time, y=stim))+
   geom_line()+
   xlab("")+
   ylab("")+
-  scale_x_continuous(breaks = seq(1,15,1))+
+  scale_x_continuous(breaks = seq(1,nrow(task),1))+
   scale_y_continuous(breaks = c(0,1))
 ```
 
@@ -93,7 +93,7 @@ cur_args_dict = list('bottomup'= FALSE,
                  'outnetwork_dsity'=.08,
                  'plot_network'= FALSE,
                  'plot_task'= FALSE, 
-                 's'=1,
+                 's'=.7,
                  'sa'=1,
                  'showplot'=FALSE,
                  'standardize'=FALSE,
@@ -132,6 +132,7 @@ Is it not going down bc the task it too short? Try longer task.
 
 ```{r}
 test = default_args_dict
+test$s = 0.7
 test$W = W
 test$I = make_stimtimes(1, test)$stimtimes
 
@@ -166,37 +167,6 @@ data.frame(net_dat$Enodes) %>%
   geom_line()
 ```
 
-Does it go back to 0 with the old system? Yes. But then node 3 is always at 0.
-
-```{r}
-net_dat = networkModel(W, test, old=T)
-
-data.frame(net_dat$Enodes) %>%
-  mutate(node = c(1,2,3)) %>%
-  gather(sampling, value, -node) %>%
-  mutate(sampling = gsub("X", "", sampling),
-         sampling = as.numeric(sampling),
-         node = as.factor(node)) %>%
-  ggplot(aes(x=sampling, y=value, color = node))+
-  geom_line()
-```
-
-```{r}
-test$tasktiming = NULL
-test$I = make_stimtimes(1, test)$stimtimes
-
-net_dat = networkModel(W, test, old=T)
-
-data.frame(net_dat$Enodes) %>%
-  mutate(node = c(1,2,3)) %>%
-  gather(sampling, value, -node) %>%
-  mutate(sampling = gsub("X", "", sampling),
-         sampling = as.numeric(sampling),
-         node = as.factor(node)) %>%
-  ggplot(aes(x=sampling, y=value, color = node))+
-  geom_line()
-```
-
 So two things to understand:
 
 1. Why doesn't activity go back to 0 in the new way?
@@ -204,13 +174,40 @@ So two things to understand:
 What happens at task comes on at time t? At t+1? At t+2?
 
 ```{r}
+test$stim_mag = .5
+tmp = make_stimtimes(1, test)$stimtimes
+tmp[1,-1:-200] = 0
+test$I = tmp
+net_dat = networkModel(matrix(0, nrow=3, ncol = 3), test, old=F)
+
+data.frame(net_dat$Enodes) %>%
+  mutate(node = c(1,2,3)) %>%
+  gather(sampling, value, -node) %>%
+  mutate(sampling = gsub("X", "", sampling),
+         sampling = as.numeric(sampling),
+         node = as.factor(node)) %>%
+  ggplot(aes(x=sampling, y=value, color = node))+
+  geom_line()
+```
+
+```{r}
+test$stim_mag = .5
 net_dat = networkModel(W, test, old=F)
+
+data.frame(net_dat$Enodes) %>%
+  mutate(node = c(1,2,3)) %>%
+  gather(sampling, value, -node) %>%
+  mutate(sampling = gsub("X", "", sampling),
+         sampling = as.numeric(sampling),
+         node = as.factor(node)) %>%
+  ggplot(aes(x=sampling, y=value, color = node))+
+  geom_line()
 ```
 
 Task activity change at the same time point as task turn on is driven NOT by k1e but k2e ONLY. Activity takes 32 steps to satiate
 
 ```{r}
-round(net_dat$Enodes[,100:135], 3)
+round(net_dat$Enodes[,100:110], 3)
 ```
 
 Each column below determines each column above.
@@ -219,14 +216,18 @@ Each column below determines each column above.
 lapply(net_dat$int_out, function(x){round(x[,100:110], 3)})
 ```
 
-What happens when a task goes off at time t? At t+1? At t+2? It takes 32 steps again to come back to lowest point.
+What happens when a task goes off at time t? At t+1? At t+2? It takes 32 steps again to come back to lowest point. But **why isn't the largest drop after task turn off isn't larger**?
 
 ```{r}
-round(net_dat$Enodes[,199:239], 3)
+round(net_dat$Enodes[,198:239], 3)
 ```
 
+Each column below determines each column above.
+
+How can k1e and k2e be 0 while net_act is != 0? Bc the subtraction of raw self activity and addition of transformed self activity.
+
 ```{r}
-lapply(net_dat$int_out, function(x){round(x[,199:209], 3)})
+lapply(net_dat$int_out, function(x){round(x[,198:209], 3)})
 ```
 
 2. Why doesn't a node that isn't directly connected to a stim node be activated in the old way?
