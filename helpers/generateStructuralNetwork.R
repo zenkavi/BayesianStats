@@ -26,21 +26,21 @@ generateStructuralNetwork = function(args_dict){
   W = matrix(0, nrow=totalnodes, ncol=totalnodes)
   # Construct structural matrix
   nodecount = 0
-  for (i in range(ncommunities)){
-    for (j in range(ncommunities)){
-      for (node in range(nodespercommunity)){
+  for (i in 1:ncommunities){
+    for (j in 1:ncommunities){
+      for (node in 1:nodespercommunity){
         # Set within network community connections
         if (i==j){
           tmp_a = matrix(rnorm(nodespercommunity*nodespercommunity), nrow=nodespercommunity)<innetwork_dsity
-          indstart = i*nodespercommunity
-          indend = i*nodespercommunity+nodespercommunity
+          indstart = (i-1)*nodespercommunity+1
+          indend = (i-1)*nodespercommunity+nodespercommunity
           W[indstart:indend,indstart:indend] = tmp_a
         } else{
           tmp_b = matrix(rnorm(nodespercommunity*nodespercommunity), nrow=nodespercommunity)<outnetwork_dsity
-          indstart_i = i*nodespercommunity
-          indend_i = i*nodespercommunity + nodespercommunity
-          indstart_j = j*nodespercommunity
-          indend_j = j*nodespercommunity + nodespercommunity
+          indstart_i = (i-1)*nodespercommunity+1
+          indend_i = (i-1)*nodespercommunity + nodespercommunity
+          indstart_j = (j-1)*nodespercommunity+1
+          indend_j = (j-1)*nodespercommunity + nodespercommunity
           W[indstart_i:indend_i, indstart_j:indend_j] = tmp_b
         }
       }
@@ -49,25 +49,25 @@ generateStructuralNetwork = function(args_dict){
     
   
   # Redo a community as a hub-network
-  hubnetwork = 0
+  hubnetwork = 1
   if (hubnetwork_dsity>0){
-    for (i in range(ncommunities)){
-      for (j in range(ncommunities)){
+    for (i in 1:ncommunities){
+      for (j in 1:ncommunities){
         if( (i==hubnetwork | j==hubnetwork) & i!=j){
-          tmp_b = np.random.rand(nodespercommunity,nodespercommunity)<hubnetwork_dsity
-          indstart_i = i*nodespercommunity
-          indend_i = i*nodespercommunity + nodespercommunity
-          indstart_j = j*nodespercommunity
-          indend_j = j*nodespercommunity + nodespercommunity
+          tmp_b = matrix(rnorm(nodespercommunity*nodespercommunity), nrow=nodespercommunity)<hubnetwork_dsity
+          indstart_i = (i-1)*nodespercommunity+1
+          indend_i = (i-1)*nodespercommunity + nodespercommunity
+          indstart_j = (j-1)*nodespercommunity+1
+          indend_j = (j-1)*nodespercommunity + nodespercommunity
           W[indstart_i:indend_i, indstart_j:indend_j] = tmp_b
         }
       }
     }
-  } # Only do if we want a hub network
+  } 
     
   
   # Make sure self-connections exist
-  # np.fill_diagonal(W, 1)
+  diag(W) = 0
   
   if (showplot){
     data.frame(W) %>%
@@ -75,6 +75,7 @@ generateStructuralNetwork = function(args_dict){
              from = names(.),
              from = gsub("X","",from)) %>%
       gather(key, weight, -to, -from) %>%
+      mutate(from = sort(from)) %>%
       select(-key) %>%
       ggplot(aes(x=from, y=to, fill=weight))+
       geom_tile() 

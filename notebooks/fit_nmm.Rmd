@@ -10,6 +10,8 @@ library(ggraph)
 ```{r}
 source('~/Dropbox/RangelLab/BayesianStats/helpers/networkModel.R')
 source('~/Dropbox/RangelLab/BayesianStats/helpers/make_stimtimes.R')
+source('~/Dropbox/RangelLab/BayesianStats/helpers/generateStructuralNetwork.R')
+source('~/Dropbox/RangelLab/BayesianStats/helpers/generateSynapticNetwork.R')
 ```
 
 Suppose we have a three node network that looks like:
@@ -121,17 +123,30 @@ data.frame(net_dat) %>%
 ```
 
 ```{r}
-test = networkModel(W, default_args_dict)
-dim(test)
+sim_args = default_args_dict
+sim_args$hubnetwork_dsity = 1
+sim_args$nodespercommunity = 3
+sim_args$showplot = TRUE
+```
 
-data.frame(net_dat) %>%
-  mutate(node = c(1,2,3)) %>%
-  gather(sampling, value, -node) %>%
-  mutate(sampling = gsub("X", "", sampling),
-         sampling = as.numeric(sampling),
-         node = as.factor(node)) %>%
-  ggplot(aes(x=sampling, y=value, color = node))+
-  geom_line()
+Check translation of network creation functions to match previous network notebooks.
+Check activity propogation in previous notebooks to match activity here.
+
+```{r}
+S = generateStructuralNetwork(args_dict = sim_args)
+data.frame(S) %>%
+  mutate(to = row.names(.),
+         from = names(.),
+         from = gsub("X","",from)) %>%
+  gather(key, weight, -to, -from) %>%
+  mutate(from = sort(from)) %>%
+  select(-key) %>%
+  ggplot(aes(x=from, y=to, fill=weight))+
+  geom_tile() +
+  geom_vline(aes(xintercept = 3.5))+
+  geom_vline(aes(xintercept = 6.5))+
+  geom_hline(aes(yintercept = 3.5))+
+  geom_hline(aes(yintercept = 6.5))
 ```
 
 ------
