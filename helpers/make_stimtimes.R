@@ -49,8 +49,6 @@ make_stimtimes = function(stim_nodes, args_dict){
       }
     }
   }else if(length(tasktiming) != length(TT)){
-    print("tasktiming not in same time resolution as sampling rate")
-    
     short_tasktiming = tasktiming
     tasktiming = rep(NA, length(TT))
     cur_t = 1

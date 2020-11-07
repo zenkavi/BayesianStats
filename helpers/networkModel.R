@@ -64,8 +64,8 @@ networkModel = function(W, args_dict, old=FALSE){
   Enodes = matrix(0, totalnodes, length(TT))
   # Initial conditions
   # Initial conditions to 0 if there is a task simulation and no noise
-  if (!is.null(I) & is.null(noise)){
-    Einit = matrix(0, totalnodes, 1)
+  if (!is.null(I)){
+      Einit = matrix(0, totalnodes, 1)
   } else {
     Enit  = matrix(rnorm(totalnodes), totalnodes, 1)
   }
@@ -94,9 +94,10 @@ networkModel = function(W, args_dict, old=FALSE){
     k1e = -Enodes[,t] + net_act + s*phi(Enodes[,t]) + spont_act
     k1e = k1e/tau
     
-    int_out$spont_act1[,t] = spont_act
-    int_out$net_act1[,t] = net_act
-    int_out$k1e[,t] = k1e
+    # Debugging
+    # int_out$spont_act1[,t] = spont_act
+    # int_out$net_act1[,t] = net_act
+    # int_out$k1e[,t] = k1e
   
     ave = Enodes[,t] + k1e*dt
     spont_act = noise[,t+1] + I[,t+1]

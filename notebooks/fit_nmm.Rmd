@@ -59,15 +59,14 @@ edges %>%
 Suppose we have a task that looks like:
 
 ```{r}
-task = data.frame(stim = rep(c(0,0,0,1,0,0,0),3))
+task = data.frame(stim = c(c(0,0,0,1),rep(0,97)))
 task$time = rep(1:nrow(task))
 task %>%
   ggplot(aes(x=time, y=stim))+
   geom_line()+
   xlab("")+
   ylab("")+
-  scale_x_continuous(breaks = seq(1,nrow(task),1))+
-  scale_y_continuous(breaks = c(0,1))
+  scale_y_continuous(breaks = c(0,1))+
 ```
 
 The task stimulates *only* node 1 directly and propagates within the network based on the following Eq:
@@ -92,14 +91,26 @@ cur_args_dict = list('dt'=.5,
 cur_args_dict$I = make_stimtimes(1, cur_args_dict)$stimtimes
 ```
 
+Since `dt` is `r cur_args_dict$dt` Resampled task looks like (red dots indicate task status in real time instead of the sampling time):
+
 ```{r}
-make_stimtimes(1, cur_args_dict)$tasktiming
+data.frame(stim = make_stimtimes(1, cur_args_dict)$tasktiming) %>%
+  mutate(time = seq(1,nrow(task), cur_args_dict$dt)) %>%
+  ggplot(aes(x=time, y=stim))+
+  geom_line()+
+  geom_point(data = task, aes(x=time, y=stim), color="red")+
+  xlab("")+
+  ylab("")+
+  # scale_x_continuous(breaks = seq(1,nrow(task), cur_args_dict$dt))+
+  scale_y_continuous(breaks = c(0,1))+
+  theme(axis.text.x = element_text(angle=90))
 ```
+Network activity looks like: 
 
 ```{r}
 net_dat = networkModel(W, cur_args_dict)
 
-data.frame(net_dat$Enodes) %>%
+data.frame(net_dat) %>%
   mutate(node = c(1,2,3)) %>%
   gather(sampling, value, -node) %>%
   mutate(sampling = gsub("X", "", sampling),
@@ -109,7 +120,19 @@ data.frame(net_dat$Enodes) %>%
   geom_line()
 ```
 
+```{r}
+test = networkModel(W, default_args_dict)
+dim(test)
 
+data.frame(net_dat) %>%
+  mutate(node = c(1,2,3)) %>%
+  gather(sampling, value, -node) %>%
+  mutate(sampling = gsub("X", "", sampling),
+         sampling = as.numeric(sampling),
+         node = as.factor(node)) %>%
+  ggplot(aes(x=sampling, y=value, color = node))+
+  geom_line()
+```
 
 ------
 
