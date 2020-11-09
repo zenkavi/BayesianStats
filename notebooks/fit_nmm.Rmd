@@ -8,10 +8,11 @@ library(ggraph)
 ```
 
 ```{r}
-source('~/Dropbox/RangelLab/BayesianStats/helpers/networkModel.R')
-source('~/Dropbox/RangelLab/BayesianStats/helpers/make_stimtimes.R')
-source('~/Dropbox/RangelLab/BayesianStats/helpers/generateStructuralNetwork.R')
-source('~/Dropbox/RangelLab/BayesianStats/helpers/generateSynapticNetwork.R')
+helpers_path = '~/Dropbox/RangelLab/NetworkGLM/r_helpers/'
+source(paste0(helpers_path,'networkModel.R'))
+source(paste0(helpers_path,'make_stimtimesk.R'))
+source(paste0(helpers_path,'generateStructuralNetwork.R'))
+source(paste0(helpers_path,'generateSynapticNetwork.R'))
 ```
 
 Suppose we have a three node network that looks like:
