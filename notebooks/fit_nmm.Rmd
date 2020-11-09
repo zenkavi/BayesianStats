@@ -122,6 +122,107 @@ data.frame(net_dat) %>%
   ggplot(aes(x=sampling, y=value, color = node))+
   geom_line()
 ```
+Does this network turn off if there are more stimulations? Yes.
+
+```{r}
+long_task = data.frame(stim = c(c(0,0,0,1),rep(0,150), 1,rep(0,150)))
+long_task$time = rep(1:nrow(long_task))
+long_task %>%
+  ggplot(aes(x=time, y=stim))+
+  geom_line()+
+  xlab("")+
+  ylab("")+
+  scale_y_continuous(breaks = c(0,1))
+```
+
+```{r}
+long_args_dict = list('dt'=.5,  
+                 'g'=1, 
+                 'noise'= NULL,
+                 'noise_loc'= 0, 
+                 'noise_scale'= 0,
+                 's'=.7,
+                 'stim_mag'=.5,
+                 'taskdata'=NULL,
+                 'tasktiming'=long_task$stim,
+                 'tau'=1, 
+                 'Tmax'=max(long_task$time),
+                 'W'= W)
+
+long_args_dict$I = make_stimtimes(1, long_args_dict)$stimtimes
+
+long_net_dat = networkModel(W, long_args_dict)
+
+data.frame(long_net_dat) %>%
+  mutate(node = c(1,2,3)) %>%
+  gather(sampling, value, -node) %>%
+  mutate(sampling = gsub("X", "", sampling),
+         sampling = as.numeric(sampling),
+         node = as.factor(node)) %>%
+  ggplot(aes(x=sampling, y=value, color = node))+
+  geom_line()
+```
+
+The stim node in the previous stimulations was **not** the hub. What if you stimulate the hub node? (In this network this would be node 2)
+
+Try the short task first:
+
+```{r}
+hub_args_dict = list('dt'=.5,  
+                 'g'=1, 
+                 'noise'= NULL,
+                 'noise_loc'= 0, 
+                 'noise_scale'= 0,
+                 's'=.7,
+                 'stim_mag'=.5,
+                 'taskdata'=NULL,
+                 'tasktiming'=task$stim,
+                 'tau'=1, 
+                 'Tmax'=max(task$time),
+                 'W'= W)
+
+hub_args_dict$I = make_stimtimes(2, hub_args_dict)$stimtimes
+
+hub_net_dat = networkModel(W, hub_args_dict)
+
+data.frame(hub_net_dat) %>%
+  mutate(node = c(1,2,3)) %>%
+  gather(sampling, value, -node) %>%
+  mutate(sampling = gsub("X", "", sampling),
+         sampling = as.numeric(sampling),
+         node = as.factor(node)) %>%
+  ggplot(aes(x=sampling, y=value, color = node))+
+  geom_line()
+```
+
+```{r}
+hub_long_args_dict = list('dt'=.5,  
+                 'g'=1, 
+                 'noise'= NULL,
+                 'noise_loc'= 0, 
+                 'noise_scale'= 0,
+                 's'=.7,
+                 'stim_mag'=.5,
+                 'taskdata'=NULL,
+                 'tasktiming'=long_task$stim,
+                 'tau'=1, 
+                 'Tmax'=max(long_task$time),
+                 'W'= W)
+
+hub_long_args_dict$I = make_stimtimes(2, hub_long_args_dict)$stimtimes
+
+hub_long_net_dat = networkModel(W, hub_long_args_dict)
+
+data.frame(hub_long_net_dat) %>%
+  mutate(node = c(1,2,3)) %>%
+  gather(sampling, value, -node) %>%
+  mutate(sampling = gsub("X", "", sampling),
+         sampling = as.numeric(sampling),
+         node = as.factor(node)) %>%
+  ggplot(aes(x=sampling, y=value, color = node))+
+  geom_line()
+```
+
 
 ------
 
