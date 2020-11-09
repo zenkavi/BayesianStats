@@ -8,9 +8,9 @@ library(ggraph)
 ```
 
 ```{r}
-helpers_path = '~/Dropbox/RangelLab/NetworkGLM/r_helpers/'
+helpers_path = '~/Dropbox/RangelLab/NetworkGLM/helpers/r_helpers/'
 source(paste0(helpers_path,'networkModel.R'))
-source(paste0(helpers_path,'make_stimtimesk.R'))
+source(paste0(helpers_path,'make_stimtimes.R'))
 source(paste0(helpers_path,'generateStructuralNetwork.R'))
 source(paste0(helpers_path,'generateSynapticNetwork.R'))
 ```
@@ -69,7 +69,7 @@ task %>%
   geom_line()+
   xlab("")+
   ylab("")+
-  scale_y_continuous(breaks = c(0,1))+
+  scale_y_continuous(breaks = c(0,1))
 ```
 
 The task stimulates *only* node 1 directly and propagates within the network based on the following Eq:
@@ -121,33 +121,6 @@ data.frame(net_dat) %>%
          node = as.factor(node)) %>%
   ggplot(aes(x=sampling, y=value, color = node))+
   geom_line()
-```
-
-```{r}
-sim_args = default_args_dict
-sim_args$hubnetwork_dsity = 1
-sim_args$nodespercommunity = 3
-sim_args$showplot = TRUE
-```
-
-Check translation of network creation functions to match previous network notebooks.
-Check activity propogation in previous notebooks to match activity here.
-
-```{r}
-S = generateStructuralNetwork(args_dict = sim_args)
-data.frame(S) %>%
-  mutate(to = row.names(.),
-         from = names(.),
-         from = gsub("X","",from)) %>%
-  gather(key, weight, -to, -from) %>%
-  mutate(from = sort(from)) %>%
-  select(-key) %>%
-  ggplot(aes(x=from, y=to, fill=weight))+
-  geom_tile() +
-  geom_vline(aes(xintercept = 3.5))+
-  geom_vline(aes(xintercept = 6.5))+
-  geom_hline(aes(yintercept = 3.5))+
-  geom_hline(aes(yintercept = 6.5))
 ```
 
 ------
