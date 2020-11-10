@@ -223,6 +223,98 @@ data.frame(hub_long_net_dat) %>%
   geom_line()
 ```
 
+What if the task is on for longer?
+```{r}
+longon_task = data.frame(stim = c(c(0,0,0), rep(1, 10), rep(0,140), rep(1,10),rep(0,140)))
+longon_task$time = rep(1:nrow(longon_task))
+longon_task %>%
+  ggplot(aes(x=time, y=stim))+
+  geom_line()+
+  xlab("")+
+  ylab("")+
+  scale_y_continuous(breaks = c(0,1))
+```
+
+```{r}
+longon_args_dict = list('dt'=.5,  
+                 'g'=1, 
+                 'noise'= NULL,
+                 'noise_loc'= 0, 
+                 'noise_scale'= 0,
+                 's'=.7,
+                 'stim_mag'=.5,
+                 'taskdata'=NULL,
+                 'tasktiming'=longon_task$stim,
+                 'tau'=1, 
+                 'Tmax'=max(longon_task$time),
+                 'W'= W)
+
+longon_args_dict$I = make_stimtimes(2, longon_args_dict)$stimtimes
+
+longon_net_dat = networkModel(W, longon_args_dict)
+
+data.frame(longon_net_dat) %>%
+  mutate(node = c(1,2,3)) %>%
+  gather(sampling, value, -node) %>%
+  mutate(sampling = gsub("X", "", sampling),
+         sampling = as.numeric(sampling),
+         node = as.factor(node)) %>%
+  ggplot(aes(x=sampling, y=value, color = node))+
+  geom_line()
+```
+
+What if you have complete loop?
+
+```{r}
+loop_W = W
+loop_W[2, 3] = .2
+loop_W
+```
+
+Such that:
+
+```{r}
+data.frame(loop_W) %>%
+  mutate(to = row.names(.),
+             from = names(.),
+             from = gsub("X","",from),
+             to = as.numeric(to),
+             from = as.numeric(to)) %>%
+      gather(key, weight, -to, -from) %>%
+      mutate(from = sort(from)) %>%
+      select(-key) %>%
+      ggplot(aes(x=from, y=to, fill=weight))+
+      geom_tile()
+```
+
+```{r}
+loop_args_dict = list('dt'=.5,  
+                 'g'=1, 
+                 'noise'= NULL,
+                 'noise_loc'= 0, 
+                 'noise_scale'= 0,
+                 's'=.7,
+                 'stim_mag'=.5,
+                 'taskdata'=NULL,
+                 'tasktiming'=longon_task$stim,
+                 'tau'=1, 
+                 'Tmax'=max(longon_task$time),
+                 'W'= loop_W)
+
+loop_args_dict$I = make_stimtimes(2, loop_args_dict)$stimtimes
+
+loop_net_dat = networkModel(loop_W, loop_args_dict)
+
+data.frame(loop_net_dat) %>%
+  mutate(node = c(1,2,3)) %>%
+  gather(sampling, value, -node) %>%
+  mutate(sampling = gsub("X", "", sampling),
+         sampling = as.numeric(sampling),
+         node = as.factor(node)) %>%
+  ggplot(aes(x=sampling, y=value, color = node))+
+  geom_line()
+```
+
 
 ------
 
