@@ -24,7 +24,6 @@ nodes = data.frame(id = c(1,2,3), label = c("1", "2", "3"))
 
 ```{r}
 min_net = tbl_graph(nodes=nodes, edges=edges, directed=T)
-min_net
 ```
 
 ```{r}
@@ -45,6 +44,7 @@ ggraph(min_net, layout="circle")+
   theme(legend.position = "none",
         plot.margin = margin(0, 1, .5, 1, "cm"))
 ```
+
 Adjacency matrix for the above minimal network looks like:
 
 ```{r}
@@ -59,6 +59,7 @@ edges %>%
   ggplot(aes(x=from, y=to, fill=weight))+
   geom_tile()
 ```
+
 Suppose we have a task that looks like:
 
 ```{r}
@@ -92,25 +93,7 @@ cur_args_dict = list('dt'=.5,
                  'W'= W)
 
 cur_args_dict$I = make_stimtimes(1, cur_args_dict)$stimtimes
-```
 
-Since `dt` is `r cur_args_dict$dt` Resampled task looks like (red dots indicate task status in real time instead of the sampling time):
-
-```{r}
-data.frame(stim = make_stimtimes(1, cur_args_dict)$tasktiming) %>%
-  mutate(time = seq(1,nrow(task), cur_args_dict$dt)) %>%
-  ggplot(aes(x=time, y=stim))+
-  geom_line()+
-  geom_point(data = task, aes(x=time, y=stim), color="red")+
-  xlab("")+
-  ylab("")+
-  # scale_x_continuous(breaks = seq(1,nrow(task), cur_args_dict$dt))+
-  scale_y_continuous(breaks = c(0,1))+
-  theme(axis.text.x = element_text(angle=90))
-```
-Network activity looks like: 
-
-```{r}
 net_dat = networkModel(W, cur_args_dict)
 
 data.frame(net_dat) %>%
@@ -122,64 +105,11 @@ data.frame(net_dat) %>%
   ggplot(aes(x=sampling, y=value, color = node))+
   geom_line()
 ```
-Does this network turn off if there are more stimulations? Yes.
-
-```{r}
-long_task = data.frame(stim = c(c(0,0,0,1),rep(0,150), 1,rep(0,150)))
-long_task$time = rep(1:nrow(long_task))
-long_task %>%
-  ggplot(aes(x=time, y=stim))+
-  geom_line()+
-  xlab("")+
-  ylab("")+
-  scale_y_continuous(breaks = c(0,1))
-```
-
-```{r}
-long_args_dict = list('dt'=.5,  
-                 'g'=1, 
-                 'noise'= NULL,
-                 'noise_loc'= 0, 
-                 'noise_scale'= 0,
-                 's'=.7,
-                 'stim_mag'=.5,
-                 'taskdata'=NULL,
-                 'tasktiming'=long_task$stim,
-                 'tau'=1, 
-                 'Tmax'=max(long_task$time),
-                 'W'= W)
-
-long_args_dict$I = make_stimtimes(1, long_args_dict)$stimtimes
-
-long_net_dat = networkModel(W, long_args_dict)
-
-data.frame(long_net_dat) %>%
-  mutate(node = c(1,2,3)) %>%
-  gather(sampling, value, -node) %>%
-  mutate(sampling = gsub("X", "", sampling),
-         sampling = as.numeric(sampling),
-         node = as.factor(node)) %>%
-  ggplot(aes(x=sampling, y=value, color = node))+
-  geom_line()
-```
 
 The stim node in the previous stimulations was **not** the hub. What if you stimulate the hub node? (In this network this would be node 2)
 
-Try the short task first:
-
 ```{r}
-hub_args_dict = list('dt'=.5,  
-                 'g'=1, 
-                 'noise'= NULL,
-                 'noise_loc'= 0, 
-                 'noise_scale'= 0,
-                 's'=.7,
-                 'stim_mag'=.5,
-                 'taskdata'=NULL,
-                 'tasktiming'=task$stim,
-                 'tau'=1, 
-                 'Tmax'=max(task$time),
-                 'W'= W)
+hub_args_dict = cur_args_dict
 
 hub_args_dict$I = make_stimtimes(2, hub_args_dict)$stimtimes
 
@@ -194,38 +124,10 @@ data.frame(hub_net_dat) %>%
   ggplot(aes(x=sampling, y=value, color = node))+
   geom_line()
 ```
-
-```{r}
-hub_long_args_dict = list('dt'=.5,  
-                 'g'=1, 
-                 'noise'= NULL,
-                 'noise_loc'= 0, 
-                 'noise_scale'= 0,
-                 's'=.7,
-                 'stim_mag'=.5,
-                 'taskdata'=NULL,
-                 'tasktiming'=long_task$stim,
-                 'tau'=1, 
-                 'Tmax'=max(long_task$time),
-                 'W'= W)
-
-hub_long_args_dict$I = make_stimtimes(2, hub_long_args_dict)$stimtimes
-
-hub_long_net_dat = networkModel(W, hub_long_args_dict)
-
-data.frame(hub_long_net_dat) %>%
-  mutate(node = c(1,2,3)) %>%
-  gather(sampling, value, -node) %>%
-  mutate(sampling = gsub("X", "", sampling),
-         sampling = as.numeric(sampling),
-         node = as.factor(node)) %>%
-  ggplot(aes(x=sampling, y=value, color = node))+
-  geom_line()
-```
-
 What if the task is on for longer?
+
 ```{r}
-longon_task = data.frame(stim = c(c(0,0,0), rep(1, 10), rep(0,140), rep(1,10),rep(0,140)))
+longon_task = data.frame(stim = c(c(0,0,0), rep(1, 10), rep(0,100)))
 longon_task$time = rep(1:nrow(longon_task))
 longon_task %>%
   ggplot(aes(x=time, y=stim))+
@@ -236,19 +138,9 @@ longon_task %>%
 ```
 
 ```{r}
-longon_args_dict = list('dt'=.5,  
-                 'g'=1, 
-                 'noise'= NULL,
-                 'noise_loc'= 0, 
-                 'noise_scale'= 0,
-                 's'=.7,
-                 'stim_mag'=.5,
-                 'taskdata'=NULL,
-                 'tasktiming'=longon_task$stim,
-                 'tau'=1, 
-                 'Tmax'=max(longon_task$time),
-                 'W'= W)
-
+longon_args_dict = cur_args_dict
+longon_args_dict$tasktiming = longon_task$stim
+longon_args_dict$Tmax = max(longon_task$time)
 longon_args_dict$I = make_stimtimes(2, longon_args_dict)$stimtimes
 
 longon_net_dat = networkModel(W, longon_args_dict)
@@ -271,37 +163,29 @@ loop_W[2, 3] = .2
 loop_W
 ```
 
-Such that:
+Such that the adjacency matrix changes to:
 
 ```{r}
 data.frame(loop_W) %>%
   mutate(to = row.names(.),
-             from = names(.),
-             from = gsub("X","",from),
-             to = as.numeric(to),
-             from = as.numeric(to)) %>%
-      gather(key, weight, -to, -from) %>%
-      mutate(from = sort(from)) %>%
-      select(-key) %>%
-      ggplot(aes(x=from, y=to, fill=weight))+
-      geom_tile()
+         from = names(.),
+         from = gsub("X","",from),
+         to = as.numeric(to),
+         from = as.numeric(to)) %>%
+  gather(key, weight, -to, -from) %>%
+  mutate(from = sort(from)) %>%
+  select(-key) %>%
+  mutate(border = ifelse(to == 2 & from == 3, T, NA)) %>%
+  ggplot(aes(x=from, y=to, fill=weight, color=border))+
+  geom_tile(size = 2) +
+  scale_color_manual(guide=F, values = c('TRUE' = "red"))
 ```
 
-```{r}
-loop_args_dict = list('dt'=.5,  
-                 'g'=1, 
-                 'noise'= NULL,
-                 'noise_loc'= 0, 
-                 'noise_scale'= 0,
-                 's'=.7,
-                 'stim_mag'=.5,
-                 'taskdata'=NULL,
-                 'tasktiming'=longon_task$stim,
-                 'tau'=1, 
-                 'Tmax'=max(longon_task$time),
-                 'W'= loop_W)
+Then activity does not turn off down to 0 but settles at an intermediate value.
 
-loop_args_dict$I = make_stimtimes(2, loop_args_dict)$stimtimes
+```{r}
+loop_args_dict = longon_args_dict
+loop_args_dict$W = loop_W
 
 loop_net_dat = networkModel(loop_W, loop_args_dict)
 
@@ -315,6 +199,31 @@ data.frame(loop_net_dat) %>%
   geom_line()
 ```
 
+Ok so now that you have a sense of how things work in the network try the regression framework in the initial simple network to see if you can detect which node is stimulated versus which is not.
+
+Based on the algebra [here](https://github.com/zenkavi/NetworkGLM/blob/master/simulations/NB0_Inverting_Runge_Kutte.ipynb).
+
+Unlike the regression framework in the python version first try it using the debug mode
+
+```{r}
+net_dat_debug = networkModel(W, cur_args_dict, debug=T)
+# Other datasets to try the regression framework on later
+# hub_net_dat = networkModel(W, hub_args_dict)
+# longon_net_dat = networkModel(W, longon_args_dict)
+# loop_net_dat = networkModel(loop_W, loop_args_dict)
+```
+
+```{r}
+
+```
+
+Conclusion on regression framework attempt:
+
+Move on to estimating task parameters using Stan.
+
+```{r}
+
+```
 
 ------
 
