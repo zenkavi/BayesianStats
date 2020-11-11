@@ -215,13 +215,7 @@ net_dat_debug = networkModel(W, cur_args_dict, debug=T)
 # loop_net_dat = networkModel(loop_W, loop_args_dict)
 ```
 
-Does the debug output have all the bits I need for the equation above? Yes.
-
-```{r}
-names(net_dat_debug$int_out)
-```
-
-Confirm that the residuals are 0 for stimulated node. Stim node for this data is node 1.
+Confirm that the residuals are 0 for stimulated node. Stim node for this data is node 1. This should confirm the resulting equation from the algebra.
 
 ```{r}
 node = 1
@@ -235,6 +229,38 @@ g_N_t = net_dat_debug$int_out$net_act1[node,]
 s = cur_args_dict$s
 s_phi_x_t = s * phi(x_t)
 I_t = net_dat_debug$int_out$spont_act1[node,]
+dt_tau = (-1)*(dt/tau)*(-x_t+g_N_t+s_phi_x_t+I_t)
+g_N_t_dt = net_dat_debug$int_out$net_act2[node,]
+s_phi_ave = s * phi(x_t - dt_tau)
+I_t_dt = net_dat_debug$int_out$spont_act2[node,]
+
+rhs = (const1 * x_t) + const2 * (g_N_t + s_phi_x_t + I_t + dt_tau + g_N_t_dt + s_phi_ave + I_t_dt)
+data.frame(resid = round(x_t_dt - rhs), 10) %>%
+  mutate(time = 1: n()) %>%
+  ggplot(aes(time, resid))+
+  geom_point()
+```
+
+Can I recover the constants if I run a GLM?
+Why is the coef of dt_tau 0?
+Why do the coefs change so drastically when we add some noise
+
+```{r}
+mod = lm(x_t_dt + rnorm(length(x_t_dt), 0, .01) ~ -1 + x_t + g_N_t + s_phi_x_t + I_t + dt_tau + g_N_t_dt + s_phi_ave + I_t_dt)
+mod = lm(x_t_dt ~ -1 + x_t + g_N_t + s_phi_x_t + I_t + dt_tau + g_N_t_dt + s_phi_ave + I_t_dt)
+summary(mod)
+coef(mod)
+```
+
+```{r}
+data.frame(dt_tau) %>%
+  mutate(time = 1:n()) %>%
+  ggplot(aes(time, dt_tau))+
+  geom_point()
+```
+
+```{r}
+summary(lm(x_t ~ I_t))
 ```
 
 Conclusion on regression framework attempt:
