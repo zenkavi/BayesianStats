@@ -240,27 +240,29 @@ data.frame(resid = round(x_t_dt - rhs), 10) %>%
   ggplot(aes(time, resid))+
   geom_point()
 ```
+"Uncorrected" GLM
+
+```{r}
+summary(lm(x_t ~ I_t))
+```
 
 Can I recover the constants if I run a GLM?
-Why is the coef of dt_tau 0?
 Why do the coefs change so drastically when we add some noise
 
 ```{r}
 mod = lm(x_t_dt + rnorm(length(x_t_dt), 0, .01) ~ -1 + x_t + g_N_t + s_phi_x_t + I_t + dt_tau + g_N_t_dt + s_phi_ave + I_t_dt)
-mod = lm(x_t_dt ~ -1 + x_t + g_N_t + s_phi_x_t + I_t + dt_tau + g_N_t_dt + s_phi_ave + I_t_dt)
+# mod = lm(x_t_dt ~ -1 + x_t + g_N_t + s_phi_x_t + I_t + dt_tau + g_N_t_dt + s_phi_ave + I_t_dt)
 summary(mod)
 coef(mod)
 ```
 
-```{r}
-data.frame(dt_tau) %>%
-  mutate(time = 1:n()) %>%
-  ggplot(aes(time, dt_tau))+
-  geom_point()
-```
+Why is the coef of dt_tau NA? Because it is linearly related to 1 or more of the other regressors. Need to further solve algebra to have only one of each term.
+
+$$x_{i}(t+dt) = (1-\frac{dt}{\tau_i}+\frac{{dt}^2}{2{\tau_i}^2}){x_{i}(t)} + \frac{dt}{2\tau_i}+ \Bigg[gN_i(t+dt) + s\phi\Bigg((1-\frac{dt}{\tau_i})x_{i}(t) + \frac{dt}{\tau_i}\big[gN_i(t) + s\phi\big(x_{i}(t)\big) + {I}_{i}(t)\big]\Bigg) + {I}_{i}(t+dt) - gN_i(t) - s\phi\big(x_{i}(t)\big) - {I}_{i}(t)\Bigg]$$
 
 ```{r}
-summary(lm(x_t ~ I_t))
+
+
 ```
 
 Conclusion on regression framework attempt:
