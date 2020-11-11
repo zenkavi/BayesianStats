@@ -203,7 +203,9 @@ Ok so now that you have a sense of how things work in the network try the regres
 
 Based on the algebra [here](https://github.com/zenkavi/NetworkGLM/blob/master/simulations/NB0_Inverting_Runge_Kutte.ipynb).
 
-Unlike the regression framework in the python version first try it using the debug mode
+$$x_{i}(t+dt) = (1-\frac{dt}{\tau_i}){x_{i}(t)} + \frac{dt}{2\tau_i}\Bigg[gN_i(t) + s\phi\big(x_{i}(t)\big) + {I}_{i}(t) - \frac{dt}{\tau_i}\Bigg[-x_{i}(t) + gN_i(t) + s\phi\big(x_{i}(t)\big) + {I}_{i}(t)\Bigg] + gN_i(t+dt) + s\phi\Bigg(x_{i}(t) + \frac{dt}{\tau_i}\Bigg[-x_{i}(t) + gN_i(t) + s\phi\big(x_{i}(t)\big) + {I}_{i}(t)\Bigg]\Bigg) + {I}_{i}(t+dt)\Bigg]$$
+
+Unlike the regression framework in the python version first try it using the outputs from debug mode
 
 ```{r}
 net_dat_debug = networkModel(W, cur_args_dict, debug=T)
@@ -213,13 +215,31 @@ net_dat_debug = networkModel(W, cur_args_dict, debug=T)
 # loop_net_dat = networkModel(loop_W, loop_args_dict)
 ```
 
-```{r}
+Does the debug output have all the bits I need for the equation above? Yes.
 
+```{r}
+names(net_dat_debug$int_out)
+```
+
+Confirm that the residuals are 0 for stimulated node. Stim node for this data is node 1.
+
+```{r}
+node = 1
+x_t_dt = net_dat_debug$Enodes[node,-1]
+dt = cur_args_dict$dt
+tau = cur_args_dict$tau
+const1 = 1 - (dt/tau)
+x_t = net_dat_debug$Enodes[node, -ncol(net_dat_debug$Enodes)]
+const2 = dt/(2*tau)
+g_N_t = net_dat_debug$int_out$net_act1[node,]
+s = cur_args_dict$s
+s_phi_x_t = s * phi(x_t)
+I_t = net_dat_debug$int_out$spont_act1[node,]
 ```
 
 Conclusion on regression framework attempt:
 
-Move on to estimating task parameters using Stan.
+Move on to estimating task parameters using Stan. [state-space models]
 
 ```{r}
 
