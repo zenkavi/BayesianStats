@@ -217,7 +217,7 @@ Ok so now that you have a sense of how things work in the network try the regres
 
 Based on the algebra [here](https://github.com/zenkavi/NetworkGLM/blob/master/simulations/NB0_Inverting_Runge_Kutte.ipynb).
 
-$$x_{i}(t+dt) = (1-\frac{dt}{\tau_i}+\frac{{dt}^2}{2{\tau_i}^2}){x_{i}(t)} + \frac{dt}{2\tau_i}\Bigg[(1 - \frac{dt}{\tau_i})\Bigg(gN_i(t) + s\phi\big(x_{i}(t)\big) + {I}_{i}(t)\Bigg) + gN_i(t+dt) + s\phi\Bigg((1-\frac{dt}{\tau_i})x_{i}(t) + \frac{dt}{\tau_i}\big[gN_i(t) + s\phi\big(x_{i}(t)\big) + {I}_{i}(t)\big]\Bigg) + {I}_{i}(t+dt)\Bigg]$$
+$$x_{i}(t+dt) = (1-\frac{dt}{\tau_i}+\frac{dt^2}{2\tau_i^2}){x_{i}(t)} + \frac{dt}{2\tau_i}\Bigg[(1 - \frac{dt}{\tau_i})\Bigg(gN_i(t) + s\phi\big(x_{i}(t)\big) + {I}_{i}(t)\Bigg) + gN_i(t+dt) + s\phi\Bigg((1-\frac{dt}{\tau_i})x_{i}(t) + \frac{dt}{\tau_i}\big[gN_i(t) + s\phi\big(x_{i}(t)\big) + {I}_{i}(t)\big]\Bigg) + {I}_{i}(t+dt)\Bigg]$$
 
 ```{r eval=FALSE}
 # Confirm that the residuals are 0 for stimulated node. Stim node for this data is node 1. This should confirm the resulting equation from the algebra.
