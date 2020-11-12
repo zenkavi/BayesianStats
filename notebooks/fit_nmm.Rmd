@@ -272,14 +272,18 @@ round(run_ucr_glm_node(3, net_dat_debug, task_reg = cur_args_dict$I[1,])$coef, 4
 round(run_ext_glm_node(3, net_dat_debug, cur_args_dict, task_reg = cur_args_dict$I[1,])$coef, 4)
 ```
 
-How about a non stim node? With the correct task regressor and the incorrect task regressor?
+Test function for all nodes with and without task_reg specified.
 
 ```{r}
-# Other datasets to try the regression framework on later
-# hub_net_dat_debug = networkModel(W, hub_args_dict, debug=T)
-# longon_net_dat_debug = networkModel(W, longon_args_dict, debug=T)
-# loop_net_dat_debug = networkModel(loop_W, loop_args_dict, debug=T)
 
+```
+
+Other datasets to try the regression framework on later
+
+```{r}
+hub_net_dat_debug = networkModel(W, hub_args_dict, debug=T)
+longon_net_dat_debug = networkModel(W, longon_args_dict, debug=T)
+loop_net_dat_debug = networkModel(loop_W, loop_args_dict, debug=T)
 ```
 
 Conclusion on regression framework attempt:
