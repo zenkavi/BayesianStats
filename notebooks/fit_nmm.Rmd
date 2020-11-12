@@ -1,5 +1,5 @@
 ---
-title: "Neural mass model simulation and parameter recovery with Stan"
+title: "Neural mass model simulation and external stimulation parameter recovery with Stan"
 ---
 
 ```{r}
@@ -13,16 +13,19 @@ source(paste0(helpers_path,'networkModel.R'))
 source(paste0(helpers_path,'make_stimtimes.R'))
 source(paste0(helpers_path,'generateStructuralNetwork.R'))
 source(paste0(helpers_path,'generateSynapticNetwork.R'))
+source(paste0(helpers_path,'run_ucr_glm.R'))
+source(paste0(helpers_path,'run_ext_glm.R'))
 ```
+
+# Developing intuitions for activity propogation within a network
+
+## Non-hub stimulation
 
 Suppose we have a three node network that looks like:
 
 ```{r}
 edges = data.frame(from = c(1, 2, 2), to = c(2, 1, 3), weight = c(.4, .2, .3))
 nodes = data.frame(id = c(1,2,3), label = c("1", "2", "3"))
-```
-
-```{r}
 min_net = tbl_graph(nodes=nodes, edges=edges, directed=T)
 ```
 
@@ -106,6 +109,8 @@ data.frame(net_dat) %>%
   geom_line()
 ```
 
+## Hub stimulation
+
 The stim node in the previous stimulations was **not** the hub. What if you stimulate the hub node? (In this network this would be node 2)
 
 ```{r}
@@ -124,6 +129,9 @@ data.frame(hub_net_dat) %>%
   ggplot(aes(x=sampling, y=value, color = node))+
   geom_line()
 ```
+
+## Longer stimulation
+
 What if the task is on for longer?
 
 ```{r}
@@ -154,6 +162,8 @@ data.frame(longon_net_dat) %>%
   ggplot(aes(x=sampling, y=value, color = node))+
   geom_line()
 ```
+
+## Loop stimulation
 
 What if you have complete loop?
 
@@ -199,73 +209,82 @@ data.frame(loop_net_dat) %>%
   geom_line()
 ```
 
+# Task parameter recovery
+
+## GLM framework
+
 Ok so now that you have a sense of how things work in the network try the regression framework in the initial simple network to see if you can detect which node is stimulated versus which is not.
 
 Based on the algebra [here](https://github.com/zenkavi/NetworkGLM/blob/master/simulations/NB0_Inverting_Runge_Kutte.ipynb).
 
-$$x_{i}(t+dt) = (1-\frac{dt}{\tau_i}){x_{i}(t)} + \frac{dt}{2\tau_i}\Bigg[gN_i(t) + s\phi\big(x_{i}(t)\big) + {I}_{i}(t) - \frac{dt}{\tau_i}\Bigg[-x_{i}(t) + gN_i(t) + s\phi\big(x_{i}(t)\big) + {I}_{i}(t)\Bigg] + gN_i(t+dt) + s\phi\Bigg(x_{i}(t) + \frac{dt}{\tau_i}\Bigg[-x_{i}(t) + gN_i(t) + s\phi\big(x_{i}(t)\big) + {I}_{i}(t)\Bigg]\Bigg) + {I}_{i}(t+dt)\Bigg]$$
+$$x_{i}(t+dt) = (1-\frac{dt}{\tau_i}+\frac{{dt}^2}{2{\tau_i}^2}){x_{i}(t)} + \frac{dt}{2\tau_i}\Bigg[(1 - \frac{dt}{\tau_i})\Bigg(gN_i(t) + s\phi\big(x_{i}(t)\big) + {I}_{i}(t)\Bigg) + gN_i(t+dt) + s\phi\Bigg((1-\frac{dt}{\tau_i})x_{i}(t) + \frac{dt}{\tau_i}\big[gN_i(t) + s\phi\big(x_{i}(t)\big) + {I}_{i}(t)\big]\Bigg) + {I}_{i}(t+dt)\Bigg]$$
+
+```{r eval=FALSE}
+# Confirm that the residuals are 0 for stimulated node. Stim node for this data is node 1. This should confirm the resulting equation from the algebra.
+
+node = 1
+x_t_dt = net_dat_debug$Enodes[node,-1]
+dt = cur_args_dict$dt
+tau = cur_args_dict$tau
+const1 = 1 - (dt/tau) +  ((dt^2)/(2*tau^2))
+x_t = net_dat_debug$Enodes[node, -ncol(net_dat_debug$Enodes)]
+const2 = dt/(2*tau)
+const2_1 = 1 - (dt/tau)
+g_N_t = net_dat_debug$int_out$net_act1[node,]
+s = cur_args_dict$s
+s_phi_x_t = s * phi(x_t)
+I_t = net_dat_debug$int_out$spont_act1[node,]
+g_N_t_dt = net_dat_debug$int_out$net_act2[node,]
+s_phi_ave = s * phi((const_2_1*x_t)+((dt/tau)*(g_N_t+s_phi_x_t+I_t)))
+I_t_dt = net_dat_debug$int_out$spont_act2[node,]
+
+rhs = (const1 * x_t) + const2 * (const2_1 * (g_N_t + s_phi_x_t + I_t) + g_N_t_dt + s_phi_ave + I_t_dt)
+unique(round(x_t_dt - rhs, 10))
+```
 
 Unlike the regression framework in the python version first try it using the outputs from debug mode
 
 ```{r}
 net_dat_debug = networkModel(W, cur_args_dict, debug=T)
+```
+
+"Uncorrected" GLM overestimates task parameter. Task betas for each node
+
+```{r}
+round(run_ucr_glm_node(1, net_dat_debug)$coef, 4)
+```
+
+"Corrected" GLM recovers task parameter.
+
+```{r}
+run_ext_glm_node(1,net_dat_debug, cur_args_dict)$coef
+```
+
+How about the other nodes? Need to use the stim time for stimulated node bc otherwise the regressor is only 0.
+
+```{r}
+round(run_ucr_glm_node(2, net_dat_debug, task_reg = cur_args_dict$I[1,])$coef, 4)
+round(run_ext_glm_node(2, net_dat_debug, cur_args_dict, task_reg = cur_args_dict$I[1,])$coef, 4)
+```
+
+```{r}
+round(run_ucr_glm_node(3, net_dat_debug, task_reg = cur_args_dict$I[1,])$coef, 4)
+round(run_ext_glm_node(3, net_dat_debug, cur_args_dict, task_reg = cur_args_dict$I[1,])$coef, 4)
+```
+
+How about a non stim node? With the correct task regressor and the incorrect task regressor?
+
+```{r}
 # Other datasets to try the regression framework on later
-# hub_net_dat = networkModel(W, hub_args_dict)
-# longon_net_dat = networkModel(W, longon_args_dict)
-# loop_net_dat = networkModel(loop_W, loop_args_dict)
-```
-
-Confirm that the residuals are 0 for stimulated node. Stim node for this data is node 1. This should confirm the resulting equation from the algebra.
-
-```{r}
-node = 1
-x_t_dt = net_dat_debug$Enodes[node,-1]
-dt = cur_args_dict$dt
-tau = cur_args_dict$tau
-const1 = 1 - (dt/tau)
-x_t = net_dat_debug$Enodes[node, -ncol(net_dat_debug$Enodes)]
-const2 = dt/(2*tau)
-g_N_t = net_dat_debug$int_out$net_act1[node,]
-s = cur_args_dict$s
-s_phi_x_t = s * phi(x_t)
-I_t = net_dat_debug$int_out$spont_act1[node,]
-dt_tau = (-1)*(dt/tau)*(-x_t+g_N_t+s_phi_x_t+I_t)
-g_N_t_dt = net_dat_debug$int_out$net_act2[node,]
-s_phi_ave = s * phi(x_t - dt_tau)
-I_t_dt = net_dat_debug$int_out$spont_act2[node,]
-
-rhs = (const1 * x_t) + const2 * (g_N_t + s_phi_x_t + I_t + dt_tau + g_N_t_dt + s_phi_ave + I_t_dt)
-data.frame(resid = round(x_t_dt - rhs), 10) %>%
-  mutate(time = 1: n()) %>%
-  ggplot(aes(time, resid))+
-  geom_point()
-```
-"Uncorrected" GLM
-
-```{r}
-summary(lm(x_t ~ I_t))
-```
-
-Can I recover the constants if I run a GLM?
-Why do the coefs change so drastically when we add some noise
-
-```{r}
-mod = lm(x_t_dt + rnorm(length(x_t_dt), 0, .01) ~ -1 + x_t + g_N_t + s_phi_x_t + I_t + dt_tau + g_N_t_dt + s_phi_ave + I_t_dt)
-# mod = lm(x_t_dt ~ -1 + x_t + g_N_t + s_phi_x_t + I_t + dt_tau + g_N_t_dt + s_phi_ave + I_t_dt)
-summary(mod)
-coef(mod)
-```
-
-Why is the coef of dt_tau NA? Because it is linearly related to 1 or more of the other regressors. Need to further solve algebra to have only one of each term.
-
-$$x_{i}(t+dt) = (1-\frac{dt}{\tau_i}+\frac{{dt}^2}{2{\tau_i}^2}){x_{i}(t)} + \frac{dt}{2\tau_i}+ \Bigg[gN_i(t+dt) + s\phi\Bigg((1-\frac{dt}{\tau_i})x_{i}(t) + \frac{dt}{\tau_i}\big[gN_i(t) + s\phi\big(x_{i}(t)\big) + {I}_{i}(t)\big]\Bigg) + {I}_{i}(t+dt) - gN_i(t) - s\phi\big(x_{i}(t)\big) - {I}_{i}(t)\Bigg]$$
-
-```{r}
-
+# hub_net_dat_debug = networkModel(W, hub_args_dict, debug=T)
+# longon_net_dat_debug = networkModel(W, longon_args_dict, debug=T)
+# loop_net_dat_debug = networkModel(loop_W, loop_args_dict, debug=T)
 
 ```
 
 Conclusion on regression framework attempt:
+
+## Bayesian parameter recovery with Stan
 
 Move on to estimating task parameters using Stan. [state-space models]
 
