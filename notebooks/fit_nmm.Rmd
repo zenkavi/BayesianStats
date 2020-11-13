@@ -249,33 +249,22 @@ net_dat_debug = networkModel(W, cur_args_dict, debug=T)
 ```
 
 "Uncorrected" GLM overestimates task parameter. Task betas for each node
+Test function for all nodes with and without task_reg specified.
 
 ```{r}
-round(run_ucr_glm_node(1, net_dat_debug)$coef, 4)
+run_ucr_glm(net_dat_debug)$ucr_task_betas
+round(run_ucr_glm(net_dat_debug, task_reg = cur_args_dict$I[1,])$ucr_task_betas, 4)
 ```
 
 "Corrected" GLM recovers task parameter.
 
-```{r}
-run_ext_glm_node(1,net_dat_debug, cur_args_dict)$coef
-```
-
-How about the other nodes? Need to use the stim time for stimulated node bc otherwise the regressor is only 0.
+Problems to solve: 
+[coding] Why is the first term (coef of stimulated node) different when task reg is specified?
+[conceptual] Why is the baseline for the non stim node not at 0?
 
 ```{r}
-round(run_ucr_glm_node(2, net_dat_debug, task_reg = cur_args_dict$I[1,])$coef, 4)
-round(run_ext_glm_node(2, net_dat_debug, cur_args_dict, task_reg = cur_args_dict$I[1,])$coef, 4)
-```
-
-```{r}
-round(run_ucr_glm_node(3, net_dat_debug, task_reg = cur_args_dict$I[1,])$coef, 4)
-round(run_ext_glm_node(3, net_dat_debug, cur_args_dict, task_reg = cur_args_dict$I[1,])$coef, 4)
-```
-
-Test function for all nodes with and without task_reg specified.
-
-```{r}
-
+run_ext_glm(net_dat_debug, cur_args_dict)$ext_task_betas
+round(run_ext_glm(net_dat_debug, cur_args_dict, task_reg = cur_args_dict$I[1,])$ext_task_betas, 4)
 ```
 
 Other datasets to try the regression framework on later
