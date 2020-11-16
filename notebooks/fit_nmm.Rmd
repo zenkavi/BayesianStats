@@ -5,6 +5,7 @@ title: "Neural mass model simulation and external stimulation parameter recovery
 ```{r}
 library(tidygraph)
 library(ggraph)
+library(gridExtra)
 ```
 
 ```{r}
@@ -15,6 +16,7 @@ source(paste0(helpers_path,'generateStructuralNetwork.R'))
 source(paste0(helpers_path,'generateSynapticNetwork.R'))
 source(paste0(helpers_path,'run_ucr_glm.R'))
 source(paste0(helpers_path,'run_ext_glm.R'))
+source(paste0(helpers_path,'check_net_resids.R'))
 ```
 
 # Developing intuitions for activity propogation within a network
@@ -95,7 +97,8 @@ cur_args_dict = list('dt'=.5,
                  'Tmax'=max(task$time),
                  'W'= W)
 
-cur_args_dict$I = make_stimtimes(1, cur_args_dict)$stimtimes
+cur_args_dict$stim_node = 1
+cur_args_dict$I = make_stimtimes(cur_args_dict$stim_node, cur_args_dict)$stimtimes
 
 net_dat = networkModel(W, cur_args_dict)
 
@@ -116,7 +119,8 @@ The stim node in the previous stimulations was **not** the hub. What if you stim
 ```{r}
 hub_args_dict = cur_args_dict
 
-hub_args_dict$I = make_stimtimes(2, hub_args_dict)$stimtimes
+hub_args_dict$stim_node = 2
+hub_args_dict$I = make_stimtimes(hub_args_dict$stim_node, hub_args_dict)$stimtimes
 
 hub_net_dat = networkModel(W, hub_args_dict)
 
@@ -149,7 +153,8 @@ longon_task %>%
 longon_args_dict = cur_args_dict
 longon_args_dict$tasktiming = longon_task$stim
 longon_args_dict$Tmax = max(longon_task$time)
-longon_args_dict$I = make_stimtimes(2, longon_args_dict)$stimtimes
+longon_args_dict$stim_node = 2
+longon_args_dict$I = make_stimtimes(longon_args_dict$stim_node, longon_args_dict)$stimtimes
 
 longon_net_dat = networkModel(W, longon_args_dict)
 
@@ -209,6 +214,28 @@ data.frame(loop_net_dat) %>%
   geom_line()
 ```
 
+## Loop short task stimulation
+
+Looks weird but keeping it for later tests.
+
+```{r}
+loop_short_args_dict = loop_args_dict
+loop_short_args_dict$tasktiming = task$stim
+loop_short_args_dict$Tmax = max(task$time)
+loop_short_args_dict$I = make_stimtimes(loop_short_args_dict$stim_node, loop_short_args_dict)$stimtimes
+
+loop_short_net_dat = networkModel(loop_W, loop_short_args_dict)
+
+data.frame(loop_short_net_dat) %>%
+  mutate(node = c(1,2,3)) %>%
+  gather(sampling, value, -node) %>%
+  mutate(sampling = gsub("X", "", sampling),
+         sampling = as.numeric(sampling),
+         node = as.factor(node)) %>%
+  ggplot(aes(x=sampling, y=value, color = node))+
+  geom_line()
+```
+
 # Task parameter recovery
 
 ## GLM framework
@@ -219,56 +246,120 @@ Based on the algebra [here](https://github.com/zenkavi/NetworkGLM/blob/master/si
 
 $$x_{i}(t+dt) = (1-\frac{dt}{\tau_i}+\frac{dt^2}{2\tau_i^2}){x_{i}(t)} + \frac{dt}{2\tau_i}\Bigg[(1 - \frac{dt}{\tau_i})\Bigg(gN_i(t) + s\phi\big(x_{i}(t)\big) + {I}_{i}(t)\Bigg) + gN_i(t+dt) + s\phi\Bigg((1-\frac{dt}{\tau_i})x_{i}(t) + \frac{dt}{\tau_i}\big[gN_i(t) + s\phi\big(x_{i}(t)\big) + {I}_{i}(t)\big]\Bigg) + {I}_{i}(t+dt)\Bigg]$$
 
-```{r eval=FALSE}
-# Confirm that the residuals are 0 for stimulated node. Stim node for this data is node 1. This should confirm the resulting equation from the algebra.
-
-node = 1
-x_t_dt = net_dat_debug$Enodes[node,-1]
-dt = cur_args_dict$dt
-tau = cur_args_dict$tau
-const1 = 1 - (dt/tau) +  ((dt^2)/(2*tau^2))
-x_t = net_dat_debug$Enodes[node, -ncol(net_dat_debug$Enodes)]
-const2 = dt/(2*tau)
-const2_1 = 1 - (dt/tau)
-g_N_t = net_dat_debug$int_out$net_act1[node,]
-s = cur_args_dict$s
-s_phi_x_t = s * phi(x_t)
-I_t = net_dat_debug$int_out$spont_act1[node,]
-g_N_t_dt = net_dat_debug$int_out$net_act2[node,]
-s_phi_ave = s * phi((const_2_1*x_t)+((dt/tau)*(g_N_t+s_phi_x_t+I_t)))
-I_t_dt = net_dat_debug$int_out$spont_act2[node,]
-
-rhs = (const1 * x_t) + const2 * (const2_1 * (g_N_t + s_phi_x_t + I_t) + g_N_t_dt + s_phi_ave + I_t_dt)
-unique(round(x_t_dt - rhs, 10))
-```
-
-Unlike the regression framework in the python version first try it using the outputs from debug mode
+### Non-hub stimulation
 
 ```{r}
 net_dat_debug = networkModel(W, cur_args_dict, debug=T)
 ```
 
-"Uncorrected" GLM overestimates task parameter. Task betas for each node
-Test function for all nodes with and without task_reg specified.
+"Uncorrected" GLM overestimates task parameter. Task betas for each node:
 
 ```{r}
-run_ucr_glm(net_dat_debug)$ucr_task_betas
+print(paste0("Stim node is: ", cur_args_dict$stim_node))
 round(run_ucr_glm(net_dat_debug, task_reg = cur_args_dict$I[1,])$ucr_task_betas, 4)
 ```
 
-"Corrected" GLM recovers task parameter.
+"Extended" GLM recovers correct task parameter.
 
 ```{r}
-run_ext_glm(net_dat_debug, cur_args_dict)$ext_task_betas
+print(paste0("Stim node is: ", cur_args_dict$stim_node))
 round(run_ext_glm(net_dat_debug, cur_args_dict, task_reg = cur_args_dict$I[1,])$ext_task_betas, 4)
 ```
 
-Other datasets to try the regression framework on later
+### Hub stimulation
 
 ```{r}
 hub_net_dat_debug = networkModel(W, hub_args_dict, debug=T)
+```
+
+Extended GLM correctly recovers task parameters when the hub node is stimulated.
+
+```{r}
+print(paste0("Stim node is: ", hub_args_dict$stim_node))
+round(run_ucr_glm(hub_net_dat_debug, task_reg = hub_args_dict$I[2,])$ucr_task_betas, 4)
+round(run_ext_glm(hub_net_dat_debug, cur_args_dict, task_reg = hub_args_dict$I[2,])$ext_task_betas, 4)
+```
+
+Why don't we observe the same problem when the stimulation is short?
+
+```{r fig.asp=.3, fig.width=6}
+tmp_df = run_ext_glm(hub_net_dat_debug, hub_args_dict, task_reg = hub_args_dict$I[2,])$ext_mods[[1]]
+resids_df = check_net_resids(1, hub_net_dat_debug, hub_args_dict, verbose= TRUE)
+
+p1 = data.frame(network = resids_df$s_phi_ave, regression = tmp_df$s_phi_ave) %>%
+  mutate(time = 1: n()) %>%
+  gather(key, value, -time) %>%
+  ggplot(aes(time, value, color=key)) +
+  geom_point()+
+  theme(legend.title = element_blank())+
+  ylab("s_phi_ave")
+
+p2 = data.frame(resids = resids_df$s_phi_ave, tmp = tmp_df$s_phi_ave) %>%
+  ggplot(aes(resids, tmp)) +
+  geom_point()+
+  geom_abline(aes(intercept=0, slope=1))+
+  ylab("Regression model") +
+  xlab("Network model")
+
+grid.arrange(p1, p2, ncol=2)
+```
+
+### Longer stimulation
+
+```{r}
 longon_net_dat_debug = networkModel(W, longon_args_dict, debug=T)
+```
+
+**Extended GLM overcorrects non-stimulated nodes.**
+
+```{r}
+round(run_ucr_glm(longon_net_dat_debug, task_reg = longon_args_dict$I[2,])$ucr_task_betas, 4)
+round(run_ext_glm(longon_net_dat_debug, longon_args_dict, task_reg = longon_args_dict$I[2,])$ext_task_betas, 4)
+```
+
+What's going on with the overcorrected nodes? Why does the model think the estimate of x_t_dt is better when you multiply I_t_dt with -0.0001 instead of 0? Because when estimating the model for non-stimulated nodes we use the tasktiming as the task regressor even though the true value for this is 0. We make this choice because apriori we can't know or measure which nodes would be stim nodes. This choice affects three regressors: `I_t`, `I_t_dt` and `s_phi_ave`
+
+```{r  fig.asp=.3, fig.width=6}
+tmp_df = run_ext_glm(longon_net_dat_debug, longon_args_dict, task_reg = longon_args_dict$I[2,])$ext_mods[[1]]
+resids_df = check_net_resids(1, longon_net_dat_debug, longon_args_dict, verbose= TRUE)
+
+p1 = data.frame(network = resids_df$s_phi_ave, regression = tmp_df$s_phi_ave) %>%
+  mutate(time = 1: n()) %>%
+  gather(key, value, -time) %>%
+  ggplot(aes(time, value, color=key)) +
+  geom_point()+
+  theme(legend.title = element_blank())+
+  ylab("s_phi_ave")
+
+p2 = data.frame(resids = resids_df$s_phi_ave, tmp = tmp_df$s_phi_ave) %>%
+  ggplot(aes(resids, tmp)) +
+  geom_point()+
+  geom_abline(aes(intercept=0, slope=1)) +
+  ylab("Regression model") +
+  xlab("Network model")
+
+grid.arrange(p1, p2, ncol=2)
+```
+
+### Loop stimulation
+
+```{r}
 loop_net_dat_debug = networkModel(loop_W, loop_args_dict, debug=T)
+```
+
+**Extended GLM overcorrects non-stimulated nodes.**
+
+```{r}
+round(run_ucr_glm(loop_net_dat_debug, task_reg = loop_args_dict$I[2,])$ucr_task_betas, 4)
+round(run_ext_glm(loop_net_dat_debug, cur_args_dict, task_reg = loop_args_dict$I[2,])$ext_task_betas, 4)
+```
+
+### Loop short stimulation
+
+Is the overcorrection for the loop stimulation due to the loop or task on length?
+
+```{r}
+
 ```
 
 Conclusion on regression framework attempt:
