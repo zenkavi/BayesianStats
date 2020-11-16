@@ -258,10 +258,6 @@ round(run_ucr_glm(net_dat_debug, task_reg = cur_args_dict$I[1,])$ucr_task_betas,
 
 "Corrected" GLM recovers task parameter.
 
-Problems to solve: 
-[coding] Why is the first term (coef of stimulated node) different when task reg is specified?
-[conceptual] Why is the baseline for the non stim node not at 0?
-
 ```{r}
 run_ext_glm(net_dat_debug, cur_args_dict)$ext_task_betas
 round(run_ext_glm(net_dat_debug, cur_args_dict, task_reg = cur_args_dict$I[1,])$ext_task_betas, 4)
