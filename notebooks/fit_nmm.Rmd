@@ -276,32 +276,10 @@ Extended GLM correctly recovers task parameters when the hub node is stimulated.
 
 ```{r}
 print(paste0("Stim node is: ", hub_args_dict$stim_node))
+print("Uncorrected estimates:")
 round(run_ucr_glm(hub_net_dat_debug, task_reg = hub_args_dict$I[2,])$ucr_task_betas, 4)
+print("Corrected estimates:")
 round(run_ext_glm(hub_net_dat_debug, cur_args_dict, task_reg = hub_args_dict$I[2,])$ext_task_betas, 4)
-```
-
-Why don't we observe the same problem when the stimulation is short?
-
-```{r fig.asp=.3, fig.width=6}
-tmp_df = run_ext_glm(hub_net_dat_debug, hub_args_dict, task_reg = hub_args_dict$I[2,])$ext_mods[[1]]
-resids_df = check_net_resids(1, hub_net_dat_debug, hub_args_dict, verbose= TRUE)
-
-p1 = data.frame(network = resids_df$s_phi_ave, regression = tmp_df$s_phi_ave) %>%
-  mutate(time = 1: n()) %>%
-  gather(key, value, -time) %>%
-  ggplot(aes(time, value, color=key)) +
-  geom_point()+
-  theme(legend.title = element_blank())+
-  ylab("s_phi_ave")
-
-p2 = data.frame(resids = resids_df$s_phi_ave, tmp = tmp_df$s_phi_ave) %>%
-  ggplot(aes(resids, tmp)) +
-  geom_point()+
-  geom_abline(aes(intercept=0, slope=1))+
-  ylab("Regression model") +
-  xlab("Network model")
-
-grid.arrange(p1, p2, ncol=2)
 ```
 
 ### Longer stimulation
@@ -313,11 +291,14 @@ longon_net_dat_debug = networkModel(W, longon_args_dict, debug=T)
 **Extended GLM overcorrects non-stimulated nodes.**
 
 ```{r}
+print(paste0("Stim node is: ", longon_args_dict$stim_node))
+print("Uncorrected estimates:")
 round(run_ucr_glm(longon_net_dat_debug, task_reg = longon_args_dict$I[2,])$ucr_task_betas, 4)
+print("Corrected estimates:")
 round(run_ext_glm(longon_net_dat_debug, longon_args_dict, task_reg = longon_args_dict$I[2,])$ext_task_betas, 4)
 ```
 
-What's going on with the overcorrected nodes? Why does the model think the estimate of x_t_dt is better when you multiply I_t_dt with -0.0001 instead of 0? Because when estimating the model for non-stimulated nodes we use the tasktiming as the task regressor even though the true value for this is 0. We make this choice because apriori we can't know or measure which nodes would be stim nodes. This choice affects three regressors: `I_t`, `I_t_dt` and `s_phi_ave`
+What's going on with the overcorrected nodes? Why does the model think the estimate of x_t_dt is better when you multiply I_t_dt with -0.0001 instead of 0? Because when estimating the model for non-stimulated nodes we use the tasktiming as the task regressor even though the true value for this is 0. We make this choice because apriori we can't know or measure which nodes would be stim nodes. This choice affects three regressors: `I_t`, `I_t_dt` and `s_phi_ave`. The model tries to balance the false increase in all three of these regressors. The difference between the shapes of `I_t` and `I_t_dt` used in the network activity creation and the corrected regression are trivial (for non-stim nodes it should be 0 but the task regressor fed into the regression model is told that the task is on) and therefore not depicted below. The effect on `s_phi_ave` is harder to visualize so it is shown below. For a non-trivial number of time points the regression `s_phi_ave` is larger than the `s_phi_ave` used in the network activity creation. To balance this overestimation the model assigns negative coefficients to the other two task regressors which appears like an "overcorrection"
 
 ```{r  fig.asp=.3, fig.width=6}
 tmp_df = run_ext_glm(longon_net_dat_debug, longon_args_dict, task_reg = longon_args_dict$I[2,])$ext_mods[[1]]
@@ -341,25 +322,58 @@ p2 = data.frame(resids = resids_df$s_phi_ave, tmp = tmp_df$s_phi_ave) %>%
 grid.arrange(p1, p2, ncol=2)
 ```
 
+Why don't we observe the same problem when the stimulation is short? It might be because the short task doesn't lead to a systematic/large enough deviation between the network `s_phi_ave` and regression `s_phi_ave`
+
+```{r fig.asp=.3, fig.width=6}
+tmp_df = run_ext_glm(hub_net_dat_debug, hub_args_dict, task_reg = hub_args_dict$I[2,])$ext_mods[[1]]
+resids_df = check_net_resids(1, hub_net_dat_debug, hub_args_dict, verbose= TRUE)
+
+p1 = data.frame(network = resids_df$s_phi_ave, regression = tmp_df$s_phi_ave) %>%
+  mutate(time = 1: n()) %>%
+  gather(key, value, -time) %>%
+  ggplot(aes(time, value, color=key)) +
+  geom_point()+
+  theme(legend.title = element_blank())+
+  ylab("s_phi_ave")
+
+p2 = data.frame(resids = resids_df$s_phi_ave, tmp = tmp_df$s_phi_ave) %>%
+  ggplot(aes(resids, tmp)) +
+  geom_point()+
+  geom_abline(aes(intercept=0, slope=1))+
+  ylab("Regression model") +
+  xlab("Network model")
+
+grid.arrange(p1, p2, ncol=2)
+```
+
 ### Loop stimulation
 
 ```{r}
 loop_net_dat_debug = networkModel(loop_W, loop_args_dict, debug=T)
 ```
 
-**Extended GLM overcorrects non-stimulated nodes.**
+Extended GLM overcorrects non-stimulated nodes. But this is due to the longer task and not due to the loop. See below for the same loop adjacency matrix with a shorter task. The corrected estimates are not over-corrected for non-stimulated nodes.
 
 ```{r}
+print(paste0("Stim node is: ", loop_args_dict$stim_node))
+print("Uncorrected estimates:")
 round(run_ucr_glm(loop_net_dat_debug, task_reg = loop_args_dict$I[2,])$ucr_task_betas, 4)
-round(run_ext_glm(loop_net_dat_debug, cur_args_dict, task_reg = loop_args_dict$I[2,])$ext_task_betas, 4)
+print("Corrected estimates:")
+round(run_ext_glm(loop_net_dat_debug, loop_args_dict, task_reg = loop_args_dict$I[2,])$ext_task_betas, 4)
 ```
 
 ### Loop short stimulation
 
-Is the overcorrection for the loop stimulation due to the loop or task on length?
+```{r}
+loop_short_net_dat_debug = networkModel(loop_W, loop_short_args_dict, debug=T)
+```
 
 ```{r}
-
+print(paste0("Stim node is: ", loop_short_args_dict$stim_node))
+print("Uncorrected estimates:")
+round(run_ucr_glm(loop_short_net_dat_debug, task_reg = loop_short_args_dict$I[2,])$ucr_task_betas, 4)
+print("Corrected estimates:")
+round(run_ext_glm(loop_short_net_dat_debug, loop_short_args_dict, task_reg = loop_short_args_dict$I[2,])$ext_task_betas, 4)
 ```
 
 Conclusion on regression framework attempt:
