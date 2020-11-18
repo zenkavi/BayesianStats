@@ -45,7 +45,12 @@ parameters {
   real<lower = 0> sigma;   // measurement error
 }
 
+
+// https://mc-stan.org/docs/2_25/stan-users-guide/measurement-error-models.html
+// in section "Estimating System Parameters and Initial State" the solver is placed in the model section
 transformed parameters {
+  // states x are estimated as parameters z with some uncertainty. 
+  // these estimated parameters are used in the model description to relate them to measured data
   vector[N] z[N_TS] = ode_rk45(dx_dt, x_init, 0, ts, N, W, I, s, g, beta, tau);
 }
 
