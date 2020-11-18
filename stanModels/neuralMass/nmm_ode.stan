@@ -40,7 +40,7 @@ parameters {
   real<lower = 0> s;   // self coupling
   real<lower = 0> g;  // global coupling
   real<lower = 0> beta;  // task modulation
-  real<lower = 0> tau; // sampling rate (?)
+  real<lower = 0> tau; // time constant
   vector[N] x_init;  // initial activity level
   real<lower = 0> sigma;   // measurement error
 }

@@ -9,6 +9,7 @@ functions {
     return dydt;
   }
 }
+
 data {
   int<lower=1> T; //max t
   vector[2] y0; // initial state
@@ -16,8 +17,11 @@ data {
   real ts[T]; //timepoints?
   real theta;
 }
+
 model {
 }
+
+
 generated quantities {
   vector[2] y_sim[T] = ode_rk45(sho, y0, t0, ts, theta);
   // add measurement error
