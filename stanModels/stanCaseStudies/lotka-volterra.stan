@@ -58,6 +58,7 @@ model {
 generated quantities {
   vector[2] y_init_rep;
   vector[2] y_rep[N];
+  
   for (k in 1:2) {
     y_init_rep[k] = lognormal_rng(log(z_init[k]), sigma[k]);
     for (n in 1:N)

@@ -378,11 +378,27 @@ round(run_ext_glm(loop_short_net_dat_debug, loop_short_args_dict, task_reg = loo
 
 **What does the adjacency matrix look like if you estimate it from timeseries?**
 
+True adjacency matrix
+
 ```{r}
-cor(t(net_dat))
+cur_args_dict$W
+```
+
+Correlation matrix from observed time series
+
+```{r}
+round(cor(t(net_dat)), 4)
+```
+
+```{r}
+round(ppcor::pcor(t(net_dat), method="kendall")$estimate, 4)
 ```
 
 **How are the estimates of ext_glm affected if you use the estimated adjacency matrix**
+
+```{r}
+
+```
 
 ## Bayesian parameter recovery with Stan
 
@@ -405,6 +421,8 @@ nmm_data = list(N_TS = dim(net_dat)[2],
                 W = cur_args_dict$W,
                 I = cur_args_dict$I[1,])
 ```
+
+Note: currently
 
 ```{r}
 fit <- mod$sample(

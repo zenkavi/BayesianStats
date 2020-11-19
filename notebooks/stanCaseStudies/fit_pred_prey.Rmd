@@ -5,7 +5,7 @@ title: "R Notebook"
 Based on this [vignette](https://mc-stan.org/users/documentation/case-studies/lotka-volterra-predator-prey.html#mechanistic-model-the-lotka-volterra-equations).
 
 ```{r}
-lynx_hare_df = read.csv("../stanModels/stanCaseStudies/hudson-bay-lynx-hare.csv", comment.char="#")
+lynx_hare_df = read.csv("../../stanModels/stanCaseStudies/hudson-bay-lynx-hare.csv", comment.char="#")
 ```
 
 ```{r}
@@ -18,7 +18,7 @@ lynx_hare_data = list(N = N, ts = ts, y_init = y_init, y = y)
 ```
 
 ```{r}
-mod = cmdstan_model("../stanModels/stanCaseStudies/lotka-volterra.stan")
+mod = cmdstan_model("../../stanModels/stanCaseStudies/lotka-volterra.stan")
 ```
 
 ```{r}
