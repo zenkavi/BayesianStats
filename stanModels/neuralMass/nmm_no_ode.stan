@@ -14,6 +14,14 @@ data {
   vector[N_TS] I_t; // task stimulation
 }
 
+transformed data{
+  vector[N] x_t_dt[N_TS-1];
+  vector[N_TS-1] I_t_dt;
+  
+  x_t_dt = x_t[,2:]; 
+  I_t_dt = I_t[2:];
+}
+
 parameters {
   real s;   // self coupling
   real g;  // global coupling
@@ -23,43 +31,29 @@ parameters {
 }
 
 transformed parameters{
-  g_N_t
-  s_phi_x_t
-  g_N_dt
-  s_phi_ave
-}
-
-transformed data{
- x_t_dt 
- I_t_dt
-}
-
-//   x_t = all_nodes_ts$Enodes[node, -ncol(all_nodes_ts$Enodes)]
-//   
-//   g_N_t = all_nodes_ts$int_out$net_act1[node,]
-//   
-//   s_phi_x_t = s * phi(x_t)
-//   
-//   if(is.null(task_reg)){
-  //     I_t = all_nodes_ts$int_out$spont_act1[node,]
-  //     I_t_dt = all_nodes_ts$int_out$spont_act2[node,]
-  //   } else {
-    //     I_t = task_reg[-length(task_reg)]
-    //     I_t_dt = task_reg[-1]
-    //   }
-    //   
-    //   g_N_t_dt = all_nodes_ts$int_out$net_act2[node,]
-    //   
-    //   s_phi_ave = s * phi(((1 - (dt/tau))*x_t)+((dt/tau)*(g_N_t+s_phi_x_t+I_t)))
-    //   
-    //   mod = lm(x_t_dt ~ -1 +x_t + g_N_t + s_phi_x_t + I_t + g_N_t_dt + s_phi_ave + I_t_dt)
-    
-    model {
-      for (node in 1:N){
-        for (t in 2:N_TS){
-          
-          x_t_dt[node, t] ~ normal(..., sigma);
-        }
-      }
+  
+  vector[N] g_N_t[N_TS-1];
+  vector[N] s_phi_x_t[N_TS-1];
+  vector[N] g_N_dt[N_TS-2];
+  vector[N] s_phi_ave[N_TS-2];
+  
+  for (node in 1:N){
+    for (t in 2:N_TS){
+      g_N_t[node, t] = g * sum(W[node,] * x_t[,t]);
+      s_phi_x_t[node, t] = ;
+      g_N_dt[node, t] = ;
+      s_phi_ave[node, t] = ;
+      
+      pred_x_t_dt = 
     }
-    
+  }
+}
+
+model {
+  for (node in 1:N){
+    for (t in 2:N_TS){
+      
+      x_t_dt[node, t] ~ normal(..., sigma);
+    }
+  }
+}

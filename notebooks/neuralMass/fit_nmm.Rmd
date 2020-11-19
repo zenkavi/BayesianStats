@@ -376,16 +376,46 @@ print("Corrected estimates:")
 round(run_ext_glm(loop_short_net_dat_debug, loop_short_args_dict, task_reg = loop_short_args_dict$I[2,])$ext_task_betas, 4)
 ```
 
-Conclusion on regression framework attempt:
+**What does the adjacency matrix look like if you estimate it from timeseries?**
+
+```{r}
+cor(t(net_dat))
+```
+
+**How are the estimates of ext_glm affected if you use the estimated adjacency matrix**
 
 ## Bayesian parameter recovery with Stan
 
-Move on to estimating task parameters using Stan. [state-space models]
+Move on to estimating task parameters using Stan. 
 
 ```{r}
-
+library(cmdstanr)
 ```
 
+```{r}
+mod = cmdstan_model("../../stanModels/neuralMass/nmm_ode.stan")
+```
+
+```{r}
+nmm_data = list(N_TS = dim(net_dat)[2],
+                N = dim(net_dat)[1],
+                ts = 1:N_TS,
+                y_init = net_dat[,1],
+                y = net_dat[,1],
+                W = cur_args_dict$W,
+                I = cur_args_dict$I[1,])
+```
+
+```{r}
+fit <- mod$sample(
+  data = nmm_data,
+  seed = 123
+)
+```
+
+```{r}
+fit$summary()
+```
 ------
 
 Question re estimation methods: Are the posteriors unimodal in VI vs MCMC? Are we losing important information when making assumptions like the Laplace approximation?
