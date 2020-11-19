@@ -55,7 +55,7 @@ functions {
   vector dx_dt(real t,       // time
                vector x,     // system state {1 x N - network activity for each time point}
                int N,
-               vector N_t,
+               vector[] N_t,
                vector I,
                vector ts,
                real s,
@@ -64,10 +64,11 @@ functions {
                real tau) {
   
     vector[N] res;
+    
     int d = find_interval_elem(t, ts, 1);
     
     for (i in 1:N){
-      res[i] = (-x[i] + s * phi(x[i]) + g * N_t[i, d] + b * I[d])/tau;
+      res[i] = (-x[i] + s * phi(x[i]) + g *N_t[d, i] + b * I[d])/tau;
     }
     
     // returns change for one time point for all nodes
@@ -80,8 +81,13 @@ data {
   int<lower = 0> N;             // number of nodes
   real ts[N_TS];                 // measurement times > 0
   vector[N] y_init;             // initial measured activity level
-  vector[N] y[N_TS];    // measured activity level with nodes in cols and timepoints in rows
-  vector[N] W[N]; // adjacency matrix
+  
+  // Arrays are declared by enclosing the dimensions in square brackets following the name of the variable.
+  // this is an array of length N_TS consisting of (column) vectors of length N
+  // Each array element is like a row
+  vector[N] y[N_TS]; // measured activity level with nodes in cols and timepoints in rows
+  matrix[N, N] W;// adjacency matrix
+  
   vector[N_TS] I; // task stimulation
 }
 
@@ -90,7 +96,9 @@ transformed data{
   
   for(i in 1:N){
     for(t in 1:N_TS){
-      N_t[i, t] = dot_product(W[i]*y[,t]);
+      //row of incoming connections to node i of length n
+      //multiplied with activity (column) vector of length n for all nodes at time t
+      N_t[t, i] = dot_product(W[i,], y[t]);
     }
   }
 }
@@ -107,7 +115,7 @@ parameters {
 transformed parameters {
   // states x are estimated as parameters z with some uncertainty. 
   // these estimated parameters are used in the model description to relate them to measured data
-  vector[N] z[N_TS] = ode_rk45(dx_dt, y_init, 0, ts, N, W, I, ts, s, g, b, tau);
+  vector[N] z[N_TS] = ode_rk45(dx_dt, y_init, 0, ts, N, N_t, I, ts, s, g, b, tau);
 }
 
 model {
