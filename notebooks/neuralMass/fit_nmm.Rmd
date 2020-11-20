@@ -409,7 +409,7 @@ library(cmdstanr)
 ```
 
 ```{r}
-mod = cmdstan_model("../../stanModels/neuralMass/nmm_ode.stan")
+mod = cmdstanr::cmdstan_model("../../stanModels/neuralMass/nmm_ode.stan")
 ```
 
 ```{r}

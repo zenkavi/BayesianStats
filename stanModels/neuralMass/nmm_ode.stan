@@ -117,7 +117,7 @@ parameters {
 transformed parameters {
   // states x are estimated as parameters z with some uncertainty. 
   // these estimated parameters are used in the model description to relate them to measured data
-  vector[N] x[N_TS] = ode_rk45(dx_dt, x_init, t0, ts, N, N_t, I, ts, s, g, b, tau);
+  vector[N] x[N_TS] = ode_rk45(dx_dt, x_init, t0, ts, N, N_t, I, to_vector(ts), s, g, b, tau);
 }
 
 model {
