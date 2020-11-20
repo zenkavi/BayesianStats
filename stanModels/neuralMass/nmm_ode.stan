@@ -7,7 +7,7 @@ functions {
   }
   
   // From
-  // https://discourse.mc-stan.org/t/zero-chain-movement-mixing-in-forced-ode-model/921
+  // https://discourse.mc-stan.org/t/forced-odes-a-start-for-a-case-study/343
   int find_interval_elem(real x, vector sorted, int start_ind){
     int res;
     int N;
@@ -66,30 +66,35 @@ functions {
     
     int d = find_interval_elem(t, ts, 1);
     
+    if(d == 0){
+      d = 1;
+    }
+    
     for (i in 1:N){
       res[i] = (-x[i] + s * phi(x[i]) + g * N_t[d, i] + b * I[d])/tau;
     }
     
     // returns change for one time point for all nodes
-    return  res;
+    return res;
   }
   
 }
 
 data {
-  int<lower = 0> N_TS;           // number of measurement times
+  int<lower = 0> N_TS;          // number of measurement times
   int<lower = 0> N;             // number of nodes
   real t0;
-  real ts[N_TS];                 // measurement times > 0
   vector[N] y_init;             // initial measured activity level
+  matrix[N, N] W;               // adjacency matrix
+  vector[N_TS] I;               // task stimulation
 
   // Arrays are declared by enclosing the dimensions in square brackets following the name of the variable.
   // this is an array of length N_TS consisting of (column) vectors of length N
   // Each array element is like a row
-  vector[N] y[N_TS]; // measured activity level with nodes in cols and timepoints in rows
-  matrix[N, N] W;// adjacency matrix
-
-  vector[N_TS] I; // task stimulation
+  
+  real ts[N_TS];                 // measurement times > 0
+  vector[N] y[N_TS];             // measured activity level with nodes in cols and timepoints in rows
+  
 }
 
 transformed data{
@@ -110,14 +115,17 @@ parameters {
   real<lower = 0> b;  // task modulation
   real<lower = 0> tau; // time constant
   real<lower = 0> sigma;   // measurement error
-  vector[N] x_init;
+  // vector[N] x_init;
 }
 
 
 transformed parameters {
+  
   // states x are estimated as parameters z with some uncertainty. 
   // these estimated parameters are used in the model description to relate them to measured data
-  vector[N] x[N_TS] = ode_rk45(dx_dt, x_init, t0, ts, N, N_t, I, to_vector(ts), s, g, b, tau);
+  // vector[N] x[N_TS] = ode_rk45(dx_dt, x_init, t0, ts, N, N_t, I, to_vector(ts), s, g, b, tau);
+  vector[N] x[N_TS] = ode_rk45(dx_dt, y_init, t0, ts, N, N_t, I, to_vector(ts), s, g, b, tau);
+
 }
 
 model {
@@ -129,7 +137,9 @@ model {
 
 
   for (k in 1:N) {
-    y_init[k] ~ lognormal(log(x_init[k]), sigma);
-    y[ , k] ~ lognormal(log(x[, k]), sigma);
+    // y_init[k] ~ lognormal(log(x_init[k]), sigma);
+    // y[ , k] ~ lognormal(log(x[, k]), sigma);
+    y[ , k] ~ normal(x[, k], sigma);
+
   }
 }

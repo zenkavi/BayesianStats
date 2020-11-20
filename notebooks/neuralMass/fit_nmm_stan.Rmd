@@ -6,6 +6,7 @@ title: "Neural mass model simulation and external stimulation parameter recovery
 library(tidygraph)
 library(ggraph)
 library(gridExtra)
+library(cmdstanr)
 ```
 
 ```{r}
@@ -104,14 +105,7 @@ data.frame(net_dat) %>%
   geom_line()
 ```
 
-
 # Bayesian parameter recovery
-
-Move on to estimating task parameters using Stan. 
-
-```{r}
-mod = cmdstanr::cmdstan_model("../../stanModels/neuralMass/nmm_ode.stan")
-```
 
 ```{r}
 nmm_data = list(N_TS = dim(net_dat)[2],
@@ -125,10 +119,8 @@ nmm_data = list(N_TS = dim(net_dat)[2],
 ```
 
 ```{r}
-dim(net_dat)
+mod = cmdstan_model("../../stanModels/neuralMass/nmm_ode.stan")
 ```
-
-Note: currently
 
 ```{r}
 fit <- mod$sample(
