@@ -1,0 +1,145 @@
+---
+title: "Neural mass model simulation and external stimulation parameter recovery with Stan"
+---
+
+```{r}
+library(tidygraph)
+library(ggraph)
+library(gridExtra)
+```
+
+```{r}
+helpers_path = '~/Dropbox/RangelLab/NetworkGLM/helpers/r_helpers/'
+source(paste0(helpers_path,'networkModel.R'))
+source(paste0(helpers_path,'make_stimtimes.R'))
+source(paste0(helpers_path,'generateStructuralNetwork.R'))
+source(paste0(helpers_path,'generateSynapticNetwork.R'))
+```
+
+# Developing intuitions for activity propogation within a network
+
+Suppose we have a three node network that looks like:
+
+```{r}
+edges = data.frame(from = c(1, 2, 2), to = c(2, 1, 3), weight = c(.4, .2, .3))
+nodes = data.frame(id = c(1,2,3), label = c("1", "2", "3"))
+min_net = tbl_graph(nodes=nodes, edges=edges, directed=T)
+```
+
+```{r}
+ggraph(min_net, layout="circle")+
+  geom_edge_parallel(aes(width=weight, label=weight), 
+                 alpha=.8,
+                 arrow = arrow(length = unit(4, 'mm')),
+                 end_cap = circle(5, 'mm'),
+                 start_cap = circle(5, 'mm'),
+                 label_dodge=unit(-4.0,"mm"),
+                 label_push=unit(4,"mm"),
+                 position="identity",angle_calc="along",force_flip=T)+
+  scale_edge_width(range=c(.2,2))+
+  geom_node_point(size=7)+
+  geom_node_label(aes(label=label), 
+                 repel=T)+ 
+  theme_graph()+
+  theme(legend.position = "none",
+        plot.margin = margin(0, 1, .5, 1, "cm"))
+```
+
+Adjacency matrix for the above minimal network looks like:
+
+```{r}
+W<-matrix(0, 3, 3)
+W[as.matrix(edges[,2:1])] <- edges$weight
+W
+```
+
+```{r}
+edges %>%
+  rbind(data.frame(from = c(1,2,3,3,1,3), to = c(1,2,3,1,3,2), weight = c(0,0,0,0,0,0))) %>%
+  ggplot(aes(x=from, y=to, fill=weight))+
+  geom_tile()
+```
+
+Suppose we have a task that looks like:
+
+```{r}
+task = data.frame(stim = c(c(0,0,0,1),rep(0,97)))
+task$time = rep(1:nrow(task))
+task %>%
+  ggplot(aes(x=time, y=stim))+
+  geom_line()+
+  xlab("")+
+  ylab("")+
+  scale_y_continuous(breaks = c(0,1))
+```
+
+Activity in each node at each time point would look like:
+
+```{r}
+cur_args_dict = list('dt'=.5,  
+                 'g'=1, 
+                 'noise'= NULL,
+                 'noise_loc'= 0, 
+                 'noise_scale'= 0,
+                 's'=.7,
+                 'stim_mag'=.5,
+                 'taskdata'=NULL,
+                 'tasktiming'=task$stim,
+                 'tau'=1, 
+                 'Tmax'=max(task$time),
+                 'W'= W)
+
+cur_args_dict$stim_node = 1
+cur_args_dict$I = make_stimtimes(cur_args_dict$stim_node, cur_args_dict)$stimtimes
+
+net_dat = networkModel(W, cur_args_dict)
+
+data.frame(net_dat) %>%
+  mutate(node = c(1,2,3)) %>%
+  gather(sampling, value, -node) %>%
+  mutate(sampling = gsub("X", "", sampling),
+         sampling = as.numeric(sampling),
+         node = as.factor(node)) %>%
+  ggplot(aes(x=sampling, y=value, color = node))+
+  geom_line()
+```
+
+
+# Bayesian parameter recovery
+
+Move on to estimating task parameters using Stan. 
+
+```{r}
+mod = cmdstanr::cmdstan_model("../../stanModels/neuralMass/nmm_ode.stan")
+```
+
+```{r}
+nmm_data = list(N_TS = dim(net_dat)[2],
+                N = dim(net_dat)[1],
+                ts = 1:dim(net_dat)[2],
+                y_init = net_dat[,1],
+                y = t(net_dat),
+                W = cur_args_dict$W,
+                I = cur_args_dict$I[1,],
+                t0 = 0)
+```
+
+```{r}
+dim(net_dat)
+```
+
+Note: currently
+
+```{r}
+fit <- mod$sample(
+  data = nmm_data,
+  seed = 123
+)
+```
+
+```{r}
+fit$summary()
+```
+------
+
+Question re estimation methods: Are the posteriors unimodal in VI vs MCMC? Are we losing important information when making assumptions like the Laplace approximation?

@@ -1,5 +1,5 @@
 ---
-title: "Neural mass model simulation and external stimulation parameter recovery with Stan"
+title: "Neural mass model simulation and external stimulation parameter recovery with GLM"
 ---
 
 ```{r}
@@ -400,40 +400,3 @@ round(ppcor::pcor(t(net_dat), method="kendall")$estimate, 4)
 
 ```
 
-## Bayesian parameter recovery with Stan
-
-Move on to estimating task parameters using Stan. 
-
-```{r}
-library(cmdstanr)
-```
-
-```{r}
-mod = cmdstanr::cmdstan_model("../../stanModels/neuralMass/nmm_ode.stan")
-```
-
-```{r}
-nmm_data = list(N_TS = dim(net_dat)[2],
-                N = dim(net_dat)[1],
-                ts = 1:N_TS,
-                y_init = net_dat[,1],
-                y = net_dat[,1],
-                W = cur_args_dict$W,
-                I = cur_args_dict$I[1,])
-```
-
-Note: currently
-
-```{r}
-fit <- mod$sample(
-  data = nmm_data,
-  seed = 123
-)
-```
-
-```{r}
-fit$summary()
-```
-------
-
-Question re estimation methods: Are the posteriors unimodal in VI vs MCMC? Are we losing important information when making assumptions like the Laplace approximation?
