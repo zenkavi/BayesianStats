@@ -66,6 +66,7 @@ functions {
     
     int d = find_interval_elem(t, ts, 1);
     
+    // To avoid indexing errors in the vector array N_t
     if(d == 0){
       d = 1;
     }

@@ -122,12 +122,20 @@ nmm_data = list(N_TS = dim(net_dat)[2],
 mod = cmdstan_model("../../stanModels/neuralMass/nmm_ode.stan")
 ```
 
+This is insanely slow. 
+
 ```{r}
 fit <- mod$sample(
   data = nmm_data,
   seed = 123
 )
 ```
+
+```{r}
+fit$save_object(file = "fit_nmm_ode.RDS")
+```
+
+Estimates don't look entirely ridiculous considering how clueless I am...
 
 ```{r}
 fit$summary()
