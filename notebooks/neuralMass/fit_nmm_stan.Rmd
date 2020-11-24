@@ -144,6 +144,8 @@ fit$summary()
 mod2 = cmdstan_model("../../stanModels/neuralMass/nmm_ode2.stan")
 ```
 
+Estimates are almost identical
+
 ```{r}
 fit2 <- mod2$sample(
   data = nmm_data,

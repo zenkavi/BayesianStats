@@ -1,0 +1,79 @@
+---
+title: "2 methods for model comparison in Bayesian inference"
+---
+
+```{r}
+library(gridExtra)
+```
+
+# True model
+
+```{r}
+set.seed(23423413)
+
+data = data.frame(x1 = rnorm(250, 0, 1),
+                  x2 = rnorm(250, 0, 1))
+
+data = data %>% 
+  mutate(noise = rnorm(250, mean = 0, sd = .5),
+         y = x1+noise)
+```
+
+# Frequentist comparison
+
+```{r}
+m1 = lm(y ~ x1, data)
+m2 = lm(y ~ x1 + x2, data)
+summary(m1)
+```
+
+```{r}
+summary(m2)
+```
+
+```{r}
+anova(m1, m2)
+```
+
+```{r}
+p1 = data %>% 
+  ggplot(aes(x1, y)) +
+  geom_point()
+
+p2 = data %>% 
+  ggplot(aes(x2, y)) +
+  geom_point()
+
+p3 = data %>%
+  mutate(pred_m1 = predict(m1)) %>%
+  ggplot(aes(pred_m1, y)) +
+  geom_point()
+
+p4 = data %>%
+  mutate(pred_m2 = predict(m2)) %>%
+  ggplot(aes(pred_m2, y)) +
+  geom_point()
+
+grid.arrange(p1, p2, p3, p4, ncol=2, nrow = 2)
+
+```
+
+```{r}
+rm(p1, p2, p3, p4)
+```
+
+# Full Bayesian Approach
+
+Computing posterior model probabilities
+
+```{r}
+
+```
+
+# Posterior predictive checks
+
+LOO-CV and K-fold
+
+```{r}
+
+```
