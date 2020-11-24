@@ -82,7 +82,7 @@ k_fold = function(aModel, testIndices, simData){
 Use `stan` to get parameters that generated simulated data.
 
 ```{r}
-m_true = stan_model('../stanModels/qLearning/QLearning_cv_trueModel.stan')
+m_true = stan_model('../../stanModels/qLearning/QLearning_cv_trueModel.stan')
 ```
 
 ```{r}

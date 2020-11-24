@@ -2,6 +2,14 @@
 title: "Stan model_0: Basics"
 ---
 
+```{r}
+library(rstan)
+```
+
+```{r}
+rstan_options(auto_write = TRUE)
+```
+
 # Model_0: Basic model with predicted data
 
 Create fake data
