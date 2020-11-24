@@ -13,7 +13,7 @@ Y = rnorm(10, 1.5, .2)
 Compile and run the MCMC
 
 ```{r}
-fit = stan('../stanModels/model_0.stan', iter=200, chains=4,
+fit = stan('../../stanModels/LambertTextbookExamples/model_0.stan', iter=200, chains=4,
            data = list(Y=Y))
 ```
 

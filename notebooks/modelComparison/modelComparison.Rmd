@@ -4,6 +4,8 @@ title: "2 methods for model comparison in Bayesian inference"
 
 ```{r}
 library(gridExtra)
+library(cmdstanr)
+library(bridgesampling)
 ```
 
 # True model
@@ -24,6 +26,9 @@ data = data %>%
 ```{r}
 m1 = lm(y ~ x1, data)
 m2 = lm(y ~ x1 + x2, data)
+```
+
+```{r}
 summary(m1)
 ```
 
@@ -67,8 +72,34 @@ rm(p1, p2, p3, p4)
 Computing posterior model probabilities
 
 ```{r}
-
+m1_stan = cmdstan_model("../../stanModels/modelComparison/fit_m1.stan")
+m1_stanfit <- m1_stan$sample(data = list(N = nrow(data), y=data$y, x1 = data$x1))
 ```
+
+```{r}
+m1_stanfit$summary()
+```
+
+```{r}
+m2_stan = cmdstan_model("../../stanModels/modelComparison/fit_m2.stan")
+m2_stanfit <- m2_stan$sample(data = list(N = nrow(data), y=data$y, x1 = data$x1, x2 = data$x2))
+```
+
+```{r}
+m2_stanfit$summary()
+```
+
+```{r}
+b_m1 <- bridge_sampler(m1_stanfit, silent = TRUE)
+```
+
+TO POST ON FORUM: CMDSTANR BROKE RSTAN? - No, previous notebooks seem to be working. So what is the problem with this model?
+
+```{r eval=F}
+m1_stan = stan_model("../../stanModels/modelComparison/fit_m1.stan")
+m1_stanfit = sampling(m1_stan, data = list(N = nrow(data), y=data$y, x1 = data$x1))
+```
+
 
 # Posterior predictive checks
 
