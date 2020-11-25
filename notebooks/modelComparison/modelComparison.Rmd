@@ -150,11 +150,12 @@ k_fold = function(aModel, testIndices, simData, dataVarNames, logLikVarName){
     
     fit = sampling(aModel, data=m_data, show_messages=FALSE, verbose=FALSE, refresh= 0)
     
-    fold_llpd = extract_log_lik(fit, logLikVarName) 
+    fold_llpd = extract_log_lik(fit, logLikVarName) #requires loo
     
     fold_llpd_means = colMeans(fold_llpd) #mean loglik for each left out train datapoint across samples
-    fold_elpd_increment = sum(fold_llpd_means) #sum of mean logliks of each train datapoint
-    elpd = elpd+fold_elpd_increment 
+    #fold_elpd_increment = sum(fold_llpd_means) #sum of mean logliks of each train datapoint
+    #elpd = elpd+fold_elpd_increment 
+    elpd = c(elpd, fold_llpd_means)
   }
   
   return(elpd)
@@ -167,7 +168,7 @@ m1_stan_cv = stan_model("../../stanModels/modelComparison/fit_m1_cv.stan")
 
 ```{r results="hide"}
 m1_elpd = k_fold(m1_stan_cv, testIndices, simData = data, dataVarNames = c("x1", "y"), logLikVarName = "logLikelihood")
-m1_elpd
+sum(m1_elpd)
 ```
 
 ```{r}
@@ -176,11 +177,13 @@ m2_stan_cv = stan_model("../../stanModels/modelComparison/fit_m2_cv.stan")
 
 ```{r results="hide"}
 m2_elpd = k_fold(m2_stan_cv, testIndices, simData = data, dataVarNames = c("x1","x2", "y"), logLikVarName = "logLikelihood")
-m2_elpd
+sum(m2_elpd)
 ```
 
 Comparison of elpds:
 
 ```{r}
-
+d = sum(m1_elpd) - sum(m2_elpd)
+d_sd = sqrt(250)*sd(m1_elpd - m2_elpd)
+1-pnorm(d/d_sd)
 ```
