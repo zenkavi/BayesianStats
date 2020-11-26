@@ -2,28 +2,36 @@ files.sources = list.files('/Users/zeynepenkavi/Dropbox/RangelLab/BayesianStats/
 files.sources = files.sources[files.sources != '/Users/zeynepenkavi/Dropbox/RangelLab/BayesianStats/helpers/demo_QlearningSimulation.R']
 sapply(files.sources, source)
 
-demo_QlearningSimulation = function(alpha=.65, beta=2.5, blockSize = 25, numBlocks = 6){
-  
-  f_fname = 'f_Qlearning'
-  g_fname = 'g_Qlearning'
+make_QlearningTask = function(probRewardGood = .75, blocksize = 25, numBlocks = 6){
   
   # probability of a positive reward following a 'correct' action 
   probRewardGood = 75/100;
   # draw 25 random feedbacks
   contBloc = runif(blockSize) < probRewardGood
   # create 6 blocks with reversals
-  # contingencies = c(contBloc, 1-contBloc, contBloc, 1-contBloc, contBloc, 1-contBloc)
   contingencies = rep(c(contBloc, 1-contBloc), numBlocks/2)
+  
+  return(contingencies)
+}
+
+demo_QlearningSimulation = function(alpha=.65, beta=2.5, 
+                                    blockSize = 25, numBlocks = 6,
+                                    f_fname = 'f_Qlearning', g_fname = 'g_Qlearning'){
+  
+  contingencies = make_QlearningTask(probRewardGood = .75, blocksize = blocksize, numBlocks = numBlocks)
   
   h_feedback = function(yt, t){
     return(as.numeric(yt == contingencies[t]))
   }
   
-  theta = VBA_sigmoid(alpha, inverse=TRUE) #will be transformed back in f_Qlearning
+  theta = c()
+  for(i in 1:length(alpha)){
+    theta[i] = VBA_sigmoid(alpha[i], inverse=TRUE) #will be transformed back in f_Qlearning
+  }
 
   phi = log(beta) #will be transformed back in g-Qlearning
 
-  x0 = c(.5, .5)
+  x0 = c(.5, .5) #starting EVs
   
   n_t = length(contingencies)
   
@@ -50,7 +58,9 @@ demo_QlearningSimulation = function(alpha=.65, beta=2.5, blockSize = 25, numBloc
   choices = sim_out$u[1,2:end]
   feedback = sim_out$u[2,2:end]
   
-  out = list('choices' = choices, 'feedback'= feedback, 'simulation' = simulation, 'eta'=sim_out$eta, 'e'=sim_out$e, 'y'=sim_out$y)
+  out = list('choices' = choices, 'feedback'= feedback, 
+             'simulation' = simulation, 'eta'=sim_out$eta, 
+             'e'=sim_out$e, 'y'=sim_out$y)
   
   return(out)
 }
