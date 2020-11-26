@@ -41,76 +41,32 @@ Using `caret` to make 5 folds for cross validation.
 
 ```{r}
 testIndices = createFolds(sim_data$choices, k = 5, list=TRUE, returnTrain = FALSE)
-```
-
-```{r}
-## Adapted from Lambert textbook p. 397
-k_fold = function(aModel, testIndices, simData){
-  numFolds = length(testIndices)
-  
-  #expected log pointwise predictive density
-  elpd = 0
-  
-  for(i in 1:numFolds){
-    cur_ind = testIndices[[i]]
-  
-    T_train = length(sim_data$choices) - length(cur_ind)
-    T_test = length(cur_ind)
-  
-    choice_train = simData$choices[-cur_ind] #adding 1 bc categorical_logit has support over [1,2]
-    choice_test = simData$choices[cur_ind]
-    
-    outcome_train = simData$feedback[-cur_ind] 
-    outcome_test = simData$feedback[cur_ind] 
-    
-    m_data = list(T_train = T_train, T_test = T_test, 
-                  choice_train = choice_train, choice_test = choice_test, 
-                  outcome_train = outcome_train, outcome_test = outcome_test)
-    
-    fit = sampling(aModel, iter=1000, chains=4, data=m_data, show_messages=FALSE, verbose=FALSE, refresh= 0)
-    
-    fold_llpd = extract_log_lik(fit, 'log_lik') #log likelihood for each sample (1000) and observations in this fold
-    
-    #Based on https://discourse.mc-stan.org/t/calculating-elpd-values-for-a-stan-model-k-fold-cross-validation/3570/7
-    #fold_llpd = exp(fold_llpd) #exponentiate each element
-    fold_llpd_means = colMeans(fold_llpd) # mean likelihood across samples for each y_test in this fold
-    #fold_llpd_means = log(fold_llpd_means)
-    fold_elpd_increment = sum(fold_llpd_means)
-    elpd = c(elpd, fold_elpd_increment)
-    
-    #For a standard error you need standard error of a sum i.e. sd*sqrt(n)
-  }
-  
-  return(list(elpd_sum = sum(elpd), elpd_se = sd(elpd)*sqrt(length(elpd))))
-}
-```
-
-Use `stan` to get parameters that generated simulated data.
-
-```{r}
-m_true = stan_model('../../stanModels/qLearning/QLearning_cv_trueModel.stan')
-```
-
-```{r}
-m_twoAlphas = stan_model('../stanModels/qLearning/QLearning_cv_twoAlphas.stan')
-m_diffAlphas = stan_model('../stanModels/qLearning/QLearning_cv_diffAlphas.stan')
-m_strawMan = stan_model('../stanModels/qLearning/QLearning_cv_strawMan.stan')
+data = data.frame(choice = sim_data$choices, outcome = sim_data$feedback)
 ```
 
 ```{r results="hide"}
-ELPD_true = k_fold(m_true, testIndices, sim_data)
+
+m_oneAlpha = stan_model('../../stanModels/qLearning/QLearning_cv_oneAlpha.stan')
+ELPD_oneAlpha  = k_fold(m_oneAlpha, testIndices, simData = data, dataVarNames = c("choice", "outcome"), logLikVarName = "log_lik")
+
+sum(ELPD_oneAlpha)
 ```
 
 ```{r results="hide"}
-ELPD_twoAlphas = k_fold(m_twoAlphas, testIndices, sim_data)
+m_twoAlphas = stan_model('../../stanModels/qLearning/QLearning_cv_twoAlphas.stan')
+ELPD_twoAlphas  = k_fold(m_twoAlphas, testIndices, simData = data, dataVarNames = c("choice", "outcome"), logLikVarName = "log_lik")
+sum(ELPD_twoAlphas)
 ```
 
 ```{r results="hide"}
-ELPD_diffAlphas = k_fold(m_diffAlphas, testIndices, sim_data)
+m_diffAlphas = stan_model('../../stanModels/qLearning/QLearning_cv_diffAlphas.stan')
+ELPD_diffAlphas = k_fold(m_diffAlphas, testIndices, simData = data, dataVarNames = c("choice", "outcome"), logLikVarName = "log_lik")
+sum(ELPD_diffAlphas)
 ```
 
 ```{r results="hide"}
-ELPD_strawMan = k_fold(m_strawMan, testIndices, sim_data)
+m_strawMan = stan_model('../../stanModels/qLearning/QLearning_cv_strawMan.stan')
+ELPD_strawMan = k_fold(m_strawMan, testIndices, simData = data, dataVarNames = c("choice", "outcome"), logLikVarName = "log_lik")
 ```
 
 ```{r}
@@ -120,9 +76,9 @@ data.frame(ELPD_strawMan) %>%
   mutate(model = "diff Alphas")) %>%
   rbind(data.frame(ELPD_twoAlphas) %>%
   mutate(model = "two Alphas")) %>%
-  rbind(data.frame(ELPD_true) %>%
+  rbind(data.frame(ELPD_oneAlpha) %>%
   mutate(model = "true")) %>%
-  mutate(model = factor(model, levels = c("true", "two Alphas", "diff Alphas", "straw man"), labels = c("true", "two Alphas", "diff Alphas", "play all"))) %>%
+  mutate(model = factor(model, levels = c("oneAlpha", "two Alphas", "diff Alphas", "straw man"), labels = c("one Alpha", "two Alphas", "diff Alphas", "play all"))) %>%
   ggplot(aes(model))+
   geom_point(aes(y=elpd_sum), size=4)+
   geom_errorbar(aes(ymin = elpd_sum-elpd_se, ymax = elpd_sum+elpd_se, width=0))+
@@ -135,7 +91,7 @@ data.frame(ELPD_strawMan) %>%
 Bridge sampling to calculate marginal likelihood and compute $p(m|y)$ for each model. Based on this [vignette](https://cran.r-project.org/web/packages/bridgesampling/vignettes/bridgesampling_example_stan.html).
 
 ```{r}
-m_true = stan_model('../stanModels/qLearning/QLearning_full_trueModel.stan')
+m_true = stan_model('../stanModels/qLearning/QLearning_full_oneAlpha.stan')
 m_twoAlphas = stan_model('../stanModels/qLearning/QLearning_full_twoAlphas.stan')
 m_diffAlphas = stan_model('../stanModels/qLearning/QLearning_full_diffAlphas.stan')
 m_strawMan = stan_model('../stanModels/qLearning/QLearning_full_strawMan.stan')
@@ -154,7 +110,7 @@ m_data = list(T_train = T_train,
 ```
 
 ```{r}
-f_true = sampling(m_true, iter = 50000, warmup = 1000, chains = 3, data=m_data, show_messages=FALSE, verbose=FALSE, refresh= 0)
+f_oneAlpha = sampling(m_true, iter = 50000, warmup = 1000, chains = 3, data=m_data, show_messages=FALSE, verbose=FALSE, refresh= 0)
 ```
 
 ```{r}
@@ -170,7 +126,7 @@ f_strawMan = sampling(m_strawMan, iter = 50000, warmup = 1000, chains = 3, data=
 ```
 
 ```{r}
-b_true <- bridge_sampler(f_true, silent = TRUE)
+b_oneAlpha <- bridge_sampler(f_true, silent = TRUE)
 ```
 
 ```{r}
@@ -190,12 +146,12 @@ post_prob(b_true, b_twoAlphas, b_diffAlphas, b_strawMan)
 ```
 
 ```{r}
-data.frame(log_p_y_m = c(b_true$logml, b_twoAlphas$logml, b_diffAlphas$logml, b_strawMan$logml),
-           model = c("true", "two Alphas", "diff Alphas", "play all")) %>%
+data.frame(log_p_y_m = c(b_oneAlpha$logml, b_twoAlphas$logml, b_diffAlphas$logml, b_strawMan$logml),
+           model = c("one Alpha", "two Alphas", "diff Alphas", "play all")) %>%
   mutate(p_y_m = exp(log_p_y_m),
          denom = sum(p_y_m),
          p_m_y = p_y_m/denom,
-         model = factor(model, levels = c("true", "two Alphas", "diff Alphas", "play all"))) %>%
+         model = factor(model, levels = c("one Alpha", "two Alphas", "diff Alphas", "play all"))) %>%
   ggplot(aes(x=model, y=p_m_y))+
   geom_bar(stat="identity")+
   geom_point()+
