@@ -7,7 +7,7 @@ zeros = function(dim1, dim2=1){
   return(out)
 }
 
-VBA_simulate = function(n_t,f_fname,g_fname,theta,phi,u,alp,sigma,x0,fb){
+VBA_simulate = function(n_t, f_fname, g_fname, theta, phi, u, alp, sigma, x0, fb){
   
 # This function creates the time series of hidden-states and measurements
 # under the following nonlinear state-space model:

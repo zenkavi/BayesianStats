@@ -1,5 +1,5 @@
 # Evolution function
-f_Qlearning = function(x, P, u){
+f_Qlearning_twoAlphas = function(x, P, u){
   # - x: action values (n x 1)
   # - P: learning rates for pos and neg RPEs respectively (will be sigmoid transformed)
   # - u: (1) previous action 
@@ -24,14 +24,8 @@ f_Qlearning = function(x, P, u){
   }
   
   n = length(x)
-  
-  dfdx = diag(n)
-  dfdx[prevActionIdx, prevActionIdx] = 1-alpha
-  
-  dfdp = c(0, 0)
-  dfdp[prevActionIdx] = alpha*(1-alpha)*delta
-  
-  out = list('fx' = fx, 'dfdx' = dfdx, 'dfdp' = dfdp)
+
+  out = list('fx' = fx)
   
   return(out)
 }

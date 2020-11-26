@@ -11,14 +11,20 @@ library(caret)
 library(bridgesampling)
 ```
 
+Simulate data with two learning rates (learning 3 times faster from negative RPEs than from positive RPEs)
+
 ```{r}
-sim_data = demo_QlearningSimulation(alpha = .65, beta = 2.5)
+sim_data = demo_QlearningSimulation(alpha = c(.25, .75), beta = 2.5, f_fname = 'f_Qlearning_twoAlphas')
 ```
 
-True learning rate `alpha`
+True learning rates `alpha_pos` and `alpha_neg`
 
 ```{r}
-true_alpha = VBA_sigmoid(sim_data$simulation$evolution, inverse=FALSE)
+raw_alpha = sim_data$simulation$evolution
+true_alpha = c()
+for(i in 1:length(raw_alpha)){
+  true_alpha[i] = VBA_sigmoid(raw_alpha[i], inverse=FALSE)
+}
 true_alpha
 ```
 

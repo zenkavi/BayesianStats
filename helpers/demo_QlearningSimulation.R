@@ -2,7 +2,7 @@ files.sources = list.files('/Users/zeynepenkavi/Dropbox/RangelLab/BayesianStats/
 files.sources = files.sources[files.sources != '/Users/zeynepenkavi/Dropbox/RangelLab/BayesianStats/helpers/demo_QlearningSimulation.R']
 sapply(files.sources, source)
 
-make_QlearningTask = function(probRewardGood = .75, blocksize = 25, numBlocks = 6){
+make_QlearningTask = function(probRewardGood = .75, blockSize = 25, numBlocks = 6){
   
   # probability of a positive reward following a 'correct' action 
   probRewardGood = 75/100;
@@ -18,7 +18,7 @@ demo_QlearningSimulation = function(alpha=.65, beta=2.5,
                                     blockSize = 25, numBlocks = 6,
                                     f_fname = 'f_Qlearning', g_fname = 'g_Qlearning'){
   
-  contingencies = make_QlearningTask(probRewardGood = .75, blocksize = blocksize, numBlocks = numBlocks)
+  contingencies = make_QlearningTask(probRewardGood = .75, blockSize = blockSize, numBlocks = numBlocks)
   
   h_feedback = function(yt, t){
     return(as.numeric(yt == contingencies[t]))
