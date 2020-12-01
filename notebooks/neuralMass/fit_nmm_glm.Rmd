@@ -59,10 +59,29 @@ W
 ```
 
 ```{r}
-edges %>%
-  rbind(data.frame(from = c(1,2,3,3,1,3), to = c(1,2,3,1,3,2), weight = c(0,0,0,0,0,0))) %>%
-  ggplot(aes(x=from, y=to, fill=weight))+
-  geom_tile()
+plot_adj_mat = function(W, border_to = NA, border_from = NA){
+  dat = data.frame(W) %>%
+    mutate(to = row.names(.),
+           from = names(.),
+           from = gsub("X","",from),
+           to = as.numeric(to),
+           from = as.numeric(to)) %>%
+    gather(key, weight, -to, -from) %>%
+    mutate(from = sort(from)) %>%
+    select(-key) %>%
+    mutate(border = ifelse(to == border_to & from == border_from, T, NA))
+  
+  p = dat %>%
+    ggplot(aes(x=from, y=to, fill=weight))+
+    geom_tile(size = 2, aes(color=border)) +
+    scale_color_manual(guide=F, values = c('TRUE' = "red"))
+  return(list(p=p, dat = dat))
+}
+```
+
+```{r}
+out = plot_adj_mat(W)
+print(out$p)
 ```
 
 Suppose we have a task that looks like:
@@ -181,19 +200,8 @@ loop_W
 Such that the adjacency matrix changes to:
 
 ```{r}
-data.frame(loop_W) %>%
-  mutate(to = row.names(.),
-         from = names(.),
-         from = gsub("X","",from),
-         to = as.numeric(to),
-         from = as.numeric(to)) %>%
-  gather(key, weight, -to, -from) %>%
-  mutate(from = sort(from)) %>%
-  select(-key) %>%
-  mutate(border = ifelse(to == 2 & from == 3, T, NA)) %>%
-  ggplot(aes(x=from, y=to, fill=weight, color=border))+
-  geom_tile(size = 2) +
-  scale_color_manual(guide=F, values = c('TRUE' = "red"))
+out = plot_adj_mat(loop_W, border_to=2, border_from=3)
+out$p
 ```
 
 Then activity does not turn off down to 0 but settles at an intermediate value.
