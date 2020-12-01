@@ -17,6 +17,7 @@ source(paste0(helpers_path,'generateSynapticNetwork.R'))
 source(paste0(helpers_path,'run_ucr_glm.R'))
 source(paste0(helpers_path,'run_ext_glm.R'))
 source(paste0(helpers_path,'check_net_resids.R'))
+source('~/Dropbox/PoldrackLab/SRO_Retest_Analyses/code/helper_functions/g_legend.R')
 ```
 
 # Developing intuitions for activity propogation within a network
@@ -390,18 +391,41 @@ round(run_ext_glm(loop_short_net_dat_debug, loop_short_args_dict, task_reg = loo
 
 True adjacency matrix
 
+**Note**: I haven't even considered inhibitory connections yet.
+
 ```{r}
-cur_args_dict$W
+true_am = plot_adj_mat(cur_args_dict$W)
+true_am_plot = true_am$p+
+  scale_fill_gradient(limits=c(-1,1)) +
+  ggtitle("True")+
+  theme(legend.position = "bottom")
+
+mylegend<-g_legend(true_am_plot)
+
 ```
 
 Correlation matrix from observed time series
 
 ```{r}
-round(cor(t(net_dat)), 4)
+methods = c("pearson", "spearman", "kendall")
+ps = list()
+for(i in 1:length(methods)){
+  ps[[i]] = true_am_plot +
+    theme(legend.position = "none")+
+    ggtitle("True")
+  ps[[i+length(methods)]] = plot_adj_mat(cor(t(net_dat), method=methods[i]))$p +
+    scale_fill_gradient(limits=c(-1,1))+
+    ggtitle(methods[i])+
+    theme(legend.position = "none")
+  ps[[i+2*length(methods)]] = plot_adj_mat(ppcor::pcor(t(net_dat), method=methods[i])$estimate)$p +
+    scale_fill_gradient(limits=c(-1,1)) +
+    ggtitle(methods[i])+
+    theme(legend.position = "none")
+}
 ```
 
 ```{r}
-round(ppcor::pcor(t(net_dat), method="kendall")$estimate, 4)
+grid.arrange(arrangeGrob(grobs = ps, nrow=3), mylegend, nrow=2, heights = c(10,1))
 ```
 
 **How are the estimates of ext_glm affected if you use the estimated adjacency matrix**
