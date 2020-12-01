@@ -6,6 +6,9 @@ title: "RL simulation and parameter recovery with Stan III: Model comparison"
 
 ```{r}
 source('/Users/zeynepenkavi/Dropbox/RangelLab/BayesianStats/helpers/demo_QlearningSimulation.R')
+library(rstan)
+options(mc.cores = parallel::detectCores())
+rstan_options(auto_write = TRUE)
 library(loo)
 library(caret)
 library(bridgesampling)
@@ -45,7 +48,6 @@ data = data.frame(choice = sim_data$choices, outcome = sim_data$feedback)
 ```
 
 ```{r results="hide"}
-
 m_oneAlpha = stan_model('../../stanModels/qLearning/QLearning_cv_oneAlpha.stan')
 ELPD_oneAlpha  = k_fold(m_oneAlpha, testIndices, simData = data, dataVarNames = c("choice", "outcome"), logLikVarName = "log_lik")
 

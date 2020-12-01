@@ -376,6 +376,8 @@ print("Corrected estimates:")
 round(run_ext_glm(loop_short_net_dat_debug, loop_short_args_dict, task_reg = loop_short_args_dict$I[2,])$ext_task_betas, 4)
 ```
 
+# Potential applicability issues
+
 **What does the adjacency matrix look like if you estimate it from timeseries?**
 
 True adjacency matrix

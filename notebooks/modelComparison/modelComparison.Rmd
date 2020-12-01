@@ -1,5 +1,5 @@
 ---
-title: "2 methods for model comparison in Bayesian inference"
+title: "Two methods for model comparison in Bayesian inference"
 ---
 
 ```{r}
@@ -70,7 +70,7 @@ grid.arrange(p1, p2, p3, p4, ncol=2, nrow = 2)
 rm(p1, p2, p3, p4)
 ```
 
-# Full Bayesian Approach
+# Bayesian Model comparison (BMC)
 
 Computing posterior model probabilities
 
@@ -122,7 +122,7 @@ data.frame(log_p_y_m = c(b_m1$logml, b_m2$logml),
 ```
 
 
-# Posterior predictive checks
+# Posterior predictive checks (PPC)
 
 LOO-CV and K-fold
 
@@ -187,3 +187,11 @@ d = sum(m1_elpd) - sum(m2_elpd)
 d_sd = sqrt(250)*sd(m1_elpd - m2_elpd)
 1-pnorm(d/d_sd)
 ```
+
+# More data
+
+Try both methods on multiple datasets.
+
+## BMC 
+
+## PPC
