@@ -440,30 +440,51 @@ args_dicts = list()
 for(i in 1:length(methods)){
   args_dicts[[i]] = cur_args_dict
   args_dicts[[i]]$W = cor(t(net_dat), method=methods[i])
+  args_dicts[[i]]$W_method = paste0(methods[i], "-full")
   args_dicts[[i+length(methods)]] = cur_args_dict
   args_dicts[[i+length(methods)]]$W = ppcor::pcor(t(net_dat), method=methods[i])$estimate
+  args_dicts[[i+length(methods)]]$W_method = paste0(methods[i], "-partial")
+
 }
 ```
 
 ```{r}
-types = c("full", "partial")
+for(i in 1:length(args_dicts)){
+  print(paste0("Stim node is: ", args_dicts[[i]]$stim_node))
+  print(paste0("Corrected estimates using: ", args_dicts[[i]]$W_method))
+  print(round(run_ext_glm(net_dat, args_dicts[[i]], task_reg = cur_args_dict$I[1,])$ext_task_betas, 4))
+}
 
+```
+
+Does using different connectivity matrices affect other scenarios?
+
+```{r}
+sub1 = hub_args_dict
+sub2 = hub_net_dat
+
+args_dicts = list()
 for(i in 1:length(methods)){
-  for(j in 1:length(types)){
-    print(paste0("Stim node is: ", args_dicts[[i*j]]$stim_node))
-    print(paste0("Corrected estimates using: ", methods[i], "-", types[j]))
-    print(round(run_ext_glm(net_dat, args_dicts[[i*j]], task_reg = cur_args_dict$I[1,])$ext_task_betas, 4))
-  }
+  args_dicts[[i]] = sub1
+  args_dicts[[i]]$W = cor(t(sub2), method=methods[i])
+  args_dicts[[i]]$W_method = paste0(methods[i], "-full")
+  args_dicts[[i+length(methods)]] = sub1
+  args_dicts[[i+length(methods)]]$W = ppcor::pcor(t(sub2), method=methods[i])$estimate
+  args_dicts[[i+length(methods)]]$W_method = paste0(methods[i], "-partial")
+
+}
+
+for(i in 1:length(args_dicts)){
+  print(paste0("Stim node is: ", args_dicts[[i]]$stim_node))
+  print(paste0("Corrected estimates using: ", args_dicts[[i]]$W_method))
+  print(round(run_ext_glm(sub2, args_dicts[[i]], task_reg = sub1$I[2,])$ext_task_betas, 4))
 }
 ```
 
-Need to fix this before looking at the above
+Good news? Using different adjacency matrices doesn't seem to affect the results too much. How come?
+
+What do the design matrices in each model look like? What regressors should be affected?
 
 ```{r}
-dim(net_dat_debug$Enodes)
-round(run_ext_glm(net_dat_debug, cur_args_dict, task_reg = cur_args_dict$I[1,])$ext_task_betas, 4)
-```
 
-```{r}
-round(run_ext_glm(net_dat, cur_args_dict, task_reg = cur_args_dict$I[1,])$ext_task_betas, 4)
 ```
