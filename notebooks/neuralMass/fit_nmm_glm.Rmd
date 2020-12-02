@@ -17,6 +17,7 @@ source(paste0(helpers_path,'generateSynapticNetwork.R'))
 source(paste0(helpers_path,'run_ucr_glm.R'))
 source(paste0(helpers_path,'run_ext_glm.R'))
 source(paste0(helpers_path,'check_net_resids.R'))
+source(paste0(helpers_path,'plot_adj_mat.R'))
 source('~/Dropbox/PoldrackLab/SRO_Retest_Analyses/code/helper_functions/g_legend.R')
 ```
 
@@ -57,27 +58,6 @@ Adjacency matrix for the above minimal network looks like:
 W<-matrix(0, 3, 3)
 W[as.matrix(edges[,2:1])] <- edges$weight
 W
-```
-
-```{r}
-plot_adj_mat = function(W, border_to = NA, border_from = NA){
-  dat = data.frame(W) %>%
-    mutate(to = row.names(.),
-           from = names(.),
-           from = gsub("X","",from),
-           to = as.numeric(to),
-           from = as.numeric(to)) %>%
-    gather(key, weight, -to, -from) %>%
-    mutate(from = sort(from)) %>%
-    select(-key) %>%
-    mutate(border = ifelse(to == border_to & from == border_from, T, NA))
-  
-  p = dat %>%
-    ggplot(aes(x=from, y=to, fill=weight))+
-    geom_tile(size = 2, aes(color=border)) +
-    scale_color_manual(guide=F, values = c('TRUE' = "red"))
-  return(list(p=p, dat = dat))
-}
 ```
 
 ```{r}
