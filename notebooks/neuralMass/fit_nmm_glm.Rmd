@@ -387,18 +387,19 @@ round(run_ext_glm(loop_short_net_dat_debug, loop_short_args_dict, task_reg = loo
 
 # Potential applicability issues
 
-**What does the adjacency matrix look like if you estimate it from timeseries?**
+## Observable vs true adjacency matrix
 
-True adjacency matrix
+What does the adjacency matrix look like if you estimate it from timeseries?
 
 **Note**: I haven't even considered inhibitory connections yet.
+
+True adjacency matrix
 
 ```{r}
 true_am = plot_adj_mat(cur_args_dict$W)
 true_am_plot = true_am$p+
   scale_fill_gradient(limits=c(-1,1)) +
-  ggtitle("True")+
-  theme(legend.position = "bottom")
+  ggtitle("True")
 
 mylegend<-g_legend(true_am_plot)
 
@@ -424,13 +425,45 @@ for(i in 1:length(methods)){
 }
 ```
 
-```{r}
-grid.arrange(arrangeGrob(grobs = ps, nrow=3), mylegend, nrow=2, heights = c(10,1))
+All three plots in first row are identical and third row is partial correlations.
+
+```{r fig.asp=.5, fig.width=6}
+grid.arrange(arrangeGrob(grobs = ps, nrow=3), mylegend, ncol=2, widths = c(10,1))
 ```
 
-**How are the estimates of ext_glm affected if you use the estimated adjacency matrix**
+## Effect on ext_glm estimates
+
+How are the estimates of ext_glm affected if you use the estimated adjacency matrix?
 
 ```{r}
-
+args_dicts = list()
+for(i in 1:length(methods)){
+  args_dicts[[i]] = cur_args_dict
+  args_dicts[[i]]$W = cor(t(net_dat), method=methods[i])
+  args_dicts[[i+length(methods)]] = cur_args_dict
+  args_dicts[[i+length(methods)]]$W = ppcor::pcor(t(net_dat), method=methods[i])$estimate
+}
 ```
 
+```{r}
+types = c("full", "partial")
+
+for(i in 1:length(methods)){
+  for(j in 1:length(types)){
+    print(paste0("Stim node is: ", args_dicts[[i*j]]$stim_node))
+    print(paste0("Corrected estimates using: ", methods[i], "-", types[j]))
+    print(round(run_ext_glm(net_dat, args_dicts[[i*j]], task_reg = cur_args_dict$I[1,])$ext_task_betas, 4))
+  }
+}
+```
+
+Need to fix this before looking at the above
+
+```{r}
+dim(net_dat_debug$Enodes)
+round(run_ext_glm(net_dat_debug, cur_args_dict, task_reg = cur_args_dict$I[1,])$ext_task_betas, 4)
+```
+
+```{r}
+round(run_ext_glm(net_dat, cur_args_dict, task_reg = cur_args_dict$I[1,])$ext_task_betas, 4)
+```
