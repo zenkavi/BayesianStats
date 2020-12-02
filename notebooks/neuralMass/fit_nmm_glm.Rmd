@@ -526,7 +526,7 @@ round(run_ucr_glm(net_dat_debug, task_reg = cur_args_dict$I[1,])$ucr_task_betas,
 print("Corrected estimates with network activity")
 round(run_ext_glm(net_dat_debug, cur_args_dict, task_reg = cur_args_dict$I[1,])$ext_task_betas, 4)
 print("Corrected estimates without network activity")
-round(run_ext_glm(net_dat_debug, cur_args_dict, task_reg = cur_args_dict$I[1,], net_act = FALSE)$ext_task_betas, 4)
+round(run_ext_glm(net_dat_debug, cur_args_dict, task_reg = cur_args_dict$I[1,], inc_net_act = FALSE)$ext_task_betas, 4)
 ```
 
 Does the addition of the network activity regressors improve the model significantly? It does. But the parameter estimates for task involvement do not change drastically compared to not including them.
@@ -574,5 +574,5 @@ round(run_ucr_glm(big_W_net_dat_debug, task_reg = big_W_args_dict$I[1,])$ucr_tas
 print("Corrected estimates with network activity")
 round(run_ext_glm(big_W_net_dat_debug, big_W_args_dict, task_reg = big_W_args_dict$I[1,])$ext_task_betas, 4)
 print("Corrected estimates without network activity")
-round(run_ext_glm(big_W_net_dat_debug, big_W_args_dict, task_reg = big_W_args_dict$I[1,], net_act = FALSE)$ext_task_betas, 4)
+round(run_ext_glm(big_W_net_dat_debug, big_W_args_dict, task_reg = big_W_args_dict$I[1,], inc_net_act = FALSE)$ext_task_betas, 4)
 ```
