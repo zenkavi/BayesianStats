@@ -9,9 +9,12 @@ library(rstan)
 library(bridgesampling)
 library(caret)
 library(loo)
+source('~/Dropbox/RangelLab/BayesianStats/helpers/k_fold.R')
 ```
 
 # True model
+
+`y = .5*x1 + noise` where `noise ~ N(0, .5)`
 
 ```{r}
 set.seed(23423413)
@@ -21,7 +24,7 @@ data = data.frame(x1 = rnorm(250, 0, 1),
 
 data = data %>% 
   mutate(noise = rnorm(250, mean = 0, sd = .5),
-         y = x1+noise)
+         y = .5*x1+noise)
 ```
 
 # Frequentist comparison
@@ -39,9 +42,13 @@ summary(m1)
 summary(m2)
 ```
 
+Adding `x2` to the model does not lead to a significant improvement (therefore simpler model with only `x1` would be chosen).
+
 ```{r}
 anova(m1, m2)
 ```
+
+Plotting `y` against both `x1` and `x2` as well as the predictions from the simpler and more complex models. Because there is no relationship between `x2` and `y` the plots for both model predictions look very similar to the relationship between `x1` and `y`.
 
 ```{r}
 p1 = data %>% 
@@ -72,17 +79,19 @@ rm(p1, p2, p3, p4)
 
 # Bayesian Model comparison (BMC)
 
-Computing posterior model probabilities
+Computing posterior model probabilities first for model with only `x1`
 
 ```{r}
 m1_stan = stan_model("../../stanModels/modelComparison/fit_m1.stan")
-m1_stanfit = sampling(m1_stan, data = list(N = nrow(data), y=data$y, x1 = data$x1))
+m1_stanfit = sampling(m1_stan, data = list(N = nrow(data), y=data$y, x1 = data$x1),
+                      show_messages=FALSE, verbose=FALSE, refresh= 0)
 ```
+
+`b1` is the coefficient for `x1` and `sigma` is the sd of `noise`.
 
 ```{r}
 m1_stanfit
 ```
-
 
 ```{r}
 b_m1 <- bridge_sampler(m1_stanfit, silent = TRUE)
@@ -90,8 +99,11 @@ b_m1 <- bridge_sampler(m1_stanfit, silent = TRUE)
 
 ```{r}
 m2_stan = stan_model("../../stanModels/modelComparison/fit_m2.stan")
-m2_stanfit = sampling(m2_stan, data = list(N = nrow(data), y=data$y, x1 = data$x1, x2=data$x2))
+m2_stanfit = sampling(m2_stan, data = list(N = nrow(data), y=data$y, x1 = data$x1, x2=data$x2),
+                      show_messages=FALSE, verbose=FALSE, refresh= 0)
 ```
+
+`b1` and `b2` are the coefficients for `x1`and `x2`, `sigma` is the sd of `noise`.
 
 ```{r}
 m2_stanfit
@@ -121,45 +133,12 @@ data.frame(log_p_y_m = c(b_m1$logml, b_m2$logml),
   ylab("p(m|y)")
 ```
 
-
 # Posterior predictive checks (PPC)
 
 LOO-CV and K-fold
 
 ```{r}
 testIndices = createFolds(data$y, k = 5, list=TRUE, returnTrain = FALSE)
-```
-
-```{r}
-k_fold = function(aModel, testIndices, simData, dataVarNames, logLikVarName){
-  
-  numFolds = length(testIndices)
-  
-  #expected log pointwise predictive density
-  elpd = 0
-  
-  for(i in 1:numFolds){
-    cur_ind = testIndices[[i]]
-    
-    m_data = list(N_train = nrow(simData) - length(cur_ind), N_test = length(cur_ind))
-    
-    for (j in 1:length(dataVarNames)){
-      m_data[[paste0(dataVarNames[j], '_train')]] = simData[-cur_ind, dataVarNames[j]]
-      m_data[[paste0(dataVarNames[j], '_test')]] = simData[cur_ind, dataVarNames[j]]
-    }
-    
-    fit = sampling(aModel, data=m_data, show_messages=FALSE, verbose=FALSE, refresh= 0)
-    
-    fold_llpd = extract_log_lik(fit, logLikVarName) #requires loo
-    
-    fold_llpd_means = colMeans(fold_llpd) #mean loglik for each left out train datapoint across samples
-    #fold_elpd_increment = sum(fold_llpd_means) #sum of mean logliks of each train datapoint
-    #elpd = elpd+fold_elpd_increment 
-    elpd = c(elpd, fold_llpd_means)
-  }
-  
-  return(elpd)
-}
 ```
 
 ```{r}
@@ -180,7 +159,7 @@ m2_elpd = k_fold(m2_stan_cv, testIndices, simData = data, dataVarNames = c("x1",
 sum(m2_elpd)
 ```
 
-Comparison of elpds:
+Comparison of elpds using a frequentist perspective. Is the difference between the elpd's suggesting as 'strong' of a difference as the posterior model probabilities? 
 
 ```{r}
 d = sum(m1_elpd) - sum(m2_elpd)
@@ -188,10 +167,59 @@ d_sd = sqrt(250)*sd(m1_elpd - m2_elpd)
 1-pnorm(d/d_sd)
 ```
 
-# More data
+# Testing with more data
 
 Try both methods on multiple datasets.
 
 ## BMC 
 
+Iterate 100 times
+Create fake data with 250 datapoints
+Compute posterior model probabilities for both models for each iteration
+Plot bar graph above but this time with standard errors across the iterations
+
+```{r}
+
+make_fake_data = function(n=250, b1 = .5, sigma = .5){
+  data = data.frame(x1 = rnorm(n, 0, 1),
+                    x2 = rnorm(n, 0, 1))
+  
+  data = data %>% 
+    mutate(noise = rnorm(n, mean = 0, sd = sigma),
+           y = b1*x1+noise)
+  return(data)
+}
+
+get_m_post_probs = function(data){
+  
+  if(!exists(m1_stan)){
+    m1_stan = stan_model("../../stanModels/modelComparison/fit_m1.stan")
+  }
+  m1_stanfit = sampling(m1_stan, data = list(N = nrow(data), y=data$y, x1 = data$x1),
+                      show_messages=FALSE, verbose=FALSE, refresh= 0) 
+  
+  b_m1 <- bridge_sampler(m1_stanfit, silent = TRUE)
+  
+  
+  if(!exists(m2_stan)){
+      m2_stan = stan_model("../../stanModels/modelComparison/fit_m2.stan")
+  }
+  m2_stanfit = sampling(m2_stan, data = list(N = nrow(data), y=data$y, x1 = data$x1, x2=data$x2),
+                        show_messages=FALSE, verbose=FALSE, refresh= 0)
+  b_m2 <- bridge_sampler(m2_stanfit, silent = TRUE)
+  post_prob(b_m1, b_m2)
+}
+
+```
+
 ## PPC
+
+Iterate 100 times
+Create fake data with 250 datapoints
+Compute ELPDs for both models for each iteration
+Compute p-value for each ELPD difference across iterations
+Plot bar graph with ELPDs with standard errors across iterations
+
+```{r}
+
+```
