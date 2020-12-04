@@ -161,6 +161,8 @@ sum(m2_elpd)
 
 Comparison of elpds using a frequentist perspective. Is the difference between the elpd's suggesting as 'strong' of a difference as the posterior model probabilities? 
 
+Testing if the m1_elpd is lower than m2_elpd
+
 ```{r}
 d = sum(m1_elpd) - sum(m2_elpd)
 d_sd = sqrt(250)*sd(m1_elpd - m2_elpd)
@@ -189,27 +191,49 @@ make_fake_data = function(n=250, b1 = .5, sigma = .5){
            y = b1*x1+noise)
   return(data)
 }
+```
 
+```{r}
 get_m_post_probs = function(data){
   
-  if(!exists(m1_stan)){
+  if(!exists("m1_stan")){
     m1_stan = stan_model("../../stanModels/modelComparison/fit_m1.stan")
   }
   m1_stanfit = sampling(m1_stan, data = list(N = nrow(data), y=data$y, x1 = data$x1),
                       show_messages=FALSE, verbose=FALSE, refresh= 0) 
-  
   b_m1 <- bridge_sampler(m1_stanfit, silent = TRUE)
   
   
-  if(!exists(m2_stan)){
+  if(!exists("m2_stan")){
       m2_stan = stan_model("../../stanModels/modelComparison/fit_m2.stan")
   }
   m2_stanfit = sampling(m2_stan, data = list(N = nrow(data), y=data$y, x1 = data$x1, x2=data$x2),
                         show_messages=FALSE, verbose=FALSE, refresh= 0)
   b_m2 <- bridge_sampler(m2_stanfit, silent = TRUE)
-  post_prob(b_m1, b_m2)
+  
+  return(post_prob(b_m1, b_m2))
 }
+```
 
+```{r}
+out = data.frame()
+n_int = 100
+for(i in 1:n_int){
+  data = make_fake_data()
+  tmp = get_m_post_probs(data)
+  tmp = t(as.data.frame(tmp))
+  out = rbind(out, tmp)
+  i = i+1
+}
+```
+
+```{r}
+out %>%
+  gather(key, value) %>%
+  ggplot(aes(key, value))+
+  geom_boxplot()+
+  xlab("")+
+  ylab("p(m|y)")
 ```
 
 ## PPC
@@ -221,5 +245,44 @@ Compute p-value for each ELPD difference across iterations
 Plot bar graph with ELPDs with standard errors across iterations
 
 ```{r}
+get_elpds = function(data){
+  testIndices = createFolds(data$y, k = 5, list=TRUE, returnTrain = FALSE)
+  
+  if(!exists("m1_stan_cv")){
+      m1_stan_cv = stan_model("../../stanModels/modelComparison/fit_m1_cv.stan")
+  }
+  
+  m1_elpd = k_fold(m1_stan_cv, testIndices, simData = data, dataVarNames = c("x1", "y"), logLikVarName = "logLikelihood")
+  m1_elpd_sum = sum(m1_elpd)
+  
+  if(!exists("m2_stan_cv")){
+    m2_stan_cv = stan_model("../../stanModels/modelComparison/fit_m2_cv.stan")
+  }
+  
+  m2_elpd = k_fold(m2_stan_cv, testIndices, simData = data, dataVarNames = c("x1","x2", "y"), logLikVarName = "logLikelihood")
+  m2_elpd_sum = sum(m2_elpd)
+  
+  d = sum(m1_elpd) - sum(m2_elpd)
+  d_sd = sqrt(250)*sd(m1_elpd - m2_elpd)
+  pval = 1-pnorm(d/d_sd)
+  
+  return(data.frame(m1_elpd_sum = m1_elpd_sum,
+                    m2_elpd_sum = m2_elpd_sum,
+                    pval = pval))
+}
+```
 
+```{r}
+out2 = data.frame()
+n_int = 100
+for(i in 1:n_int){
+  data = make_fake_data()
+  tmp = get_elpds(data)
+  out2 = rbind(out2, tmp)
+  i = i+1
+}
+```
+
+```{r}
+out2
 ```
