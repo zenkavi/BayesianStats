@@ -19,12 +19,17 @@ source('~/Dropbox/RangelLab/BayesianStats/helpers/k_fold.R')
 ```{r}
 set.seed(23423413)
 
-data = data.frame(x1 = rnorm(250, 0, 1),
-                  x2 = rnorm(250, 0, 1))
+make_fake_data = function(n=250, b1 = .5, sigma = .5){
+  data = data.frame(x1 = rnorm(n, 0, 1),
+                    x2 = rnorm(n, 0, 1))
+  
+  data = data %>% 
+    mutate(noise = rnorm(n, mean = 0, sd = sigma),
+           y = b1*x1+noise)
+  return(data)
+}
 
-data = data %>% 
-  mutate(noise = rnorm(250, mean = 0, sd = .5),
-         y = .5*x1+noise)
+data = make_fake_data(n=2500)
 ```
 
 # Frequentist comparison
@@ -117,21 +122,6 @@ b_m2 <- bridge_sampler(m2_stanfit, silent = TRUE)
 post_prob(b_m1, b_m2)
 ```
 
-Note: there are no error bars! Those are just points.
-
-```{r}
-data.frame(log_p_y_m = c(b_m1$logml, b_m2$logml),
-           model = c("true", "false")) %>%
-  mutate(p_y_m = exp(log_p_y_m),
-         denom = sum(p_y_m),
-         p_m_y = p_y_m/denom,
-         model = factor(model, levels = c("true", "false"))) %>%
-  ggplot(aes(x=model, y=p_m_y))+
-  geom_bar(stat="identity")+
-  geom_point()+
-  xlab("")+
-  ylab("p(m|y)")
-```
 
 # Posterior predictive checks (PPC)
 
@@ -179,19 +169,6 @@ Iterate 100 times
 Create fake data with 250 datapoints
 Compute posterior model probabilities for both models for each iteration
 Plot bar graph above but this time with standard errors across the iterations
-
-```{r}
-
-make_fake_data = function(n=250, b1 = .5, sigma = .5){
-  data = data.frame(x1 = rnorm(n, 0, 1),
-                    x2 = rnorm(n, 0, 1))
-  
-  data = data %>% 
-    mutate(noise = rnorm(n, mean = 0, sd = sigma),
-           y = b1*x1+noise)
-  return(data)
-}
-```
 
 ```{r}
 get_m_post_probs = function(data){
@@ -272,17 +249,28 @@ get_elpds = function(data){
 }
 ```
 
-```{r}
-out2 = data.frame()
+```{r eval=FALSE}
+# out2 =   data.frame()
 n_int = 100
-for(i in 1:n_int){
-  data = make_fake_data()
-  tmp = get_elpds(data)
-  out2 = rbind(out2, tmp)
-  i = i+1
-}
+# for(i in 1:n_int){
+#   data = make_fake_data(n=2500)
+#   tmp = get_elpds(data)
+#   out2 = rbind(out2, tmp)
+#   i = i+1
+# }
 ```
 
 ```{r}
-out2
+out2 %>%
+  ggplot(aes(pval))+
+  geom_histogram()+
+  geom_vline(aes(xintercept = .05))
+```
+
+Proportion of samples that have significantly different ELPD's:
+
+```{r}
+out2 %>%
+  mutate(sigdiff = ifelse(pval<.05, 1, 0)) %>%
+  summarise(sigdiffprop = mean(sigdiff))
 ```
