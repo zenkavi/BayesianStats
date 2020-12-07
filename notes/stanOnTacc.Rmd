@@ -1,0 +1,10 @@
+Stan on a cluster pipeline notes
+
+Data prepation R script
+Model text file
+Model compilation and running R script
+Model output processing script
+Batch script parallelizing the model fit step
+
+From https://mc-stan.org/users/documentation/case-studies/reduce_sum_tutorial.html
+"If a model has a large number of arguments that are either defined in the parameters block, transformed parameters block, or model block, or do not do very much computation inside the reduce function, or does not get lucky with caching, the speedup will be much more limited."

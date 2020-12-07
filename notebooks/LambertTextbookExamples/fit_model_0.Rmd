@@ -21,7 +21,7 @@ Y = rnorm(10, 1.5, .2)
 Compile and run the MCMC
 
 ```{r}
-fit = stan('../../stanModels/LambertTextbookExamples/model_0.stan', iter=200, chains=4,
+fit = stan('stanModels/LambertTextbookExamples/model_0.stan', iter=200, chains=4,
            data = list(Y=Y))
 ```
 
@@ -61,7 +61,7 @@ X = rnorm(N, 60, 10)
 beta = .3
 sigma = .3
 Y = beta * log(X) + rnorm(N, 0, sigma)
-fit = stan('../stanModels/model_0.1.stan', iter = 200, chains = 4,
+fit = stan('stanModels/model_0.1.stan', iter = 200, chains = 4,
            data = list(Y=Y, X=X, N=N))
 ```
 
@@ -75,7 +75,7 @@ Fit new model with `transformed parameters` block
 
 ```{r}
 Y = rnorm(10, 1.5, .2)
-fit = stan('../stanModels/model_0.2.stan', iter = 200, chains = 4, data= list(Y=Y))
+fit = stan('stanModels/model_0.2.stan', iter = 200, chains = 4, data= list(Y=Y))
 ```
 
 ```{r}
@@ -88,7 +88,7 @@ Creating posterior predictive check variable within `{}` to avoid memory overhea
 
 ```{r}
 Y = rnorm(10, 1.5, .2)
-fit = stan('../stanModels/model_0.3.stan', iter = 200, chains = 4, data= list(Y=Y))
+fit = stan('stanModels/model_0.3.stan', iter = 200, chains = 4, data= list(Y=Y))
 ```
 
 Note lack of `lSimData` variable in the output
@@ -104,7 +104,7 @@ Creating custom probability distributions.
 ```{r}
 N = 4
 X = c(-1.5, 2.3, 0.1, -0.4)
-fit = stan('../stanModels/model_0.4.stan', iter = 200, chains = 4, data= list(N=N, X=X))
+fit = stan('stanModels/model_0.4.stan', iter = 200, chains = 4, data= list(N=N, X=X))
 ```
 
 ```{r}
@@ -129,7 +129,7 @@ require(loo)
 Compare models using `WAIC`
 
 ```{r}
-fit1 = stan('../stanModels/model_0.5.stan', iter=200, chains=4, data=list(N=N, X=X))
+fit1 = stan('stanModels/model_0.5.stan', iter=200, chains=4, data=list(N=N, X=X))
 logLikelihood1 = extract_log_lik(fit1, 'logLikelihood')
 WAIC1 = waic(logLikelihood1)
 ```
@@ -138,7 +138,7 @@ WAIC1
 ```
 
 ```{r}
-fit2 = stan('../stanModels/model_0.6.stan', iter=200, chains=4, data=list(N=N, X=X))
+fit2 = stan('stanModels/model_0.6.stan', iter=200, chains=4, data=list(N=N, X=X))
 logLikelihood2 = extract_log_lik(fit2, 'logLikelihood')
 WAIC2 = waic(logLikelihood2)
 ```
@@ -201,8 +201,8 @@ kFold = function(aModel, testIndices, X){
 ```
 
 ```{r}
-Model1 = stan_model('../stanModels/LambertTextbookExamples/model_0.7.stan')
-Model2 = stan_model('../stanModels/LambertTextbookExamples/model_0.8.stan')
+Model1 = stan_model('stanModels/LambertTextbookExamples/model_0.7.stan')
+Model2 = stan_model('stanModels/LambertTextbookExamples/model_0.8.stan')
 ```
 
 ```{r}
@@ -244,7 +244,7 @@ Example model where the defined parameter `alpha` does not have prior defined in
 ```{r}
 N=4
 Y=c(0,0,1,0)
-fit = stan('../stanModels/model_0.9.stan', iter=200, chains=4, data=list(N=N, Y=Y))
+fit = stan('stanModels/model_0.9.stan', iter=200, chains=4, data=list(N=N, Y=Y))
 ```
 
 ```{r}
@@ -256,7 +256,7 @@ print(fit, probs=c(.25,.5,.75))
 Corrected model where the log probability is correctly updated using the Jacobian
 
 ```{r}
-fit = stan('../stanModels/model_0.10.stan', iter=200, chains=4, data=list(N=N, Y=Y))
+fit = stan('stanModels/model_0.10.stan', iter=200, chains=4, data=list(N=N, Y=Y))
 ```
 
 ```{r}
@@ -293,7 +293,7 @@ state
 ```
 
 ```{r}
-fit = stan('../stanModels/model_0.11.stan', iter=200, chains=4, data=list(X=X, N=N, nStudy=nStudy))
+fit = stan('stanModels/model_0.11.stan', iter=200, chains=4, data=list(X=X, N=N, nStudy=nStudy))
 ```
 
 ```{r}

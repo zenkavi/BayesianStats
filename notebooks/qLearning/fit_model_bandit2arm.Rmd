@@ -9,7 +9,7 @@ Comparison of NUTS and ADVI on 2 armed bandit task model from the [hBayesDM pack
 2 armed bandit task with 100 trials for 20 subjects.
 
 ```{r}
-data = read.table('../stanModels/bandit2arm_exampleData.txt', header = T)
+data = read.table('stanModels/bandit2arm_exampleData.txt', header = T)
 data
 ```
 ```{r}
@@ -42,14 +42,14 @@ outcome = as.matrix(outcome)
 ### NUTS sampler
 
 ```{r}
-fit = stan('../stanModels/bandit2arm_delta.stan', iter=200, chains=4, 
+fit = stan('stanModels/bandit2arm_delta.stan', iter=200, chains=4, 
            data=list(N = N, T = TN, Tsubj = Tsubj, choice = choice, outcome = outcome))
 ```
 
 ### ADVI
 
 ```{r}
-m = stan_model('../stanModels/bandit2arm_delta.stan')
+m = stan_model('stanModels/bandit2arm_delta.stan')
 ```
 
 ```{r}

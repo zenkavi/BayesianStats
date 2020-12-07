@@ -15,7 +15,7 @@ N = rep(aN, K)
 Fit previously defined model
 
 ```{r}
-aModel = stan_model('../stanModels/model_1.4.stan')
+aModel = stan_model('stanModels/model_1.4.stan')
 fit = sampling(aModel, data = list(N=N, K=K, Y=Y), iter=400, chains=4)
 ```
 

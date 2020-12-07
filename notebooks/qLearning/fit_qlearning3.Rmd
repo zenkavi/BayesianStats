@@ -48,26 +48,26 @@ data = data.frame(choice = sim_data$choices, outcome = sim_data$feedback)
 ```
 
 ```{r results="hide"}
-m_oneAlpha = stan_model('../../stanModels/qLearning/QLearning_cv_oneAlpha.stan')
+m_oneAlpha = stan_model('stanModels/qLearning/QLearning_cv_oneAlpha.stan')
 ELPD_oneAlpha  = k_fold(m_oneAlpha, testIndices, simData = data, dataVarNames = c("choice", "outcome"), logLikVarName = "log_lik")
 
 sum(ELPD_oneAlpha)
 ```
 
 ```{r results="hide"}
-m_twoAlphas = stan_model('../../stanModels/qLearning/QLearning_cv_twoAlphas.stan')
+m_twoAlphas = stan_model('stanModels/qLearning/QLearning_cv_twoAlphas.stan')
 ELPD_twoAlphas  = k_fold(m_twoAlphas, testIndices, simData = data, dataVarNames = c("choice", "outcome"), logLikVarName = "log_lik")
 sum(ELPD_twoAlphas)
 ```
 
 ```{r results="hide"}
-m_diffAlphas = stan_model('../../stanModels/qLearning/QLearning_cv_diffAlphas.stan')
+m_diffAlphas = stan_model('stanModels/qLearning/QLearning_cv_diffAlphas.stan')
 ELPD_diffAlphas = k_fold(m_diffAlphas, testIndices, simData = data, dataVarNames = c("choice", "outcome"), logLikVarName = "log_lik")
 sum(ELPD_diffAlphas)
 ```
 
 ```{r results="hide"}
-m_strawMan = stan_model('../../stanModels/qLearning/QLearning_cv_strawMan.stan')
+m_strawMan = stan_model('stanModels/qLearning/QLearning_cv_strawMan.stan')
 ELPD_strawMan = k_fold(m_strawMan, testIndices, simData = data, dataVarNames = c("choice", "outcome"), logLikVarName = "log_lik")
 ```
 
@@ -93,10 +93,10 @@ data.frame(ELPD_strawMan) %>%
 Bridge sampling to calculate marginal likelihood and compute $p(m|y)$ for each model. Based on this [vignette](https://cran.r-project.org/web/packages/bridgesampling/vignettes/bridgesampling_example_stan.html).
 
 ```{r}
-m_true = stan_model('../stanModels/qLearning/QLearning_full_oneAlpha.stan')
-m_twoAlphas = stan_model('../stanModels/qLearning/QLearning_full_twoAlphas.stan')
-m_diffAlphas = stan_model('../stanModels/qLearning/QLearning_full_diffAlphas.stan')
-m_strawMan = stan_model('../stanModels/qLearning/QLearning_full_strawMan.stan')
+m_true = stan_model('stanModels/qLearning/QLearning_full_oneAlpha.stan')
+m_twoAlphas = stan_model('stanModels/qLearning/QLearning_full_twoAlphas.stan')
+m_diffAlphas = stan_model('stanModels/qLearning/QLearning_full_diffAlphas.stan')
+m_strawMan = stan_model('stanModels/qLearning/QLearning_full_strawMan.stan')
 ```
 
 ```{r}

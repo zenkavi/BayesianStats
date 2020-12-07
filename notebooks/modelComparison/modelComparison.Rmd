@@ -87,7 +87,7 @@ rm(p1, p2, p3, p4)
 Computing posterior model probabilities first for model with only `x1`
 
 ```{r}
-m1_stan = stan_model("../../stanModels/modelComparison/fit_m1.stan")
+m1_stan = stan_model("stanModels/modelComparison/fit_m1.stan")
 m1_stanfit = sampling(m1_stan, data = list(N = nrow(data), y=data$y, x1 = data$x1),
                       show_messages=FALSE, verbose=FALSE, refresh= 0)
 ```
@@ -103,7 +103,7 @@ b_m1 <- bridge_sampler(m1_stanfit, silent = TRUE)
 ```
 
 ```{r}
-m2_stan = stan_model("../../stanModels/modelComparison/fit_m2.stan")
+m2_stan = stan_model("stanModels/modelComparison/fit_m2.stan")
 m2_stanfit = sampling(m2_stan, data = list(N = nrow(data), y=data$y, x1 = data$x1, x2=data$x2),
                       show_messages=FALSE, verbose=FALSE, refresh= 0)
 ```
@@ -132,7 +132,7 @@ testIndices = createFolds(data$y, k = 5, list=TRUE, returnTrain = FALSE)
 ```
 
 ```{r}
-m1_stan_cv = stan_model("../../stanModels/modelComparison/fit_m1_cv.stan")
+m1_stan_cv = stan_model("stanModels/modelComparison/fit_m1_cv.stan")
 ```
 
 ```{r results="hide"}
@@ -141,7 +141,7 @@ sum(m1_elpd)
 ```
 
 ```{r}
-m2_stan_cv = stan_model("../../stanModels/modelComparison/fit_m2_cv.stan")
+m2_stan_cv = stan_model("stanModels/modelComparison/fit_m2_cv.stan")
 ```
 
 ```{r results="hide"}
@@ -174,7 +174,7 @@ Plot bar graph above but this time with standard errors across the iterations
 get_m_post_probs = function(data){
   
   if(!exists("m1_stan")){
-    m1_stan = stan_model("../../stanModels/modelComparison/fit_m1.stan")
+    m1_stan = stan_model("stanModels/modelComparison/fit_m1.stan")
   }
   m1_stanfit = sampling(m1_stan, data = list(N = nrow(data), y=data$y, x1 = data$x1),
                       show_messages=FALSE, verbose=FALSE, refresh= 0) 
@@ -182,7 +182,7 @@ get_m_post_probs = function(data){
   
   
   if(!exists("m2_stan")){
-      m2_stan = stan_model("../../stanModels/modelComparison/fit_m2.stan")
+      m2_stan = stan_model("stanModels/modelComparison/fit_m2.stan")
   }
   m2_stanfit = sampling(m2_stan, data = list(N = nrow(data), y=data$y, x1 = data$x1, x2=data$x2),
                         show_messages=FALSE, verbose=FALSE, refresh= 0)
@@ -226,14 +226,14 @@ get_elpds = function(data){
   testIndices = createFolds(data$y, k = 5, list=TRUE, returnTrain = FALSE)
   
   if(!exists("m1_stan_cv")){
-      m1_stan_cv = stan_model("../../stanModels/modelComparison/fit_m1_cv.stan")
+      m1_stan_cv = stan_model("stanModels/modelComparison/fit_m1_cv.stan")
   }
   
   m1_elpd = k_fold(m1_stan_cv, testIndices, simData = data, dataVarNames = c("x1", "y"), logLikVarName = "logLikelihood")
   m1_elpd_sum = sum(m1_elpd)
   
   if(!exists("m2_stan_cv")){
-    m2_stan_cv = stan_model("../../stanModels/modelComparison/fit_m2_cv.stan")
+    m2_stan_cv = stan_model("stanModels/modelComparison/fit_m2_cv.stan")
   }
   
   m2_elpd = k_fold(m2_stan_cv, testIndices, simData = data, dataVarNames = c("x1","x2", "y"), logLikVarName = "logLikelihood")
