@@ -131,7 +131,7 @@ testIndices = createFolds(data$y, k = 5, list=TRUE, returnTrain = FALSE)
 ```
 
 ```{r}
-m1_stan_cv = stan_model("stanModels/modelComparison/fit_m1_cv.stan")
+m1_stan_cv = stan_model("stanModels/fit_m1_cv.stan")
 ```
 
 ```{r results="hide"}
@@ -140,7 +140,7 @@ sum(m1_elpd)
 ```
 
 ```{r}
-m2_stan_cv = stan_model("stanModels/modelComparison/fit_m2_cv.stan")
+m2_stan_cv = stan_model("stanModels/fit_m2_cv.stan")
 ```
 
 ```{r results="hide"}
@@ -153,9 +153,16 @@ Comparison of elpds using a frequentist perspective. Is the difference between t
 Testing if the m1_elpd is lower than m2_elpd
 
 ```{r}
-d = sum(m1_elpd) - sum(m2_elpd)
-d_sd = sqrt(250)*sd(m1_elpd - m2_elpd)
-1-pnorm(d/d_sd)
+better_mod= m2_elpd
+worse_mod = m1_elpd
+
+get_elpd_pval = function(better_mod, worse_mod, N){
+  d = sum(better_mod) - sum(worse_mod)
+  d_sd = sqrt(N)*sd(better_mod - worse_mod)
+  return(1-pnorm(d/d_sd))
+}
+
+get_elpd_pval(better_mod, worse_mod, N=nrow(data))
 ```
 
 # Testing with more data [TO BE MOVED TO CLUSTER]
