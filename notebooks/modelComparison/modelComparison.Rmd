@@ -4,7 +4,6 @@ title: "Two methods for model comparison in Bayesian inference"
 
 ```{r}
 library(gridExtra)
-# library(cmdstanr)
 library(rstan)
 library(bridgesampling)
 library(caret)
@@ -14,22 +13,22 @@ source('~/Dropbox/RangelLab/BayesianStats/helpers/k_fold.R')
 
 # True model
 
-`y = .5*x1 + noise` where `noise ~ N(0, .5)`
+`y = .5*x1 + .7*x2 + noise` where `noise ~ N(0, .5)`
 
 ```{r}
 set.seed(23423413)
 
-make_fake_data = function(n=250, b1 = .5, sigma = .5){
+make_fake_data = function(n=250, bs =c(.5, .7), sigma = .5){
   data = data.frame(x1 = rnorm(n, 0, 1),
                     x2 = rnorm(n, 0, 1))
   
   data = data %>% 
     mutate(noise = rnorm(n, mean = 0, sd = sigma),
-           y = b1*x1+noise)
+           y = bs[1]*x1+bs[2]*x2+noise)
   return(data)
 }
 
-data = make_fake_data(n=2500)
+data = make_fake_data(n=500)
 ```
 
 # Frequentist comparison
@@ -53,7 +52,7 @@ Adding `x2` to the model does not lead to a significant improvement (therefore s
 anova(m1, m2)
 ```
 
-Plotting `y` against both `x1` and `x2` as well as the predictions from the simpler and more complex models. Because there is no relationship between `x2` and `y` the plots for both model predictions look very similar to the relationship between `x1` and `y`.
+Plotting `y` against both `x1` and `x2` as well as the predictions from the simpler and more complex models. 
 
 ```{r}
 p1 = data %>% 
@@ -87,7 +86,7 @@ rm(p1, p2, p3, p4)
 Computing posterior model probabilities first for model with only `x1`
 
 ```{r}
-m1_stan = stan_model("stanModels/modelComparison/fit_m1.stan")
+m1_stan = stan_model("./stanModels/fit_m1.stan")
 m1_stanfit = sampling(m1_stan, data = list(N = nrow(data), y=data$y, x1 = data$x1),
                       show_messages=FALSE, verbose=FALSE, refresh= 0)
 ```
@@ -103,7 +102,7 @@ b_m1 <- bridge_sampler(m1_stanfit, silent = TRUE)
 ```
 
 ```{r}
-m2_stan = stan_model("stanModels/modelComparison/fit_m2.stan")
+m2_stan = stan_model("stanModels/fit_m2.stan")
 m2_stanfit = sampling(m2_stan, data = list(N = nrow(data), y=data$y, x1 = data$x1, x2=data$x2),
                       show_messages=FALSE, verbose=FALSE, refresh= 0)
 ```
@@ -159,7 +158,7 @@ d_sd = sqrt(250)*sd(m1_elpd - m2_elpd)
 1-pnorm(d/d_sd)
 ```
 
-# Testing with more data
+# Testing with more data [TO BE MOVED TO CLUSTER]
 
 Try both methods on multiple datasets.
 

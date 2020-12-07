@@ -21,7 +21,7 @@ Y = rnorm(10, 1.5, .2)
 Compile and run the MCMC
 
 ```{r}
-fit = stan('stanModels/LambertTextbookExamples/model_0.stan', iter=200, chains=4,
+fit = stan('stanModels/model_0.stan', iter=200, chains=4,
            data = list(Y=Y))
 ```
 
@@ -201,8 +201,8 @@ kFold = function(aModel, testIndices, X){
 ```
 
 ```{r}
-Model1 = stan_model('stanModels/LambertTextbookExamples/model_0.7.stan')
-Model2 = stan_model('stanModels/LambertTextbookExamples/model_0.8.stan')
+Model1 = stan_model('stanModels/model_0.7.stan')
+Model2 = stan_model('stanModels/model_0.8.stan')
 ```
 
 ```{r}

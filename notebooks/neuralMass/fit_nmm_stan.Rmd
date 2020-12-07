@@ -115,7 +115,7 @@ nmm_data = list(N_TS = dim(net_dat)[2],
 ```
 
 ```{r}
-mod = cmdstan_model("stanModels/neuralMass/nmm_ode.stan")
+mod = cmdstan_model("stanModels/nmm_ode.stan")
 ```
 
 This is insanely slow. 
@@ -144,7 +144,7 @@ fit$summary()
 Estimates are almost identical using `nmm_ode2.stan` where the states are not estimated are parameters. But the fitting is not faster either.
 
 ```{r eval=FALSE}
-mod2 = cmdstan_model("stanModels/neuralMass/nmm_ode2.stan")
+mod2 = cmdstan_model("stanModels/nmm_ode2.stan")
 ```
 
 ```{r eval=FALSE}

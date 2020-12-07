@@ -65,7 +65,7 @@ m_data = list(T = TN, choice = choice, outcome = outcome)
 Priors: `beta(1,1)` for `alpha` and `gamma(1,2)` for `beta`
 
 ```{r}
-m = stan_model('stanModels/qLearning/QLearning_singleSubject.stan')
+m = stan_model('stanModels/QLearning_singleSubject.stan')
 ```
 
 ```{r}

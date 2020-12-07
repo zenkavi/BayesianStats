@@ -9,7 +9,7 @@ library(cmdstanr)
 ```
 
 ```{r}
-sim = cmdstan_model("stanModels/stanCaseStudies/sho_stim.stan")
+sim = cmdstan_model("stanModels/sho_stim.stan")
 ```
 
 ```{r}
