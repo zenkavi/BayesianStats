@@ -180,7 +180,7 @@ Plot bar graph above but this time with standard errors across the iterations
 get_m_post_probs = function(data){
   
   if(!exists("m1_stan")){
-    m1_stan = stan_model("stanModels/modelComparison/fit_m1.stan")
+    m1_stan = stan_model("stanModels/fit_m1.stan")
   }
   m1_stanfit = sampling(m1_stan, data = list(N = nrow(data), y=data$y, x1 = data$x1),
                       show_messages=FALSE, verbose=FALSE, refresh= 0) 
@@ -188,7 +188,7 @@ get_m_post_probs = function(data){
   
   
   if(!exists("m2_stan")){
-      m2_stan = stan_model("stanModels/modelComparison/fit_m2.stan")
+      m2_stan = stan_model("stanModels/fit_m2.stan")
   }
   m2_stanfit = sampling(m2_stan, data = list(N = nrow(data), y=data$y, x1 = data$x1, x2=data$x2),
                         show_messages=FALSE, verbose=FALSE, refresh= 0)
@@ -232,22 +232,20 @@ get_elpds = function(data){
   testIndices = createFolds(data$y, k = 5, list=TRUE, returnTrain = FALSE)
   
   if(!exists("m1_stan_cv")){
-      m1_stan_cv = stan_model("stanModels/modelComparison/fit_m1_cv.stan")
+      m1_stan_cv = stan_model("stanModels/fit_m1_cv.stan")
   }
   
   m1_elpd = k_fold(m1_stan_cv, testIndices, simData = data, dataVarNames = c("x1", "y"), logLikVarName = "logLikelihood")
   m1_elpd_sum = sum(m1_elpd)
   
   if(!exists("m2_stan_cv")){
-    m2_stan_cv = stan_model("stanModels/modelComparison/fit_m2_cv.stan")
+    m2_stan_cv = stan_model("stanModels/fit_m2_cv.stan")
   }
   
   m2_elpd = k_fold(m2_stan_cv, testIndices, simData = data, dataVarNames = c("x1","x2", "y"), logLikVarName = "logLikelihood")
   m2_elpd_sum = sum(m2_elpd)
   
-  d = sum(m1_elpd) - sum(m2_elpd)
-  d_sd = sqrt(250)*sd(m1_elpd - m2_elpd)
-  pval = 1-pnorm(d/d_sd)
+  pval = get_elpd_pval(better_mod=m2_elpd, worse_mod=m1_elpd, N=nrow(data))
   
   return(data.frame(m1_elpd_sum = m1_elpd_sum,
                     m2_elpd_sum = m2_elpd_sum,
@@ -255,15 +253,21 @@ get_elpds = function(data){
 }
 ```
 
+```{r}
+out2 = data.frame()
+```
+
 ```{r eval=FALSE}
-# out2 =   data.frame()
-n_int = 100
-# for(i in 1:n_int){
-#   data = make_fake_data(n=2500)
-#   tmp = get_elpds(data)
-#   out2 = rbind(out2, tmp)
-#   i = i+1
-# }
+n_int = 10
+Sys.time()
+for(i in 1:n_int){
+  print(i)
+  data = make_fake_data(n=2500)
+  tmp = get_elpds(data)
+  out2 = rbind(out2, tmp)
+  i = i+1
+}
+Sys.time()
 ```
 
 ```{r}
