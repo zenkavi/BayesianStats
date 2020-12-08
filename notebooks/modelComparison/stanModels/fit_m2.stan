@@ -20,3 +20,10 @@ model {
   b2 ~ normal(0, 1);
   sigma ~ lognormal(1,1);
 }
+
+generated quantities {
+  real logLikelihood[N];
+  for(i in 1:N){
+    logLikelihood[i]=normal_lpdf(y[i]|b1*x1[i]+b2*x2[i], sigma);
+  }
+}

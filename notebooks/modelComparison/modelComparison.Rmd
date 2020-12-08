@@ -28,7 +28,7 @@ make_fake_data = function(n=250, bs =c(.5, .7), sigma = .5){
   return(data)
 }
 
-data = make_fake_data(n=500)
+data = make_fake_data(n=500, sigma=10)
 ```
 
 # Frequentist comparison
@@ -99,6 +99,7 @@ m1_stanfit
 
 ```{r}
 b_m1 <- bridge_sampler(m1_stanfit, silent = TRUE)
+b_m1
 ```
 
 ```{r}
@@ -115,12 +116,30 @@ m2_stanfit
 
 ```{r}
 b_m2 <- bridge_sampler(m2_stanfit, silent = TRUE)
+b_m2
 ```
 
 ```{r}
 post_prob(b_m1, b_m2)
 ```
 
+Do this with log likelihood proportions as done in VBA-toolbox
+
+```{r}
+tmp1 = mean(rowSums(extract_log_lik(m1_stanfit, "logLikelihood")))
+tmp1
+```
+
+```{r}
+tmp2 = mean(rowSums(extract_log_lik(m2_stanfit, "logLikelihood")))
+tmp2
+```
+
+```{r}
+e = Brobdingnag::as.brob(exp(1))
+
+as.numeric((e^tmp1)/(e^tmp1+e^tmp2))
+```
 
 # Posterior predictive checks (PPC)
 
