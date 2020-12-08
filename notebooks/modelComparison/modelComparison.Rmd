@@ -198,16 +198,19 @@ get_m_post_probs = function(data){
 }
 ```
 
-```{r}
+```{r eval=FALSE}
 out = data.frame()
 n_int = 100
+n = 500
+start = Sys.time()
 for(i in 1:n_int){
-  data = make_fake_data()
+  data = make_fake_data(n)
   tmp = get_m_post_probs(data)
   tmp = t(as.data.frame(tmp))
   out = rbind(out, tmp)
   i = i+1
 }
+end = Sys.time()
 ```
 
 ```{r}
@@ -262,7 +265,7 @@ n_int = 10
 Sys.time()
 for(i in 1:n_int){
   print(i)
-  data = make_fake_data(n=2500)
+  data = make_fake_data(n=500)
   tmp = get_elpds(data)
   out2 = rbind(out2, tmp)
   i = i+1
