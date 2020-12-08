@@ -1,12 +1,12 @@
 
 functions {
-  real partial_sum_lpmf(int[] slice_y,
+  real partial_sum_lpdf(real[] slice_y,
                         int start, int end,
                         vector x1,
                         vector x2,
                         vector beta,
                         real sigma) {
-    return normal_lupmf(slice_y | betap[1]*x1[start:end]+beta[2]*x2[start:end], sigma);
+    return normal_lupdf(slice_y | beta[1]*x1[start:end]+beta[2]*x2[start:end], sigma);
   }
 }
 
@@ -29,5 +29,5 @@ model {
   // }
   beta ~ normal(0, 1);
   sigma ~ lognormal(1,1);
-  target += reduce_sum(partial_sum_lupmf, y, grainsize, x1, x2, beta, sigma);
+  target += reduce_sum(partial_sum_lupdf, y, grainsize, x1, x2, beta, sigma);
 }

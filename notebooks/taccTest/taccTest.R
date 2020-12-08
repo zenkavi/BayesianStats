@@ -12,15 +12,26 @@ make_fake_data = function(n=250, bs =c(.5, .7), sigma = .5){
   return(data)
 }
 
+convert_to_standata = function(data){
+  stanData = list(N = nrow(data), y=data$y, x1 = data$x1, x2 = data$x2)
+  return(stanData)
+}
+
 testData = make_fake_data(n=500)
 
-mod = cmdstan_model("stanModels/taccTest.stan")
+mod = cmdstan_model("notebooks/taccTest/stanModels/taccTest1.stan")
 
-start = Sys.time()
-fit <- mod$sample(data = testData)
-end = start = Sys.time()
+start_time = Sys.time()
+fit <- mod$sample(data = convert_to_standata(testData))
+end_time = Sys.time()
 
-print(end-start)
+# Come back to this
+# mod = cmdstan_model("notebooks/taccTest/stanModels/taccTest2.stan")
+# start_time = Sys.time()
+# fit <- mod$sample(data = convert_to_standata(testData))
+# end_time = Sys.time()
+
+print(end_time-start_time)
 print("Saving model fit...")
 
 fit$save_object(file = "fit_taccTest.RDS")
