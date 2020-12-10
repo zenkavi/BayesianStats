@@ -28,6 +28,7 @@ What have I gotten done on TACC so far?
 What else needs to be done?
 
 -nmm_ode needs to run as it is
+  - interactive and batch script
 -nmm_ode faster. try:
   - reduce_sum
   - parallelization

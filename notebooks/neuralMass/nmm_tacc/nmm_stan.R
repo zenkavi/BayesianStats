@@ -13,6 +13,10 @@ W = matrix(c(0, .2, 0,
              .4, 0, 0,
              0, .3, 0), nrow=3, byrow=T)
 
+task = data.frame(stim = c(c(0,0,0,1),rep(0,97)))
+
+task$time = rep(1:nrow(task))
+
 cur_args_dict = list('dt'=.5,  
                      'g'=1, 
                      'noise'= NULL,
@@ -40,11 +44,14 @@ nmm_data = list(N_TS = dim(net_dat)[2],
                 I = cur_args_dict$I[1,],
                 t0 = 0)
 
+# Can check compiling locally
 mod = cmdstan_model("stanModels/nmm_ode.stan")
 
-fit <- mod$sample(
-  data = nmm_data,
-  seed = 123
-)
-
+#DO NOT RUN LOCALLY
+start_time = Sys.time()
+print("Beginning sampling...")
+fit <- mod$sample(data = nmm_data)
+print("Saving model fit...")
 fit$save_object(file = "fit_nmm_ode.RDS")
+end_time = Sys.time()
+print(end_time-start_time)
