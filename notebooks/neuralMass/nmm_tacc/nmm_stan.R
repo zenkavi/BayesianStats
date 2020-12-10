@@ -45,13 +45,20 @@ nmm_data = list(N_TS = dim(net_dat)[2],
                 t0 = 0)
 
 # Can check compiling locally
-mod = cmdstan_model("stanModels/nmm_ode.stan")
+mod = cmdstan_model("stanModels/nmm_ode.stan",
+                    cpp_options = list(stan_threads = TRUE))
 
 #DO NOT RUN LOCALLY
 start_time = Sys.time()
+
 print("Beginning sampling...")
-fit <- mod$sample(data = nmm_data)
+fit <- mod$sample(data = nmm_data,
+                  chains = 4,
+                  parallel_chains = 4,
+                  threads_per_chain = 16)
+
 print("Saving model fit...")
 fit$save_object(file = "fit_nmm_ode.RDS")
+
 end_time = Sys.time()
 print(end_time-start_time)

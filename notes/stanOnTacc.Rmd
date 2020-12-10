@@ -1,12 +1,11 @@
 # Stan on a cluster pipeline notes
 
-## Steps you might need:
+## TACC architecture
 
-- Data prepation R script
-- Model text file
-- Model compilation and running R script
-- Model output processing script
-- Batch script parallelizing the model fit step
+1 node has
+68 cores
+with 4 threads/core
+so 68*4 = 272 threads per node
 
 ## Speeding up model fitting
 
@@ -14,6 +13,9 @@
 
 From https://mc-stan.org/users/documentation/case-studies/reduce_sum_tutorial.html
 "If a model has a large number of arguments that are either defined in the parameters block, transformed parameters block, or model block, or do not do very much computation inside the reduce function, or does not get lucky with caching, the speedup will be much more limited."
+
+Based on "Can be parallelized across multiple cores and multiple computers, while reduce summation can only parallelized across multiple cores on a single machine." from https://mc-stan.org/docs/2_25/stan-users-guide/parallelization-chapter.html
+I might need `map_rect` instead.
 
 2. Parallelization of chains
 
@@ -24,13 +26,14 @@ This is done in Stan by default but on cores of a single node. Can it be paralle
 What have I gotten done on TACC so far?
 
 - ran the same simple model (using cmdstanr) with and without reduce_sum (sped up about twice)
+- ran nmm_ode as it is in interactive mode. Got same results but similarly slow
 
 What else needs to be done?
 
 -nmm_ode needs to run as it is
-  - interactive and batch script
+  - batch script
 -nmm_ode faster. try:
-  - reduce_sum
+  - `reduce_sum` or `map_rect`
   - parallelization
   - ADVI
 -nmm_ode with more data
