@@ -102,7 +102,7 @@ data {
   
   real ts[N_TS];                 // measurement times > 0
   vector[N] y[N_TS];             // measured activity level with nodes in cols and timepoints in rows
-  
+  int<lower=1> grainsize;
 }
 
 transformed data{

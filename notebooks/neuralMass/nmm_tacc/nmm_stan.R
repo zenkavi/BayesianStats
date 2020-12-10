@@ -42,7 +42,8 @@ nmm_data = list(N_TS = dim(net_dat)[2],
                 y = t(net_dat),
                 W = cur_args_dict$W,
                 I = cur_args_dict$I[1,],
-                t0 = 0)
+                t0 = 0,
+                grainsize = 1)
 
 # Can check compiling locally
 mod = cmdstan_model("stanModels/nmm_ode_redsum.stan",
