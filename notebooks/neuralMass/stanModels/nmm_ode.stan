@@ -119,23 +119,14 @@ parameters {
   // vector[N] x_init;
 }
 
-
-transformed parameters {
-  
-  // states x are estimated as parameters z with some uncertainty. 
-  // these estimated parameters are used in the model description to relate them to measured data
-  // vector[N] x[N_TS] = ode_rk45(dx_dt, x_init, t0, ts, N, N_t, I, to_vector(ts), s, g, b, tau);
-  vector[N] x[N_TS] = ode_rk45(dx_dt, y_init, t0, ts, N, N_t, I, to_vector(ts), s, g, b, tau);
-
-}
-
 model {
   s ~ lognormal(-1, 1);
   g ~ lognormal(-1, 1);
   b ~ lognormal(-1, 1);
   tau ~ normal(1, 0.5);
   sigma ~ lognormal(-1, 1);
-
+  
+  vector[N] x[N_TS] = ode_rk45(dx_dt, y_init, t0, ts, N, N_t, I, to_vector(ts), s, g, b, tau);
 
   for (k in 1:N) {
     // y_init[k] ~ lognormal(log(x_init[k]), sigma);

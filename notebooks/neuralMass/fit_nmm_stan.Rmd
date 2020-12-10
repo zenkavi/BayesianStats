@@ -141,18 +141,6 @@ Estimates don't look entirely ridiculous considering how clueless I am...
 ```{r}
 fit$summary()
 ```
-Estimates are almost identical using `nmm_ode2.stan` where the states are not estimated are parameters. But the fitting is not faster either.
-
-```{r eval=FALSE}
-mod2 = cmdstan_model("stanModels/nmm_ode2.stan")
-```
-
-```{r eval=FALSE}
-fit2 <- mod2$sample(
-  data = nmm_data,
-  seed = 123
-)
-```
 
 
 ------
