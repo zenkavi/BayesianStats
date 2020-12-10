@@ -28,6 +28,9 @@ What have I gotten done on TACC so far?
 What else needs to be done?
 
 -nmm_ode needs to run as it is
--nmm_ode faster (try reduce_sum, parallelization)
+-nmm_ode faster. try:
+  - reduce_sum
+  - parallelization
+  - ADVI
 -nmm_ode with more data
 -parallelized cross validation

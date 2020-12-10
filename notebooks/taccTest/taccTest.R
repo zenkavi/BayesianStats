@@ -1,3 +1,6 @@
+# Send to TACC via
+# rsync -avzh taccTest zenkavi@stampede2.tacc.utexas.edu:/work/04127/zenkavi/stampede2
+
 library(cmdstanr)
 
 set.seed(343857240)
