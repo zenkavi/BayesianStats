@@ -148,6 +148,11 @@ model {
   // of all the data given the sampled parameters
   // so for the network data within chain parallelization should happen across nodes?
   // or can it also be parallelized across time points yielding N x N_TS tasks that can be parallelized? 
+  
+  // partial_sum_lupdf will always return a real; a log unnormalized prob density
+  // previously the model log prob was incremented by the log prob of all
+  // if all time points of all nodes are considered independent (given that the dependence is accounted for by the ODE)
+  //
   target += reduce_sum(partial_sum_lupdf, y, grainsize, x, sigma);
 
 }

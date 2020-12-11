@@ -47,8 +47,7 @@ nmm_data = list(N_TS = dim(net_dat)[2],
                 grainsize = 1)
 
 # Can check compiling locally
-mod = cmdstan_model("stanModels/nmm_ode.stan",
-                    cpp_options = list(stan_threads = TRUE))
+mod = cmdstan_model("stanModels/nmm_ode.stan")
 
 #DO NOT RUN LOCALLY
 start_time = Sys.time()
