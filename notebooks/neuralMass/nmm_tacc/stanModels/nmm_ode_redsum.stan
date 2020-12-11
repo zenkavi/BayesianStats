@@ -115,6 +115,8 @@ transformed data{
       N_t[t, i] = dot_product(W[i,], y[t]);
     }
   }
+  
+  real[N*N_TS] y_vec = to_vector(to_matrix(y))
 }
 
 parameters {
@@ -136,6 +138,8 @@ model {
   // in each sample the current parameter values are plugged into the ODE 
   // this generates
   vector[N] x[N_TS] = ode_rk45(dx_dt, y_init, t0, ts, N, N_t, I, to_vector(ts), s, g, b, tau);
+  
+  real[N * N_TS] x_vec = to_vector(to_matrix(x))
 
   // previously was looping over nodes
   // for (k in 1:N) {
@@ -152,7 +156,9 @@ model {
   // partial_sum_lupdf will always return a real; a log unnormalized prob density
   // previously the model log prob was incremented by the log prob of all
   // if all time points of all nodes are considered independent (given that the dependence is accounted for by the ODE)
-  //
+  // then you could reshape both the states x and observed data y into a single long vector
+  // making sure the vectorization matches the correct time points and nodes across x and y
+  // each y is then a sample from a normal distribution with mean x
   target += reduce_sum(partial_sum_lupdf, y, grainsize, x, sigma);
 
 }
