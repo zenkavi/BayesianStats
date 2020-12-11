@@ -1,11 +1,13 @@
 #!/bin/bash
 
-#SBATCH -p russpold
+#SBATCH -p normal
 #SBATCH -J nmm_stan
 #SBATCH -t 02:00:00
 #SBATCH --mail-user=zenkavi@stanford.edu
 #SBATCH --mail-type=all
 #SBATCH -o nmm_stan.o
 #SBATCH -e nmm_stan.e
+#SBATCH -n 68
+#SBATCH -N 1
 
 Rscript nmm_stan.R
