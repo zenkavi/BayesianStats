@@ -79,11 +79,11 @@ functions {
     return res;
   }
   
-  real partial_sum_lpdf(real[] slice_y,
+  real partial_sum_lpdf(vector[] slice_y,
                         int start, int end,
-                        vector x,
+                        vector[] x,
                         real sigma) {
-    return normal_lupdf(slice_y | x[start:end], sigma);
+    return normal_lupdf(slice_y | x[,start:end], sigma);
   }
   
 }
@@ -132,12 +132,22 @@ model {
   tau ~ normal(1, 0.5);
   sigma ~ lognormal(-1, 1);
   
+  // Without reduce sum:
+  // in each sample the current parameter values are plugged into the ODE 
+  // this generates
   vector[N] x[N_TS] = ode_rk45(dx_dt, y_init, t0, ts, N, N_t, I, to_vector(ts), s, g, b, tau);
 
+  // previously was looping over nodes
   // for (k in 1:N) {
+  // and vectorizing time points
   //   y[ , k] ~ normal(x[, k], sigma);
   // }
   
+  // reduce-sum is supposed to parallelize within chain computations of independent log likelihoods
+  // these independent components of the log likelihood will then be summed to get the log likelihood
+  // of all the data given the sampled parameters
+  // so for the network data within chain parallelization should happen across nodes?
+  // or can it also be parallelized across time points yielding N x N_TS tasks that can be parallelized? 
   target += reduce_sum(partial_sum_lupdf, y, grainsize, x, sigma);
 
 }

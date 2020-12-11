@@ -13,8 +13,7 @@ W = matrix(c(0, .2, 0,
              .4, 0, 0,
              0, .3, 0), nrow=3, byrow=T)
 
-## Give the model five times more the data
-task = data.frame(stim = rep(c(c(0,0,1),rep(0,97)), 5) )
+task = data.frame(stim = c(c(0,0,0,1),rep(0,97)))
 
 task$time = rep(1:nrow(task))
 
@@ -56,10 +55,11 @@ start_time = Sys.time()
 print("Beginning sampling...")
 fit <- mod$sample(data = nmm_data,
                   chains = 4,
-                  parallel_chains = 4)
+                  parallel_chains = 4, 
+                  threads_per_chain = 16)
 
 print("Saving model fit...")
-fit$save_object(file = "fit_nmm_ode_longtask.RDS")
+fit$save_object(file = "fit_nmm_ode_redsum.RDS")
 
 end_time = Sys.time()
 print(end_time-start_time)
