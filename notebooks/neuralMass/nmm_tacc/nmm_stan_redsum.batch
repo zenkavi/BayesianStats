@@ -2,7 +2,7 @@
 
 #SBATCH -p normal
 #SBATCH -J nmm_stan_redsum
-#SBATCH -t 02:00:00
+#SBATCH -t 05:00:00
 #SBATCH --mail-user=zenkavi@stanford.edu
 #SBATCH --mail-type=all
 #SBATCH -o .out/nmm_stan_redsum_%j.o

@@ -31,10 +31,11 @@ What have I gotten done on TACC so far?
 What else needs to be done?
 
 -nmm_ode needs to run as it is
+  - with more data
   - batch script
 -nmm_ode faster. try:
   - `reduce_sum` or `map_rect`
+  - is adding compilation as an sbatch job worth it?
   - parallelization
   - ADVI
--nmm_ode with more data
 -parallelized cross validation
