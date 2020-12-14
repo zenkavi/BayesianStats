@@ -7,37 +7,33 @@
 with 4 threads/core
 so 68*4 = 272 threads per node
 
-## Speeding up model fitting
-
-1. `reduce_sum` (within chain parallelization)
-
-From https://mc-stan.org/users/documentation/case-studies/reduce_sum_tutorial.html
-"If a model has a large number of arguments that are either defined in the parameters block, transformed parameters block, or model block, or do not do very much computation inside the reduce function, or does not get lucky with caching, the speedup will be much more limited."
-
-Based on "Can be parallelized across multiple cores and multiple computers, while reduce summation can only parallelized across multiple cores on a single machine." from https://mc-stan.org/docs/2_25/stan-users-guide/parallelization-chapter.html
-I might need `map_rect` instead.
-
-2. Parallelization of chains
-
-This is done in Stan by default but on cores of a single node. Can it be parallelized across nodes and would this lead to any performance improvements?
-
 ## Progress and Todo's
 
 ### TACC Progress
 
-- ran the same simple model (using cmdstanr) with and without reduce_sum (sped up about twice)
-- ran nmm_ode as it is in interactive mode. Got same results but similarly slow
-- ran nmm_ode with 5 times more data. Took ~5 hours. Estimates don't look very different from those from the shorter task
-- ran nmm_ode_redsum with initial small data. Took just as long (~5) and doesn't look like it saved the model fit even though there aren't any errors in the std_err or std_out
-  - Does saving RDS not work with multithread models? Trying with taccTest2.stan.
-  - Outputs were the same when taccTest2.stan was run with threads_per_chain specified to actually use reduce_sum correctly BUT it was slower in fitting!
-  - Saving worked correctly so not sure what was broken in nmm_ode_redsum saving.
+- ran the same simple model (`taccTest.R`) with and without `reduce_sum` 
+  - sped up about twice **BUT wasn't actually using within chain threads correctly/using the threads_per_chain option in sampling**
+- ran `nmm_ode` as it is in interactive mode. Got same results as running it locally but fitting was similarly slow.
+- ran `nmm_ode` with 5 times more data. Took ~5 hours. Estimates don't look very different from those from the shorter task
+- ran `nmm_ode_redsum` with initial small data. Took just as long (~5) and doesn't look like it saved the model fit even though there aren't any errors in the `std_err` or `std_out`
+  - Does saving RDS not work with multithread models? Trying with `taccTest2.stan`.
+  - Outputs were the same when `taccTest2.sta`n was run with `threads_per_chain` specified to actually use `reduce_sum` correctly **BUT it was slower in fitting!**
+  - Saving worked correctly so **not sure what was broken in nmm_ode_redsum saving**.
 
 ### TACC Todo's
 
--nmm_ode needs to be faster. try:
-  - `reduce_sum` or `map_rect`
-    - these might not be helping as much due to ode solver. Test performance on lotka-volterra with and without redsum to see if there is a difference in fit time
+- Back to basics: How much does the ode solver slow a model down? How much does reduce sum speed a regular model? How much does it speed up a model with an ode solver?
+  - these might not be helping as much due to ode solver. Test performance on lotka-volterra with and without redsum to     see if there is a difference in fit time. Or even better: test how much ode solver slows down sampling for a problem      with a known analytic solution
+
+- `nmm_ode` needs to be faster. try:
+  - more vectorization and/or improvements for ode solver
+  
+  - Within chain parallelization: `reduce_sum` or `map_rect`
+  From https://mc-stan.org/users/documentation/case-studies/reduce_sum_tutorial.html
+  "If a model has a large number of arguments that are either defined in the parameters block, transformed parameters       block, or model block, or do not do very much computation inside the reduce function, or does not get lucky with          caching, the speedup will be much more limited." Based on "Can be parallelized across multiple cores and multiple         computers, while reduce summation can only parallelized across multiple cores on a single machine." from https://mc-stan.org/docs/2_25/stan-users-guide/parallelization-chapter.html. I might need `map_rect` instead.
+  
+  - Parallelization of chains: This is done in Stan by default but on cores of a single node. Can it be parallelized        across nodes and would this lead to any performance improvements?
+
   - is adding compilation as an sbatch job worth it?
   - parallelization
   - ADVI
