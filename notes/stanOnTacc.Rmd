@@ -23,19 +23,23 @@ This is done in Stan by default but on cores of a single node. Can it be paralle
 
 ## Progress and Todo's
 
-What have I gotten done on TACC so far?
+### TACC Progress
 
 - ran the same simple model (using cmdstanr) with and without reduce_sum (sped up about twice)
 - ran nmm_ode as it is in interactive mode. Got same results but similarly slow
+- ran nmm_ode with 5 times more data. Took ~5 hours. Estimates don't look very different from those from the shorter task
+- ran nmm_ode_redsum with initial small data. Took just as long (~5) and doesn't look like it saved the model fit even though there aren't any errors in the std_err or std_out
+  - Does saving RDS not work with multithread models? Trying with taccTest2.stan.
+  - Outputs were the same when taccTest2.stan was run with threads_per_chain specified to actually use reduce_sum correctly BUT it was slower in fitting!
+  - Saving worked correctly so not sure what was broken in nmm_ode_redsum saving.
 
-What else needs to be done?
+### TACC Todo's
 
--nmm_ode needs to run as it is
-  - with more data
-  - batch script
--nmm_ode faster. try:
+-nmm_ode needs to be faster. try:
   - `reduce_sum` or `map_rect`
+    - these might not be helping as much due to ode solver. Test performance on lotka-volterra with and without redsum to see if there is a difference in fit time
   - is adding compilation as an sbatch job worth it?
   - parallelization
   - ADVI
+
 -parallelized cross validation
