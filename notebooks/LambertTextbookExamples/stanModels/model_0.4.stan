@@ -1,7 +1,9 @@
 
 functions{
   
-  // if we believe that variable X follows a random distribution not defined in Stan we can use it for inference by writing a function that returns the log density for each value of the parameters (in this case this would be the log for each value of mu)
+  // if we believe that variable X follows a random distribution not defined in Stan 
+  // we can use it for inference by writing a function that returns the log density for each value of the parameters 
+  //(in this case this would be the log for each value of mu)
   
   // the suffix `_lpdf` tells Stan to regards this function as a log prob density function which then can be used in the `model` definition below
   
