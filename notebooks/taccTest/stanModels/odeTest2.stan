@@ -11,10 +11,10 @@ functions{
 
 data {
   int<lower=0> T;
-  vector[2] state0;
-  vector[2] states[T]; //states[1] = x; states[2] = y
-  real ts[T];
-  real t0;
+  vector[2] state0; // initial state
+  vector[2] states[T]; //states[1] = x(t); states[2] = y(t)
+  real ts[T]; // time points
+  real t0; // first time point 0
 }
 
 parameters {
@@ -22,10 +22,10 @@ parameters {
 }
 
 model {
-  vector[2] z[T] = ode_rk45(dy_dx, state0, t0, ts, sigma);
+  vector[2] z[T] = ode_rk45(dy_dx, state0, t0, ts);
   
   for (i in 1:T){
-    y[,i] ~ normal(z[,i], sigma); 
+    states[,i] ~ normal(z[,i], sigma); 
   }
   sigma ~ lognormal(-1, 1);
 }
