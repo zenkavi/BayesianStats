@@ -28,6 +28,29 @@ fit <- mod$sample(
 )
 ```
 
+What does predicted versus true look like? How does the ODE solver work?
+
 ```{r}
-fit$summary()
+fit$summary("z") %>%
+  select(variable, mean) %>%
+  separate(variable, sep = ",", into=c("time", "key")) %>%
+  mutate(time = gsub("z\\[", "", time),
+         key = gsub("\\]", "", key),
+         time = as.numeric(time),
+         key = ifelse(key == 1, "Hare", "Lynx"),
+         type = "est") %>%
+  rename(value=mean) %>%
+  rbind(lynx_hare_df %>%
+          slice(-1) %>% ## Don't forget it's modeling change so drop first time point!!
+        select(-Year)%>%
+        mutate(time = 1:n(),
+               type = "true") %>%
+  gather(key, value, -time, -type)) %>%
+  spread(type, value) %>%
+  ggplot(aes(est, true))+
+  geom_point()+
+  geom_abline(aes(intercept=0, slope=1))+
+  facet_wrap(~key)
+
+
 ```

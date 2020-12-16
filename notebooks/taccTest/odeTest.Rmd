@@ -68,6 +68,7 @@ est_z %>%
   ggplot(aes(est, true))+
   geom_point()+
   facet_wrap(~var)+
-  geom_abline(aes(intercept=0, slope=1))
+  geom_abline(aes(intercept=0, slope=1))+
+  ylim(-2, 10)
 
 ```
