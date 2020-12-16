@@ -2,6 +2,22 @@ library(cmdstanr)
 
 # Compare stan model fitting time using ODE vs no ODE for a function with an analytical solution
 
+# y = x - 1 + 2*exp(-x)
+make_states = function(n=1000, mu=5, sigma=3){
+  x = rnorm(n, mu, sigma)
+  y = x - 1 + 2*exp(-x)
+  states = cbind(x, y)
+  return(states)
+}
+
+testStates = make_states()
+
+testData = list(T = nrow(testStates)-1,
+                state0 = testStates[1,],
+                states = testStates[-1,],
+                ts = 1:(nrow(testStates)-1),
+                t0 = 0,
+                diffx = diff(testStates[,1]))
 
 test_model = function(testData, model_path, output_path){
   
@@ -18,5 +34,5 @@ test_model = function(testData, model_path, output_path){
   return(fit)
 }
 
-ode_fit1 = test_model("stanModels/odeTest1.stan", "stanModels/fit_odeTest1.RDS")
-ode_fit2 = test_model("stanModels/odeTest2.stan", "stanModels/fit_odeTest2.RDS")
+ode_fit1 = test_model(testData, "stanModels/odeTest1.stan", "stanModels/fit_odeTest1.RDS")
+ode_fit2 = test_model(testData, "stanModels/odeTest2.stan", "stanModels/fit_odeTest2.RDS")

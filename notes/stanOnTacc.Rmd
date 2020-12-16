@@ -38,4 +38,4 @@ so 68*4 = 272 threads per node
   - parallelization
   - ADVI
 
--parallelized cross validation
+- parallelized cross validation

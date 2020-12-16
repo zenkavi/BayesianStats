@@ -1,0 +1,40 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Post processing ODE test results
+
+```{r}
+ode_fit1 = readRDS("./stanModels/fit_odeTest1.RDS")
+ode_fit2 = readRDS("./stanModels/fit_odeTest2.RDS")
+```
+
+```{r}
+est_z = data.frame(ode_fit2$summary("z"))
+
+est_z  = est_z %>% 
+  select(variable, mean) %>%
+  separate(variable, sep=",", into = c("time", "var")) %>%
+  mutate(time = gsub("z\\[", "", time),
+         time = as.numeric(time),
+         var = gsub("\\]", "", var),
+         var = ifelse(var == 1, "est_x", "est_y")) %>%
+  rename(key = var, value=mean) %>%
+  arrange(time) %>%
+  rbind(data.frame(testStates) %>% 
+          mutate(time = 1:n()) %>% 
+          rename(true_x = x, true_y = y) %>%
+          gather(key, value, -time))
+```
+
+```{r}
+est_z %>%
+  separate(key, sep="_", into=c("type","var")) %>%
+  spread(type, value) %>%
+  ggplot(aes(est, true))+
+  geom_point()+
+  facet_wrap(~var)+
+  geom_abline(aes(intercept=0, slope=1))
+
+```

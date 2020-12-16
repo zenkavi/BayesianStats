@@ -1,19 +1,31 @@
 
 
 data {
-  int<lower=0> N;
-  real x[N];
-  real y[N];
-  real y0;
+  int<lower=0> T; //nrow states-1
+  vector[2] state0; // initial state
+  vector[2] states[T]; //states[1] = x(t); states[2] = y(t)
+  real ts[T]; // time points
+  real t0; // first time point 0
+  vector[T] diffx;
 }
 
 parameters {
   real sigma;
+  real theta;
 }
 
 model {
-  for (i in 1:N){
-    y[i] ~ normal(x[i] - 1 + 2*exp(-x[i]), sigma); 
+  for (i in 1:T){
+    states[i, 2] ~ normal(states[i,1] - 1 + theta*exp(-states[i, 1]), sigma); 
   }
   sigma ~ lognormal(-1, 1);
+  theta ~ normal(3, 5);
+}
+
+generated quantities{
+  vector[2] states_rep[T];
+  
+    for (i in 1:T){
+      states_rep[i, 2] = normal_rng(states[i,1] - 1 + theta*exp(-states[i, 1]), sigma);
+  }
 }
