@@ -44,6 +44,7 @@ True versus estimated states for ODE solver:
 
 ```{r}
 est_z = data.frame(ode_fit2$summary("z"))
+est_z
 ```
 
 True versus estimated y's look very strange. I need to understand how this ode solver works...
@@ -68,7 +69,5 @@ est_z %>%
   ggplot(aes(est, true))+
   geom_point()+
   facet_wrap(~var)+
-  geom_abline(aes(intercept=0, slope=1))+
-  ylim(-2, 10)
-
+  geom_abline(aes(intercept=0, slope=1))
 ```
