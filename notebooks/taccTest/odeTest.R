@@ -1,4 +1,5 @@
 library(cmdstanr)
+set.seed(1302589023)
 
 # Compare stan model fitting time using ODE vs no ODE for a function with an analytical solution
 

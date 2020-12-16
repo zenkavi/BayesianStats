@@ -1,7 +1,7 @@
 
 
 data {
-  int<lower=0> T; //nrow states-1
+  int T; //nrow states-1
   vector[2] state0; // initial state
   vector[2] states[T]; //states[1] = x(t); states[2] = y(t)
   real ts[T]; // time points
@@ -23,9 +23,9 @@ model {
 }
 
 generated quantities{
-  vector[2] states_rep[T];
+  vector[T] states_rep;
   
-    for (i in 1:T){
-      states_rep[i, 2] = normal_rng(states[i,1] - 1 + theta*exp(-states[i, 1]), sigma);
+  for (i in 1:T){
+    states_rep[i] = normal_rng(states[i,1] - 1 + theta*exp(-states[i, 1]), sigma);
   }
 }

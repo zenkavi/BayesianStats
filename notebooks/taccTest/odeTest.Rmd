@@ -1,25 +1,55 @@
 ---
-title: "R Notebook"
+title: "ODE benchmarking"
 output: html_notebook
 ---
+
+```{r}
+source("odeTest.R")
+```
 
 Post processing ODE test results
 
 ```{r}
-ode_fit1 = readRDS("./stanModels/fit_odeTest1.RDS")
-ode_fit2 = readRDS("./stanModels/fit_odeTest2.RDS")
+if(!exists("ode_fit1")){
+  ode_fit1 = readRDS("./stanModels/fit_odeTest1.RDS")
+}
+if(!exists("ode_fit2")){
+  ode_fit2 = readRDS("./stanModels/fit_odeTest2.RDS")
+}
 ```
+
+True versus estimated y's for analytical solution:
 
 ```{r}
+est_y = data.frame(ode_fit1$summary("states_rep"))
 
+est_y %>%
+  select(mean) %>%
+  mutate(time = 1:n(),
+         key = "est_y") %>%
+  rename(value = mean) %>%
+  rbind(data.frame(testStates) %>%
+          select(y) %>%
+          slice(-1) %>%
+          mutate(time = 1:n(), 
+                 key = "true_y") %>%
+          rename(value = y)) %>%
+  spread(key, value) %>%
+  ggplot(aes(est_y, true_y))+
+  geom_point()+
+  geom_abline(aes(intercept=0, slope=1))
 ```
 
-Extract estimated "states" 
+True versus estimated states for ODE solver:
 
 ```{r}
 est_z = data.frame(ode_fit2$summary("z"))
+```
 
-est_z  = est_z %>% 
+True versus estimated y's look very strange. I need to understand how this ode solver works...
+
+```{r}
+est_z %>% 
   select(variable, mean) %>%
   separate(variable, sep=",", into = c("time", "var")) %>%
   mutate(time = gsub("z\\[", "", time),
@@ -29,15 +59,10 @@ est_z  = est_z %>%
   rename(key = var, value=mean) %>%
   arrange(time) %>%
   rbind(data.frame(testStates) %>% 
+          slice(-1)%>%
           mutate(time = 1:n()) %>% 
           rename(true_x = x, true_y = y) %>%
-          gather(key, value, -time))
-```
-
-True versus estimated y's look very strange. I need to understand how this ode solver works...
-
-```{r}
-est_z %>%
+          gather(key, value, -time)) %>%
   separate(key, sep="_", into=c("type","var")) %>%
   spread(type, value) %>%
   ggplot(aes(est, true))+
