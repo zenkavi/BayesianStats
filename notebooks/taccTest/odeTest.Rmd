@@ -11,6 +11,12 @@ ode_fit2 = readRDS("./stanModels/fit_odeTest2.RDS")
 ```
 
 ```{r}
+
+```
+
+Extract estimated "states" 
+
+```{r}
 est_z = data.frame(ode_fit2$summary("z"))
 
 est_z  = est_z %>% 
@@ -27,6 +33,8 @@ est_z  = est_z %>%
           rename(true_x = x, true_y = y) %>%
           gather(key, value, -time))
 ```
+
+True versus estimated y's look very strange. I need to understand how this ode solver works...
 
 ```{r}
 est_z %>%
