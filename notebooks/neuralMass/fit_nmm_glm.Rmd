@@ -542,6 +542,50 @@ for (i in 1:length(out$ext_mods)){
 }
 ```
 
+## Changing rations of s and g
+
+Does removing network activity from the extended regression have a big effect if the nodes self-stimulate very little? (ie if the network is driven primarily by the network)
+
+```{r}
+small_s_args_dict = cur_args_dict
+small_s_args_dict$s = 0.0001
+small_s_args_dict$g = 10
+small_s_net_dat_debug = networkModel(W, small_s_args_dict, debug=T)
+```
+
+```{r}
+print(paste0("Stim node is: ", small_s_args_dict$stim_node))
+print("Uncorrected estimates")
+round(run_ucr_glm(small_s_net_dat_debug, task_reg = small_s_args_dict$I[1,])$ucr_task_betas, 4)
+print("Corrected estimates with network activity")
+round(run_ext_glm(small_s_net_dat_debug, small_s_args_dict, task_reg = small_s_args_dict$I[1,])$ext_task_betas, 4)
+print("Corrected estimates without network activity")
+round(run_ext_glm(small_s_net_dat_debug, small_s_args_dict, task_reg = small_s_args_dict$I[1,], inc_net_act = FALSE)$ext_task_betas, 4)
+```
+
+This isn't what I was expecting. Check design matrices
+
+```{r}
+tmp1 = run_ext_glm(small_s_net_dat_debug, small_s_args_dict, task_reg = small_s_args_dict$I[1,])$ext_mods[[1]]
+
+tmp2 = run_ext_glm(small_s_net_dat_debug, small_s_args_dict, task_reg = small_s_args_dict$I[1,], inc_net_act = F)$ext_mods[[1]]
+
+tmp1 %>%
+  mutate(time = 1:n()) %>%
+  gather(key, value, -time) %>%
+  ggplot(aes(key, time, fill=value))+
+  geom_raster()
+  
+```
+
+```{r}
+tmp2 %>%
+  mutate(time = 1:n()) %>%
+  gather(key, value, -time) %>%
+  ggplot(aes(key, time, fill=value))+
+  geom_raster()
+```
+
 ## Effect on larger network
 
 Is the effect of accounting for the network activity in correcting the task involvement small bc the network is small? Would it be more substantial for a larger/more complicated network?
