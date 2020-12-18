@@ -577,10 +577,22 @@ print("Corrected estimates without network activity")
 round(run_ext_glm(big_W_net_dat_debug, big_W_args_dict, task_reg = big_W_args_dict$I[1,], inc_net_act = FALSE)$ext_task_betas, 4)
 ```
 
-## Changing ratios of s and g
+# `s` and `g` effects on extended GLM
 
 What is the effect of removing network activity from the extended regression depending on the ratio of `s` to `g` (ie if the network is driven primarily by the network)
+
+s , g , ucr1, ucr2, ucr3, ext1, ext2, ext3, ext_nonet1, ext_nonet2, ext_nonet3, ext_noself1, ext_noself2, ext_noself3
+
+4 Heatmaps per node
+x axis = s
+y axis = g
+color by divergence from true task coefficient
+
+```{r}
+
+```
 
 What proportion of activity is driven by task versus network?
 
 What drives the bleeding of task effect to nonstim nodes that are connected to stim nodes? How does it change depending on the `s` to `g` ratio?
+Bleeding = more overestimation of task coefficients for non-stim nodes connected to stim nodes (e.g. other nodes in a hub community for a top-down task) compared to non-stim nodes without direct connections to stim nodes (maybe it's better to keep this continuous by using a metric like distance to stim node instead of a binary classification)
