@@ -615,10 +615,25 @@ for(cur_s in 1:length(sweep_vals)){
     print(row_count)
   }
 }
-
-
 names(out) = c("s", "g" , "ucr1", "ucr2", "ucr3", "ext1", "ext2", "ext3", "ext_nonet1", "ext_nonet2", "ext_nonet3", "ext_noself1", "ext_noself2", "ext_noself3")
 
+```
+
+Heatmaps for stim node
+
+```{r}
+out %>%
+  select(s, g, ucr1, ext1, ext_nonet1, ext_noself1) %>%
+  gather(key, value, -s, -g) %>%
+  mutate(dev = value-.25,
+         s = as.factor(round(s, 2)),
+         g = as.factor(round(g, 2)),
+         key = factor(key,levels = c("ucr1", "ext1", "ext_nonet1", "ext_noself1"),
+                      labels = c("ucr1", "ext1", "ext_nonet1", "ext_noself1"))) %>%
+  ggplot(aes(s, g, fill=dev))+
+  geom_tile()+
+  facet_wrap(~key)+
+  theme(panel.grid=element_blank())
 ```
 
 What proportion of activity is driven by task versus network?
