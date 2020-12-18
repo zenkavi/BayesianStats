@@ -579,7 +579,7 @@ round(run_ext_glm(big_W_net_dat_debug, big_W_args_dict, task_reg = big_W_args_di
 
 # `s` and `g` effects on extended GLM
 
-What is the effect of removing network activity from the extended regression depending on the ratio of `s` to `g` (ie if the network is driven primarily by the network)
+What is the effect of removing network activity from the extended regression depending `s` to `g` (ie if the network is driven more or less by the network compared to self stimulation)
 
 s , g , ucr1, ucr2, ucr3, ext1, ext2, ext3, ext_nonet1, ext_nonet2, ext_nonet3, ext_noself1, ext_noself2, ext_noself3
 
@@ -589,10 +589,51 @@ y axis = g
 color by divergence from true task coefficient
 
 ```{r}
+sweep_vals = c(seq(0.001, .1 ,.01), seq(1, 5, .5))
+
+copy_dict = cur_args_dict
+stim_node = 1
+adj_mat = W
+
+out = data.frame(matrix(NA, nrow=length(sweep_vals)^2, ncol=14))
+
+row_count = 1 
+for(cur_s in 1:length(sweep_vals)){
+  for(cur_g in 1:length(sweep_vals)){
+    
+    cur_sg_dict = copy_dict
+    cur_sg_dict$s = sweep_vals[cur_s]
+    cur_sg_dict$g = sweep_vals[cur_g]
+    cur_sg_netact = networkModel(adj_mat, cur_sg_dict, debug=T)
+    cur_ucr = run_ucr_glm(cur_sg_netact, task_reg = cur_sg_dict$I[stim_node,])$ucr_task_betas
+    cur_ext = run_ext_glm(cur_sg_netact, cur_sg_dict, task_reg = cur_sg_dict$I[stim_node,])$ext_task_betas
+    cur_ext_nonet = run_ext_glm(cur_sg_netact, cur_sg_dict, task_reg = cur_sg_dict$I[stim_node,], inc_net_act=FALSE)$ext_task_betas
+    cur_ext_noself = run_ext_glm(cur_sg_netact, cur_sg_dict, task_reg = cur_sg_dict$I[stim_node,], inc_self_stim=FALSE)$ext_task_betas
+    cur_row = c(sweep_vals[cur_s], sweep_vals[cur_g], cur_ucr, cur_ext, cur_ext_nonet, cur_ext_noself)
+    out[row_count,] = cur_row
+    row_count = row_count+1
+    print(row_count)
+  }
+}
+
+
+names(out) = c("s", "g" , "ucr1", "ucr2", "ucr3", "ext1", "ext2", "ext3", "ext_nonet1", "ext_nonet2", "ext_nonet3", "ext_noself1", "ext_noself2", "ext_noself3")
 
 ```
 
 What proportion of activity is driven by task versus network?
+task driver: self stim + task stim
+Can you work this out from the eq above?
+
+```{r}
+
+
+```
 
 What drives the bleeding of task effect to nonstim nodes that are connected to stim nodes? How does it change depending on the `s` to `g` ratio?
 Bleeding = more overestimation of task coefficients for non-stim nodes connected to stim nodes (e.g. other nodes in a hub community for a top-down task) compared to non-stim nodes without direct connections to stim nodes (maybe it's better to keep this continuous by using a metric like distance to stim node instead of a binary classification)
+
+```{r}
+
+
+```
