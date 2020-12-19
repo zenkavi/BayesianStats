@@ -623,19 +623,23 @@ Heatmaps for stim node
 
 ```{r}
 out %>%
-  select(s, g, ext_nonet1, ext_noself1) %>%
+  select(s, g, ext_nonet1, ext_noself1, ext_nonet2, ext_noself2, ext_nonet3, ext_noself3) %>%
   gather(key, value, -s, -g) %>%
-  mutate(dev = value-.25,
+  separate(key, into = c("key", "node"), "(?<=[a-z])(?=[0-9])") %>%
+  mutate(dev = value-.25, #
          s = as.factor(round(s, 2)),
          g = as.factor(round(g, 2)),
-         key = factor(key,levels = c("ext_nonet1", "ext_noself1"),
-                      labels = c("W/out network activity", "W/out self stimulation"))) %>%
+         key = factor(key,levels = c("ext_nonet", "ext_noself"),
+                      labels = c("W/out network activity", "W/out self stimulation")),
+         node = factor(node, levels=c(1,2,3),
+                       labels = c("Non-hub stim", "Hub non-stim", "Non-hub non-stim"))) %>%
   ggplot(aes(s, g, fill=dev))+
   geom_tile(size=.6)+
-  facet_wrap(~key)+
+  facet_grid(node~key)+
   theme(panel.grid=element_blank(),
         axis.text.x = element_text(angle=90))+
-  scale_fill_gradient2(low = "red", mid="white", high = "blue")
+  scale_fill_gradient2(low = "red", mid="white", high = "blue", midpoint=0,  limits=c(-1,1),
+                       name="Over/under \nestimation")
 ```
 
 What proportion of activity is driven by task versus network?
