@@ -623,17 +623,19 @@ Heatmaps for stim node
 
 ```{r}
 out %>%
-  select(s, g, ucr1, ext1, ext_nonet1, ext_noself1) %>%
+  select(s, g, ext_nonet1, ext_noself1) %>%
   gather(key, value, -s, -g) %>%
   mutate(dev = value-.25,
          s = as.factor(round(s, 2)),
          g = as.factor(round(g, 2)),
-         key = factor(key,levels = c("ucr1", "ext1", "ext_nonet1", "ext_noself1"),
-                      labels = c("ucr1", "ext1", "ext_nonet1", "ext_noself1"))) %>%
+         key = factor(key,levels = c("ext_nonet1", "ext_noself1"),
+                      labels = c("W/out network activity", "W/out self stimulation"))) %>%
   ggplot(aes(s, g, fill=dev))+
-  geom_tile()+
+  geom_tile(size=.6)+
   facet_wrap(~key)+
-  theme(panel.grid=element_blank())
+  theme(panel.grid=element_blank(),
+        axis.text.x = element_text(angle=90))+
+  scale_fill_gradient2(low = "red", mid="white", high = "blue")
 ```
 
 What proportion of activity is driven by task versus network?
