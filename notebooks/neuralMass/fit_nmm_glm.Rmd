@@ -619,14 +619,14 @@ names(out) = c("s", "g" , "ucr1", "ucr2", "ucr3", "ext1", "ext2", "ext3", "ext_n
 
 ```
 
-Heatmaps for stim node
+Heatmaps of deviance from the correct task estimate for the extended GLM model ran without either the network activity regressors or self-stimulation regressors.
 
 ```{r}
 out %>%
   select(s, g, ext_nonet1, ext_noself1, ext_nonet2, ext_noself2, ext_nonet3, ext_noself3) %>%
   gather(key, value, -s, -g) %>%
   separate(key, into = c("key", "node"), "(?<=[a-z])(?=[0-9])") %>%
-  mutate(dev = value-.25, #
+  mutate(dev = ifelse(node == "1", value-.25, value), #
          s = as.factor(round(s, 2)),
          g = as.factor(round(g, 2)),
          key = factor(key,levels = c("ext_nonet", "ext_noself"),
