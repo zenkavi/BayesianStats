@@ -419,6 +419,11 @@ Does the extended GLM framework work for a larger network with a topdown block t
 
 ```{r}
 big_W_args_dict = default_args_dict
+
+#Change network such that most of the activity is driven by network compared to self stimulation
+big_W_args_dict$s = 1
+big_W_args_dict$g = 1
+
 big_G = generateStructuralNetwork(big_W_args_dict)
 big_W_args_dict$W = generateSynapticNetwork(big_G$W, showplot=big_W_args_dict$showplot)$G
 big_W_args_dict$stim_nodes = c(1:10)
@@ -466,7 +471,7 @@ cat("\n")
 round(run_ext_glm(big_W_net_dat_debug, big_W_args_dict, task_reg = big_W_args_dict$I[1,], inc_net_act = FALSE)$ext_task_betas, 4)
 ```
 
-Plotting as I did before to visually detect if there is any "bleeding" to non-stim hub nodes.
+Plotting as I did before to visually detect if there is any "bleeding" to non-stim hub nodes. Where has the bleeding gone?
 
 ```{r}
 data.frame(ucr_betas = run_ucr_glm(big_W_net_dat_debug, task_reg = big_W_args_dict$I[1,])$ucr_task_betas,
@@ -481,3 +486,29 @@ data.frame(ucr_betas = run_ucr_glm(big_W_net_dat_debug, task_reg = big_W_args_di
 ```
 
 How to plot overestimation by distance from stim/hub node?
+
+x = distance (average distance from stimulated nodes)
+y = overestimation (ucr - ext)
+
+It doesn't look like there is any difference between the distance from stim nodes to non stim hub nodes compared to the distance from stim nodes to non stim local nodes.
+
+```{r}
+#from in columns 
+#to in rows
+#so i want the stim_node columns for non-stim-node rows
+
+dist_mat = distances(graph_from_adjacency_matrix(big_W_args_dict$W, weighted=T), algorithm = 'johnson')
+rowMeans(dist_mat[11:105 , 1:10])
+```
+
+What is bleeding? [Especially for UCR] Higher overestimation of task activity to nodes closer (/directly connected to) stimulated nodes.
+
+Since the task regressor used for all nodes in the same
+Are the time series of non stim hub nodes more similar to stim nodes than other nodes are to stim nodes?
+They should be since they should be more likely to be connected to a stim node
+
+Even before the time series: confirm that the number of stim nodes and the sum of weights from stim nodes to non stim hub nodes is larger than that for non stim local nodes
+
+```{r}
+rowSums(big_W_args_dict$W[11:105, 1:10])
+```
