@@ -2,7 +2,7 @@
 title: "Neural mass model simulation and external stimulation parameter recovery with GLM"
 ---
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 library(tidygraph)
 library(ggraph)
 library(gridExtra)
@@ -21,7 +21,7 @@ source(paste0(helpers_path,'plot_adj_mat.R'))
 source('~/Dropbox/PoldrackLab/SRO_Retest_Analyses/code/helper_functions/g_legend.R')
 ```
 
-# Developing intuitions for activity propogation within a network
+# Intuitions for activity propogation within a network
 
 ## Non-hub stimulation
 
@@ -81,7 +81,7 @@ task %>%
 The task stimulates *only* node 1 directly and propagates within the network based on the following Eq:
 
 $$\frac{dx_i}{dt}\tau_i = -x_i(t) + s\phi\big(x_i(t)\big) + g\Bigg(\sum_{j\neq i}^{N} W_{ij}\phi\big(x_j(t)\big)\Bigg) + I_i(t)$$
-Activity in each node at each time point would look like:
+where the self-stimulation `s` and network-stimulation `g` parameters are:
 
 ```{r}
 cur_args_dict = list('dt'=.5,  
@@ -100,6 +100,13 @@ cur_args_dict = list('dt'=.5,
 cur_args_dict$stim_node = 1
 cur_args_dict$I = make_stimtimes(cur_args_dict$stim_node, cur_args_dict)$stimtimes
 
+print(paste0('Self-stimulation parameter s is: ', cur_args_dict$s))
+print(paste0('Network stimulation parameter g is: ', cur_args_dict$g))
+```
+
+Activity in each node at each time point would look like:
+
+```{r}
 net_dat = networkModel(W, cur_args_dict)
 
 data.frame(net_dat) %>%
@@ -235,6 +242,21 @@ Based on the algebra [here](https://github.com/zenkavi/NetworkGLM/blob/master/si
 
 $$x_{i}(t+dt) = (1-\frac{dt}{\tau_i}+\frac{dt^2}{2\tau_i^2}){x_{i}(t)} + \frac{dt}{2\tau_i}\Bigg[(1 - \frac{dt}{\tau_i})\Bigg(gN_i(t) + s\phi\big(x_{i}(t)\big) + {I}_{i}(t)\Bigg) + gN_i(t+dt) + s\phi\Bigg((1-\frac{dt}{\tau_i})x_{i}(t) + \frac{dt}{\tau_i}\big[gN_i(t) + s\phi\big(x_{i}(t)\big) + {I}_{i}(t)\big]\Bigg) + {I}_{i}(t+dt)\Bigg]$$
 
+Given the parameters set in the stimulation
+
+```{r}
+print(paste0('Sampling rate dt is: ', cur_args_dict$dt))
+print(paste0('Time constant tau is: ', cur_args_dict$tau))
+```
+
+and the above equation used for the GLM inversion the true task effect for stimulated nodes is the coefficient of the ${I}_{i}(t+dt)$ regressor which is $\frac{dt}{2\tau_i}$
+
+```{r}
+cur_args_dict$dt / (2*cur_args_dict$tau)
+```
+
+and 0 for non-stimulated nodes.
+
 ### Non-hub stimulation
 
 ```{r}
@@ -287,7 +309,11 @@ print("Corrected estimates:")
 round(run_ext_glm(longon_net_dat_debug, longon_args_dict, task_reg = longon_args_dict$I[2,])$ext_task_betas, 4)
 ```
 
-What's going on with the overcorrected nodes? Why does the model think the estimate of x_t_dt is better when you multiply I_t_dt with -0.0001 instead of 0? Because when estimating the model for non-stimulated nodes we use the tasktiming as the task regressor even though the true value for this is 0. We make this choice because apriori we can't know or measure which nodes would be stim nodes. This choice affects three regressors: `I_t`, `I_t_dt` and `s_phi_ave`. The model tries to balance the false increase in all three of these regressors. The difference between the shapes of `I_t` and `I_t_dt` used in the network activity creation and the corrected regression are trivial (for non-stim nodes it should be 0 but the task regressor fed into the regression model is told that the task is on) and therefore not depicted below. The effect on `s_phi_ave` is harder to visualize so it is shown below. For a non-trivial number of time points the regression `s_phi_ave` is larger than the `s_phi_ave` used in the network activity creation. To balance this overestimation the model assigns negative coefficients to the other two task regressors which appears like an "overcorrection"
+What's going on with the overcorrected nodes? Why does the model think the estimate of `x_t_dt` is better when you multiply `I_t_dt` with -0.0001 instead of 0? Because when estimating the model for non-stimulated nodes we use the tasktiming as the task regressor even though the true value for this is 0. We make this choice because apriori we can't know or measure which nodes would be stim nodes. This choice affects three regressors: `I_t`, `I_t_dt` and `s_phi_ave`. The model tries to balance the false increase in all three of these regressors. 
+
+The difference between the shapes of `I_t` and `I_t_dt` used in the network activity creation and the corrected regression are trivial (for non-stim nodes it should be 0 but the task regressor fed into the regression model is told that the task is on) and therefore not depicted below.    
+
+The effect on `s_phi_ave` is harder to visualize so it is shown below. For a non-trivial number of time points the regression `s_phi_ave` is larger than the `s_phi_ave` used in the network activity creation. To balance this overestimation the model assigns negative coefficients to the other two task regressors (`I_t`, `I_t_dt`) which appears like an "overcorrection" for the `I_t_dt` which is used as the task effect proxy.
 
 ```{r  fig.asp=.3, fig.height=10}
 tmp_df = run_ext_glm(longon_net_dat_debug, longon_args_dict, task_reg = longon_args_dict$I[2,])$ext_mods[[1]]
@@ -311,7 +337,7 @@ p2 = data.frame(resids = resids_df$s_phi_ave, tmp = tmp_df$s_phi_ave) %>%
 grid.arrange(p1, p2, ncol=2)
 ```
 
-Why don't we observe the same problem when the stimulation is short? It might be because the short task doesn't lead to a systematic/large enough deviation between the network `s_phi_ave` and regression `s_phi_ave`
+Why don't we observe the same problem when the stimulation is short? Because the short task doesn't lead to a systematic/large enough deviation between the network `s_phi_ave` and regression `s_phi_ave`
 
 ```{r fig.asp=.3, fig.height=10}
 tmp_df = run_ext_glm(hub_net_dat_debug, hub_args_dict, task_reg = hub_args_dict$I[2,])$ext_mods[[1]]
@@ -365,296 +391,3 @@ print("Corrected estimates:")
 round(run_ext_glm(loop_short_net_dat_debug, loop_short_args_dict, task_reg = loop_short_args_dict$I[2,])$ext_task_betas, 4)
 ```
 
-# Potential applicability issues
-
-## Observable vs true adjacency matrix
-
-What does the adjacency matrix look like if you estimate it from timeseries?
-
-**Note**: I haven't even considered inhibitory connections yet.
-
-True adjacency matrix
-
-```{r}
-true_am = plot_adj_mat(cur_args_dict$W)
-true_am_plot = true_am$p+
-  scale_fill_gradient(limits=c(-1,1)) +
-  ggtitle("True")
-
-mylegend<-g_legend(true_am_plot)
-
-```
-
-Correlation matrix from observed time series
-
-```{r}
-methods = c("pearson", "spearman", "kendall")
-ps = list()
-for(i in 1:length(methods)){
-  ps[[i]] = true_am_plot +
-    theme(legend.position = "none")+
-    ggtitle("True")
-  ps[[i+length(methods)]] = plot_adj_mat(cor(t(net_dat), method=methods[i]))$p +
-    scale_fill_gradient(limits=c(-1,1))+
-    ggtitle(methods[i])+
-    theme(legend.position = "none")
-  ps[[i+2*length(methods)]] = plot_adj_mat(ppcor::pcor(t(net_dat), method=methods[i])$estimate)$p +
-    scale_fill_gradient(limits=c(-1,1)) +
-    ggtitle(methods[i])+
-    theme(legend.position = "none")
-}
-```
-
-All three plots in first row are identical and third row is partial correlations.
-
-```{r out.height='100%'}
-grid.arrange(arrangeGrob(grobs = ps, nrow=3), mylegend, ncol=2, widths = c(10,1))
-```
-
-## Effect on ext_glm estimates
-
-How are the estimates of ext_glm affected if you use the estimated adjacency matrix?
-
-```{r}
-args_dicts = list()
-for(i in 1:length(methods)){
-  args_dicts[[i]] = cur_args_dict
-  args_dicts[[i]]$W = cor(t(net_dat), method=methods[i])
-  args_dicts[[i]]$W_method = paste0(methods[i], "-full")
-  args_dicts[[i+length(methods)]] = cur_args_dict
-  args_dicts[[i+length(methods)]]$W = ppcor::pcor(t(net_dat), method=methods[i])$estimate
-  args_dicts[[i+length(methods)]]$W_method = paste0(methods[i], "-partial")
-
-}
-
-for(i in 1:length(args_dicts)){
-  print(paste0("Stim node is: ", args_dicts[[i]]$stim_node))
-  print(paste0("Corrected estimates using: ", args_dicts[[i]]$W_method))
-  print(round(run_ext_glm(net_dat, args_dicts[[i]], task_reg = cur_args_dict$I[1,])$ext_task_betas, 4))
-}
-
-```
-
-Does using different connectivity matrices affect other scenarios?
-
-Hub stimulation
-
-```{r}
-sub1 = hub_args_dict
-sub2 = hub_net_dat
-
-args_dicts = list()
-for(i in 1:length(methods)){
-  args_dicts[[i]] = sub1
-  args_dicts[[i]]$W = cor(t(sub2), method=methods[i])
-  args_dicts[[i]]$W_method = paste0(methods[i], "-full")
-  args_dicts[[i+length(methods)]] = sub1
-  args_dicts[[i+length(methods)]]$W = ppcor::pcor(t(sub2), method=methods[i])$estimate
-  args_dicts[[i+length(methods)]]$W_method = paste0(methods[i], "-partial")
-
-}
-
-for(i in 1:length(args_dicts)){
-  print(paste0("Stim node is: ", args_dicts[[i]]$stim_node))
-  print(paste0("Corrected estimates using: ", args_dicts[[i]]$W_method))
-  print(round(run_ext_glm(sub2, args_dicts[[i]], task_reg = sub1$I[2,])$ext_task_betas, 4))
-}
-```
-
-Longer task with hub stimulation
-
-```{r}
-sub1 = longon_args_dict
-sub2 = longon_net_dat
-
-args_dicts = list()
-for(i in 1:length(methods)){
-  args_dicts[[i]] = sub1
-  args_dicts[[i]]$W = cor(t(sub2), method=methods[i])
-  args_dicts[[i]]$W_method = paste0(methods[i], "-full")
-  args_dicts[[i+length(methods)]] = sub1
-  args_dicts[[i+length(methods)]]$W = ppcor::pcor(t(sub2), method=methods[i])$estimate
-  args_dicts[[i+length(methods)]]$W_method = paste0(methods[i], "-partial")
-
-}
-
-for(i in 1:length(args_dicts)){
-  print(paste0("Stim node is: ", args_dicts[[i]]$stim_node))
-  print(paste0("Corrected estimates using: ", args_dicts[[i]]$W_method))
-  print(round(run_ext_glm(sub2, args_dicts[[i]], task_reg = sub1$I[2,])$ext_task_betas, 4))
-}
-```
-
-Looped network with longer task and hub stimulation
-
-```{r}
-sub1 = loop_args_dict
-sub2 = loop_net_dat
-
-args_dicts = list()
-for(i in 1:length(methods)){
-  args_dicts[[i]] = sub1
-  args_dicts[[i]]$W = cor(t(sub2), method=methods[i])
-  args_dicts[[i]]$W_method = paste0(methods[i], "-full")
-  args_dicts[[i+length(methods)]] = sub1
-  args_dicts[[i+length(methods)]]$W = ppcor::pcor(t(sub2), method=methods[i])$estimate
-  args_dicts[[i+length(methods)]]$W_method = paste0(methods[i], "-partial")
-
-}
-
-for(i in 1:length(args_dicts)){
-  print(paste0("Stim node is: ", args_dicts[[i]]$stim_node))
-  print(paste0("Corrected estimates using: ", args_dicts[[i]]$W_method))
-  print(round(run_ext_glm(sub2, args_dicts[[i]], task_reg = sub1$I[2,])$ext_task_betas, 4))
-}
-```
-
-Good news? Using different adjacency matrices doesn't seem to affect the results too much. How come?  
-
-What regressors are affected by the change in the connectivity matrix? Given the model  
-
-`mod = lm(x_t_dt ~ -1 + x_t + g_N_t + s_phi_x_t + I_t + g_N_t_dt + s_phi_ave + I_t_dt)`  
-
-affected regressors would be: `g_N_t`, `g_N_t_dt`, `s_phi_ave`  
-
-So can you get significant improvement in estimating task involvement of each node just by accounting for self activity and not accounting for network activity? Yes.
-
-```{r}
-print(paste0("Stim node is: ", cur_args_dict$stim_node))
-print("Uncorrected estimates")
-round(run_ucr_glm(net_dat_debug, task_reg = cur_args_dict$I[1,])$ucr_task_betas, 4)
-print("Corrected estimates with network activity")
-round(run_ext_glm(net_dat_debug, cur_args_dict, task_reg = cur_args_dict$I[1,])$ext_task_betas, 4)
-print("Corrected estimates without network activity")
-round(run_ext_glm(net_dat_debug, cur_args_dict, task_reg = cur_args_dict$I[1,], inc_net_act = FALSE)$ext_task_betas, 4)
-```
-
-Does the addition of the network activity regressors improve the model significantly? It does. But the parameter estimates for task involvement do not change drastically compared to not including them.
-
-```{r}
-out = run_ext_glm(net_dat_debug, cur_args_dict, task_reg = cur_args_dict$I[1,])
-
-for (i in 1:length(out$ext_mods)){
-  cur_df = out$ext_mods[[i]]
-  m1 = lm(x_t_dt ~ -1 + x_t + s_phi_x_t + I_t + I_t_dt, data = cur_df)
-  m2 = lm(x_t_dt ~ -1 + x_t + g_N_t + s_phi_x_t + I_t + g_N_t_dt + s_phi_ave + I_t_dt, data = cur_df)
-  print(anova(m1, m2))
-}
-```
-
-## Effect on larger network
-
-Is the effect of accounting for the network activity in correcting the task involvement small bc the network is small? Would it be more substantial for a larger/more complicated network?
-
-```{r}
-big_W_args_dict = default_args_dict
-big_G = generateStructuralNetwork(big_W_args_dict)
-big_W_args_dict$W = generateSynapticNetwork(big_G$W, showplot=big_W_args_dict$showplot)$G
-big_W_args_dict$stim_nodes = c(1:10)
-big_W_args_dict$I = make_stimtimes(big_W_args_dict$stim_nodes, big_W_args_dict)$stimtimes
-big_W_net_dat = networkModel(big_W_args_dict$W, big_W_args_dict)
-big_W_net_dat_debug = networkModel(big_W_args_dict$W, big_W_args_dict, debug=T)
-```
-
-```{r}
-plot_adj_mat(big_W_args_dict$W)$p
-```
-
-```{r}
-data.frame(stim = make_stimtimes(big_W_args_dict$stim_nodes, big_W_args_dict)$tasktiming) %>%
-  mutate(timepoint = 1:n())%>%
-  ggplot(aes(timepoint, stim)) +
-  geom_line()
-```
-
-```{r}
-print(paste0("Stim node is: ", big_W_args_dict$stim_nodes))
-print("Uncorrected estimates")
-round(run_ucr_glm(big_W_net_dat_debug, task_reg = big_W_args_dict$I[1,])$ucr_task_betas, 4)
-print("Corrected estimates with network activity")
-round(run_ext_glm(big_W_net_dat_debug, big_W_args_dict, task_reg = big_W_args_dict$I[1,])$ext_task_betas, 4)
-print("Corrected estimates without network activity")
-round(run_ext_glm(big_W_net_dat_debug, big_W_args_dict, task_reg = big_W_args_dict$I[1,], inc_net_act = FALSE)$ext_task_betas, 4)
-```
-
-# `s` and `g` effects on extended GLM
-
-What is the effect of removing network activity from the extended regression depending `s` to `g` (ie if the network is driven more or less by the network compared to self stimulation)
-
-s , g , ucr1, ucr2, ucr3, ext1, ext2, ext3, ext_nonet1, ext_nonet2, ext_nonet3, ext_noself1, ext_noself2, ext_noself3
-
-4 Heatmaps per node
-x axis = s
-y axis = g
-color by divergence from true task coefficient
-
-```{r}
-sweep_vals = c(seq(0.001, .1 ,.01), seq(1, 5, .5))
-
-copy_dict = cur_args_dict
-stim_node = 1
-adj_mat = W
-
-out = data.frame(matrix(NA, nrow=length(sweep_vals)^2, ncol=14))
-
-row_count = 1 
-for(cur_s in 1:length(sweep_vals)){
-  for(cur_g in 1:length(sweep_vals)){
-    
-    cur_sg_dict = copy_dict
-    cur_sg_dict$s = sweep_vals[cur_s]
-    cur_sg_dict$g = sweep_vals[cur_g]
-    cur_sg_netact = networkModel(adj_mat, cur_sg_dict, debug=T)
-    cur_ucr = run_ucr_glm(cur_sg_netact, task_reg = cur_sg_dict$I[stim_node,])$ucr_task_betas
-    cur_ext = run_ext_glm(cur_sg_netact, cur_sg_dict, task_reg = cur_sg_dict$I[stim_node,])$ext_task_betas
-    cur_ext_nonet = run_ext_glm(cur_sg_netact, cur_sg_dict, task_reg = cur_sg_dict$I[stim_node,], inc_net_act=FALSE)$ext_task_betas
-    cur_ext_noself = run_ext_glm(cur_sg_netact, cur_sg_dict, task_reg = cur_sg_dict$I[stim_node,], inc_self_stim=FALSE)$ext_task_betas
-    cur_row = c(sweep_vals[cur_s], sweep_vals[cur_g], cur_ucr, cur_ext, cur_ext_nonet, cur_ext_noself)
-    out[row_count,] = cur_row
-    row_count = row_count+1
-    print(row_count)
-  }
-}
-names(out) = c("s", "g" , "ucr1", "ucr2", "ucr3", "ext1", "ext2", "ext3", "ext_nonet1", "ext_nonet2", "ext_nonet3", "ext_noself1", "ext_noself2", "ext_noself3")
-
-```
-
-Heatmaps of deviance from the correct task estimate for the extended GLM model ran without either the network activity regressors or self-stimulation regressors.
-
-```{r}
-out %>%
-  select(s, g, ext_nonet1, ext_noself1, ext_nonet2, ext_noself2, ext_nonet3, ext_noself3) %>%
-  gather(key, value, -s, -g) %>%
-  separate(key, into = c("key", "node"), "(?<=[a-z])(?=[0-9])") %>%
-  mutate(dev = ifelse(node == "1", value-.25, value), #
-         s = as.factor(round(s, 2)),
-         g = as.factor(round(g, 2)),
-         key = factor(key,levels = c("ext_nonet", "ext_noself"),
-                      labels = c("W/out network activity", "W/out self stimulation")),
-         node = factor(node, levels=c(1,2,3),
-                       labels = c("Non-hub stim", "Hub non-stim", "Non-hub non-stim"))) %>%
-  ggplot(aes(s, g, fill=dev))+
-  geom_tile(size=.6)+
-  facet_grid(node~key)+
-  theme(panel.grid=element_blank(),
-        axis.text.x = element_text(angle=90))+
-  scale_fill_gradient2(low = "red", mid="white", high = "blue", midpoint=0,  limits=c(-1,1),
-                       name="Over/under \nestimation")
-```
-
-What proportion of activity is driven by task versus network?
-task driver: self stim + task stim
-Can you work this out from the eq above?
-
-```{r}
-
-
-```
-
-What drives the bleeding of task effect to nonstim nodes that are connected to stim nodes? How does it change depending on the `s` to `g` ratio?
-Bleeding = more overestimation of task coefficients for non-stim nodes connected to stim nodes (e.g. other nodes in a hub community for a top-down task) compared to non-stim nodes without direct connections to stim nodes (maybe it's better to keep this continuous by using a metric like distance to stim node instead of a binary classification)
-
-```{r}
-
-
-```
