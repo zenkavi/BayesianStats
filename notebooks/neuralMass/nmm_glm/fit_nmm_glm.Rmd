@@ -471,7 +471,7 @@ cat("\n")
 round(run_ext_glm(big_W_net_dat_debug, big_W_args_dict, task_reg = big_W_args_dict$I[1,], inc_net_act = FALSE)$ext_task_betas, 4)
 ```
 
-Plotting as I did before to visually detect if there is any "bleeding" to non-stim hub nodes. Where has the bleeding gone?
+Plotting as I did before to visually detect if there is any "bleeding" to non-stim hub nodes. 
 
 ```{r}
 data.frame(ucr_betas = run_ucr_glm(big_W_net_dat_debug, task_reg = big_W_args_dict$I[1,])$ucr_task_betas,
@@ -484,31 +484,53 @@ data.frame(ucr_betas = run_ucr_glm(big_W_net_dat_debug, task_reg = big_W_args_di
   geom_vline(aes(xintercept = 35), linetype="dashed")+
   geom_vline(aes(xintercept = 70), linetype="dashed")
 ```
+**WHERE HAS THE BLEEDING IN UCR ESTIMATES GONE?**
 
+First check network structure: confirm that the number of stim nodes and the sum of weights from stim nodes to non stim hub nodes is larger than that for non stim local nodes
+
+```{r}
+#from in columns; to in rows
+dist_mat = distances(graph_from_adjacency_matrix(big_W_args_dict$W, weighted=T), algorithm = 'johnson')
+
+tmp = data.frame(sum_stim_node_cons = rowSums(big_G$W[11:105, 1:10]), 
+           sum_stim_node_weights = rowSums(big_W_args_dict$W[11:105, 1:10]),
+           distance = rowMeans(dist_mat[11:105 , 1:10])) %>%
+  mutate(node = 1:n(),
+         node = node+10,
+         comm = ifelse(node<36, 1, ifelse(node>35 & node<71, 2, 3)))
+
+
+tmp %>%
+  gather(key, value, -node, -comm) %>%
+  ggplot(aes(node, value))+
+  geom_line()+
+  geom_vline(aes(xintercept = 35), linetype="dashed")+
+  geom_vline(aes(xintercept = 70), linetype="dashed")+
+  facet_grid(key~., scales='free_y', switch = 'both')+
+  scale_y_continuous(position="right")+
+  ylab("")
+```
+
+```{r}
+tmp %>%
+  gather(key, value, -node, -comm) %>%
+  ggplot(aes(as.factor(comm), value))+
+  geom_boxplot(width=.3)+
+  facet_grid(key~., scales='free_y', switch = 'both')+
+  scale_y_continuous(position="right")+
+  xlab("Community")+
+  ylab("")+
+  geom_hline(aes(yintercept=0))+
+  theme(axis.line.x = element_blank(),
+        axis.ticks.x = element_blank())
+```
 How to plot overestimation by distance from stim/hub node?
 
 x = distance (average distance from stimulated nodes)
 y = overestimation (ucr - ext)
-
-It doesn't look like there is any difference between the distance from stim nodes to non stim hub nodes compared to the distance from stim nodes to non stim local nodes.
-
-```{r}
-#from in columns 
-#to in rows
-#so i want the stim_node columns for non-stim-node rows
-
-dist_mat = distances(graph_from_adjacency_matrix(big_W_args_dict$W, weighted=T), algorithm = 'johnson')
-rowMeans(dist_mat[11:105 , 1:10])
-```
 
 What is bleeding? [Especially for UCR] Higher overestimation of task activity to nodes closer (/directly connected to) stimulated nodes.
 
 Since the task regressor used for all nodes in the same
 Are the time series of non stim hub nodes more similar to stim nodes than other nodes are to stim nodes?
 They should be since they should be more likely to be connected to a stim node
-
-Even before the time series: confirm that the number of stim nodes and the sum of weights from stim nodes to non stim hub nodes is larger than that for non stim local nodes
-
-```{r}
-rowSums(big_W_args_dict$W[11:105, 1:10])
-```
