@@ -18,7 +18,6 @@ source(paste0(helpers_path,'run_ucr_glm.R'))
 source(paste0(helpers_path,'run_ext_glm.R'))
 source(paste0(helpers_path,'check_net_resids.R'))
 source(paste0(helpers_path,'plot_adj_mat.R'))
-source('~/Dropbox/PoldrackLab/SRO_Retest_Analyses/code/helper_functions/g_legend.R')
 ```
 
 # Intuitions for activity propogation within a network
@@ -100,8 +99,9 @@ cur_args_dict = list('dt'=.5,
 cur_args_dict$stim_node = 1
 cur_args_dict$I = make_stimtimes(cur_args_dict$stim_node, cur_args_dict)$stimtimes
 
-print(paste0('Self-stimulation parameter s is: ', cur_args_dict$s))
-print(paste0('Network stimulation parameter g is: ', cur_args_dict$g))
+cat(paste0('Self-stimulation parameter s is: ', cur_args_dict$s))
+cat("\n")
+cat(paste0('Network stimulation parameter g is: ', cur_args_dict$g))
 ```
 
 Activity in each node at each time point would look like:
@@ -245,8 +245,9 @@ $$x_{i}(t+dt) = (1-\frac{dt}{\tau_i}+\frac{dt^2}{2\tau_i^2}){x_{i}(t)} + \frac{d
 Given the parameters set in the stimulation
 
 ```{r}
-print(paste0('Sampling rate dt is: ', cur_args_dict$dt))
-print(paste0('Time constant tau is: ', cur_args_dict$tau))
+cat(paste0('Sampling rate dt is: ', cur_args_dict$dt))
+cat("\n")
+cat(paste0('Time constant tau is: ', cur_args_dict$tau))
 ```
 
 and the above equation used for the GLM inversion the true task effect for stimulated nodes is the coefficient of the ${I}_{i}(t+dt)$ regressor which is $\frac{dt}{2\tau_i}$
@@ -266,14 +267,20 @@ net_dat_debug = networkModel(W, cur_args_dict, debug=T)
 "Uncorrected" GLM overestimates task parameter. Task betas for each node:
 
 ```{r}
-print(paste0("Stim node is: ", cur_args_dict$stim_node))
+cat(paste0("Stim node is: ", cur_args_dict$stim_node))
+cat("\n")
+cat("Uncorrected estimates for each node:")
+cat("\n")
 round(run_ucr_glm(net_dat_debug, task_reg = cur_args_dict$I[1,])$ucr_task_betas, 4)
 ```
 
 "Extended" GLM recovers correct task parameter.
 
 ```{r}
-print(paste0("Stim node is: ", cur_args_dict$stim_node))
+cat(paste0("Stim node is: ", cur_args_dict$stim_node))
+cat("\n")
+cat("Corrected estimates for each node:")
+cat("\n")
 round(run_ext_glm(net_dat_debug, cur_args_dict, task_reg = cur_args_dict$I[1,])$ext_task_betas, 4)
 ```
 
@@ -286,10 +293,14 @@ hub_net_dat_debug = networkModel(W, hub_args_dict, debug=T)
 Extended GLM correctly recovers task parameters when the hub node is stimulated.
 
 ```{r}
-print(paste0("Stim node is: ", hub_args_dict$stim_node))
-print("Uncorrected estimates:")
+cat(paste0("Stim node is: ", hub_args_dict$stim_node))
+cat("\n")
+cat("Uncorrected estimates:")
+cat("\n")
 round(run_ucr_glm(hub_net_dat_debug, task_reg = hub_args_dict$I[2,])$ucr_task_betas, 4)
-print("Corrected estimates:")
+cat("\n")
+cat("Corrected estimates:")
+cat("\n")
 round(run_ext_glm(hub_net_dat_debug, cur_args_dict, task_reg = hub_args_dict$I[2,])$ext_task_betas, 4)
 ```
 
@@ -302,10 +313,14 @@ longon_net_dat_debug = networkModel(W, longon_args_dict, debug=T)
 **Extended GLM overcorrects non-stimulated nodes.**
 
 ```{r}
-print(paste0("Stim node is: ", longon_args_dict$stim_node))
-print("Uncorrected estimates:")
+cat(paste0("Stim node is: ", longon_args_dict$stim_node))
+cat("\n")
+cat("Uncorrected estimates:")
+cat("\n")
 round(run_ucr_glm(longon_net_dat_debug, task_reg = longon_args_dict$I[2,])$ucr_task_betas, 4)
-print("Corrected estimates:")
+cat("\n")
+cat("Corrected estimates:")
+cat("\n")
 round(run_ext_glm(longon_net_dat_debug, longon_args_dict, task_reg = longon_args_dict$I[2,])$ext_task_betas, 4)
 ```
 
@@ -370,10 +385,14 @@ loop_net_dat_debug = networkModel(loop_W, loop_args_dict, debug=T)
 Extended GLM overcorrects non-stimulated nodes. But this is due to the longer task and not due to the loop. See below for the same loop adjacency matrix with a shorter task. The corrected estimates are not over-corrected for non-stimulated nodes.
 
 ```{r}
-print(paste0("Stim node is: ", loop_args_dict$stim_node))
-print("Uncorrected estimates:")
+cat(paste0("Stim node is: ", loop_args_dict$stim_node))
+cat("\n")
+cat("Uncorrected estimates:")
+cat("\n")
 round(run_ucr_glm(loop_net_dat_debug, task_reg = loop_args_dict$I[2,])$ucr_task_betas, 4)
-print("Corrected estimates:")
+cat("\n")
+cat("Corrected estimates:")
+cat("\n")
 round(run_ext_glm(loop_net_dat_debug, loop_args_dict, task_reg = loop_args_dict$I[2,])$ext_task_betas, 4)
 ```
 
@@ -384,10 +403,81 @@ loop_short_net_dat_debug = networkModel(loop_W, loop_short_args_dict, debug=T)
 ```
 
 ```{r}
-print(paste0("Stim node is: ", loop_short_args_dict$stim_node))
-print("Uncorrected estimates:")
+cat(paste0("Stim node is: ", loop_short_args_dict$stim_node))
+cat("\n")
+cat("Uncorrected estimates:")
 round(run_ucr_glm(loop_short_net_dat_debug, task_reg = loop_short_args_dict$I[2,])$ucr_task_betas, 4)
-print("Corrected estimates:")
+cat("\n")
+cat("Corrected estimates:")
+cat("\n")
 round(run_ext_glm(loop_short_net_dat_debug, loop_short_args_dict, task_reg = loop_short_args_dict$I[2,])$ext_task_betas, 4)
 ```
 
+## Larger network
+
+Does the extended GLM framework work for a larger network with a topdown block task?
+
+```{r}
+big_W_args_dict = default_args_dict
+big_G = generateStructuralNetwork(big_W_args_dict)
+big_W_args_dict$W = generateSynapticNetwork(big_G$W, showplot=big_W_args_dict$showplot)$G
+big_W_args_dict$stim_nodes = c(1:10)
+big_W_args_dict$I = make_stimtimes(big_W_args_dict$stim_nodes, big_W_args_dict)$stimtimes
+big_W_net_dat = networkModel(big_W_args_dict$W, big_W_args_dict)
+big_W_net_dat_debug = networkModel(big_W_args_dict$W, big_W_args_dict, debug=T)
+```
+
+Suppose we have a network of 105 nodes with 3 communities of 35 nodes each. This network has one hub and two local communities. The hub community is more likely to be connected to the local community nodes, while local communities only have high connectivity within their own networks.
+
+```{r}
+plot_adj_mat(big_W_args_dict$W)$p
+```
+
+The block task comes on first after 100 time points and then after every 400 time points for 100 time points. It is top-down, meaning it only stimulates some (10) nodes in the hub network directly.
+
+```{r}
+data.frame(stim = make_stimtimes(big_W_args_dict$stim_nodes, big_W_args_dict)$tasktiming) %>%
+  mutate(timepoint = 1:n())%>%
+  ggplot(aes(timepoint, stim)) +
+  geom_line()
+```
+
+Activity propagates in this network based on the following self and network stimulation parameters
+
+```{r}
+cat(paste0("Self stimulation parameter s is: ", big_W_args_dict$s))
+cat("\n")
+cat(paste0("Network stimulation parameter g is: ", big_W_args_dict$g))
+```
+
+```{r}
+print(paste0("Stim node is: ", big_W_args_dict$stim_nodes))
+cat("\n")
+cat("Uncorrected estimates")
+cat("\n")
+round(run_ucr_glm(big_W_net_dat_debug, task_reg = big_W_args_dict$I[1,])$ucr_task_betas, 4)
+cat("\n")
+cat("Corrected estimates with network activity")
+cat("\n")
+round(run_ext_glm(big_W_net_dat_debug, big_W_args_dict, task_reg = big_W_args_dict$I[1,])$ext_task_betas, 4)
+cat("\n")
+cat("Corrected estimates without network activity")
+cat("\n")
+round(run_ext_glm(big_W_net_dat_debug, big_W_args_dict, task_reg = big_W_args_dict$I[1,], inc_net_act = FALSE)$ext_task_betas, 4)
+```
+
+Plotting as I did before to visually detect if there is any "bleeding" to non-stim hub nodes.
+
+```{r}
+data.frame(ucr_betas = run_ucr_glm(big_W_net_dat_debug, task_reg = big_W_args_dict$I[1,])$ucr_task_betas,
+           ext_betas = run_ext_glm(big_W_net_dat_debug, big_W_args_dict, task_reg = big_W_args_dict$I[1,])$ext_task_betas) %>%
+  mutate(node = 1:n()) %>%
+  gather(key, beta, -node) %>%
+  ggplot(aes(node, beta, col=key))+
+  geom_line()+
+  theme(legend.title = element_blank())+
+  geom_vline(aes(xintercept = 35), linetype="dashed")+
+  geom_vline(aes(xintercept = 70), linetype="dashed")
+```
+
+How to plot overestimation by distance from stim/hub node?
