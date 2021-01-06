@@ -421,7 +421,7 @@ Does the extended GLM framework work for a larger network with a topdown block t
 big_W_args_dict = default_args_dict
 
 #Change network such that most of the activity is driven by network compared to self stimulation
-big_W_args_dict$s = 1
+big_W_args_dict$s = .7
 big_W_args_dict$g = 1
 
 big_G = generateStructuralNetwork(big_W_args_dict)
@@ -486,7 +486,7 @@ data.frame(ucr_betas = run_ucr_glm(big_W_net_dat_debug, task_reg = big_W_args_di
 ```
 **WHERE HAS THE BLEEDING IN UCR ESTIMATES GONE?**
 
-First check network structure: confirm that the number of stim nodes and the sum of weights from stim nodes to non stim hub nodes is larger than that for non stim local nodes
+First check network structure. Confirm that the number of total connections to stim nodes and the sum of weights from stim nodes is larger for non-stim hub nodes than they are for non stim local nodes.
 
 ```{r}
 #from in columns; to in rows
@@ -494,7 +494,7 @@ dist_mat = distances(graph_from_adjacency_matrix(big_W_args_dict$W, weighted=T),
 
 tmp = data.frame(sum_stim_node_cons = rowSums(big_G$W[11:105, 1:10]), 
            sum_stim_node_weights = rowSums(big_W_args_dict$W[11:105, 1:10]),
-           distance = rowMeans(dist_mat[11:105 , 1:10])) %>%
+           mean_distance = rowMeans(dist_mat[11:105 , 1:10])) %>%
   mutate(node = 1:n(),
          node = node+10,
          comm = ifelse(node<36, 1, ifelse(node>35 & node<71, 2, 3)))
@@ -524,13 +524,50 @@ tmp %>%
   theme(axis.line.x = element_blank(),
         axis.ticks.x = element_blank())
 ```
-How to plot overestimation by distance from stim/hub node?
+
+The structure of the network looks fine based on the above. So where is the bleeding supposed to be?  
+
+What is bleeding? It is the higher overestimation of task activity to nodes closer (/directly connected) to stimulated nodes in UCR GLM. Since the task regressor used for all nodes in the same difference in relationship can only be due to difference on nodes' timeseries.
+
+If the time series of non-stim hub nodes are more similar to stim hub nodes than the non-stim local community nodes (which as shown above are not as strongly connected to stim nodes) other nodes are to stim nodes?
+
+
+```{r}
+similarity_df = data.frame(cor(t(big_W_net_dat))[11:105,1:10]) %>%
+  mutate(node = 1:n(),
+         node = node+10) %>%
+  gather(key, similarity, -node) %>%
+  mutate(key = gsub("X", "node_", key))
+
+similarity_df %>%
+  ggplot(aes(node, similarity, color=key))+
+  geom_line()+
+  ylab("Similarity to stim node")+
+  theme(legend.title=element_blank())+
+  geom_vline(aes(xintercept = 35), linetype="dashed")+
+  geom_vline(aes(xintercept = 70), linetype="dashed")
+
+```
+Does the similarity of a non-stim timeseries to stim timeseries depend on its distance from stim node?
+
+```{r}
+data.frame(dist_mat[11:105 , 1:10]) %>%
+  mutate(node = 1:n(),
+         node = node+10) %>%
+  gather(key, distance, -node) %>%
+  mutate(key = gsub("X", "node_", key)) %>%
+  left_join(similarity_df, by=c("node", "key")) %>%
+  mutate(community = as.factor(ifelse(node<36,1, ifelse(node>35&node<71,2,3)))) %>%
+  ggplot(aes(distance, similarity, color=community))+
+  geom_point()
+  
+```
+
+Plot overestimation by distance from stim/hub node?
 
 x = distance (average distance from stimulated nodes)
 y = overestimation (ucr - ext)
 
-What is bleeding? [Especially for UCR] Higher overestimation of task activity to nodes closer (/directly connected to) stimulated nodes.
+```{r}
 
-Since the task regressor used for all nodes in the same
-Are the time series of non stim hub nodes more similar to stim nodes than other nodes are to stim nodes?
-They should be since they should be more likely to be connected to a stim node
+```
