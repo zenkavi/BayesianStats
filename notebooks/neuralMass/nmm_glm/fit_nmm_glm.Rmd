@@ -421,8 +421,8 @@ Does the extended GLM framework work for a larger network with a topdown block t
 big_W_args_dict = default_args_dict
 
 #Change network such that most of the activity is driven by network compared to self stimulation
-big_W_args_dict$s = .55
-big_W_args_dict$g = .55
+big_W_args_dict$s = .7
+big_W_args_dict$g = .4
 
 big_G = generateStructuralNetwork(big_W_args_dict)
 big_W_args_dict$W = generateSynapticNetwork(big_G$W, showplot=big_W_args_dict$showplot)$G
@@ -432,7 +432,6 @@ big_W_args_dict$tasktiming = c(rep(0, 99), rep(1, 100), rep(0, 301))
 
 big_W_args_dict$I = make_stimtimes(big_W_args_dict$stim_nodes, big_W_args_dict)$stimtimes
 big_W_net_dat = networkModel(big_W_args_dict$W, big_W_args_dict)
-big_W_net_dat_debug = networkModel(big_W_args_dict$W, big_W_args_dict, debug=T)
 ```
 
 Suppose we have a network of 105 nodes with 3 communities of 35 nodes each. This network has one hub and two local communities. The hub community is more likely to be connected to the local community nodes, while local communities only have high connectivity within their own networks.
@@ -485,10 +484,6 @@ cat(paste0("Network stimulation parameter g is: ", big_W_args_dict$g))
 
 What does the activity look like in the network?
 
-**When $\frac{s}{g}=1$ AND $s>.5$ activity doesn't turn off after task does.**
-
-**When $\frac{s}{g}<1$ activity doesn't turn off after task does.**
-
 ```{r}
 data.frame(big_W_net_dat) %>%
   mutate(node = 1:n())  %>%
@@ -499,6 +494,42 @@ data.frame(big_W_net_dat) %>%
   ggplot(aes(time, value, col=comm, shape=comm))+
   geom_point()+
   theme(legend.title = element_blank())
+```
+
+When does activity turn off?
+
+```{r}
+sweep_vals = seq(0,1.5,.1)
+
+sweep_W_args_dict = default_args_dict
+sweep_G = generateStructuralNetwork(sweep_W_args_dict)
+sweep_W_args_dict$W = generateSynapticNetwork(sweep_G$W, showplot=sweep_W_args_dict$showplot)$G
+sweep_W_args_dict$stim_nodes = c(1:10)
+sweep_W_args_dict$tasktiming = c(rep(0, 99), rep(1, 100), rep(0, 301))
+sweep_W_args_dict$I = make_stimtimes(sweep_W_args_dict$stim_nodes, sweep_W_args_dict)$stimtimes
+
+out = data.frame(s=rep(NA,length(sweep_vals)^2), g=rep(NA,length(sweep_vals)^2), min_val=rep(NA,length(sweep_vals)^2))
+cur_row=1
+for(i in 1:length(sweep_vals)){
+  for(j in 1:length(sweep_vals)){
+    cur_s = sweep_vals[i]
+    cur_g = sweep_vals[j]
+    sweep_W_args_dict$s = cur_s
+    sweep_W_args_dict$g = cur_g
+    sweep_W_net_dat = networkModel(sweep_W_args_dict$W, sweep_W_args_dict)
+    cur_min_val = min(sweep_W_net_dat[,dim(sweep_W_net_dat)[2]])
+    out[cur_row,] = c(cur_s, cur_g, cur_min_val)
+    cur_row = cur_row+1
+  }
+}
+```
+
+```{r}
+out %>%
+  mutate(s=as.factor(s),
+         g=as.factor(g))%>%
+  ggplot(aes(s, g, fill=min_val))+
+  geom_tile()
 ```
 
 ```{r}
