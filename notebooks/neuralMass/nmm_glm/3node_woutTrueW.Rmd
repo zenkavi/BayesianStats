@@ -1,5 +1,5 @@
 ---
-title: "Neural mass model simulation and external stimulation parameter recovery with GLM"
+title: "Accounting for network connectivity without true adjacency matrix"
 ---
 
 ```{r}
@@ -83,6 +83,7 @@ cur_args_dict$stim_node = 1
 cur_args_dict$I = make_stimtimes(cur_args_dict$stim_node, cur_args_dict)$stimtimes
 
 net_dat = networkModel(W, cur_args_dict)
+net_dat_debug = networkModel(W, cur_args_dict, debug=T)
 
 print(paste0('Self-stimulation parameter s is: ', cur_args_dict$s))
 print(paste0('Network stimulation parameter g is: ', cur_args_dict$g))
@@ -131,10 +132,18 @@ All three plots in first row are identical and third row is partial correlations
 grid.arrange(arrangeGrob(grobs = ps, nrow=3), mylegend, ncol=2, widths = c(10,1))
 ```
 
-How similar is the "functional connectivity" matrices to the true connectivity matrix?
+How similar is the "functional connectivity" matrices to the true connectivity matrix? Not very.
 
 ```{r}
-W
+for(i in 1:length(methods)){
+  cat(paste0("r between W and ", methods[i], " - full: "))
+  cat(cor(c(W), c(cor(t(net_dat), method=methods[i]))))
+  cat("\n")
+  cat(paste0("r between W and ", methods[i], " - partial: "))
+  cat(cor(c(W), c(ppcor::pcor(t(net_dat), method=methods[i])$estimate)))
+  cat("\n")
+}
+
 ```
 
 ## Effect on ext_glm estimates
@@ -268,54 +277,15 @@ for (i in 1:length(out$ext_mods)){
 }
 ```
 
-## Effect on larger network
-
-Is the effect of accounting for the network activity in correcting the task involvement small bc the network is small? Would it be more substantial for a larger/more complicated network?
-
-```{r}
-big_W_args_dict = default_args_dict
-big_G = generateStructuralNetwork(big_W_args_dict)
-big_W_args_dict$W = generateSynapticNetwork(big_G$W, showplot=big_W_args_dict$showplot)$G
-big_W_args_dict$stim_nodes = c(1:10)
-big_W_args_dict$I = make_stimtimes(big_W_args_dict$stim_nodes, big_W_args_dict)$stimtimes
-big_W_net_dat = networkModel(big_W_args_dict$W, big_W_args_dict)
-big_W_net_dat_debug = networkModel(big_W_args_dict$W, big_W_args_dict, debug=T)
-```
-
-```{r}
-plot_adj_mat(big_W_args_dict$W)$p
-```
-
-```{r}
-data.frame(stim = make_stimtimes(big_W_args_dict$stim_nodes, big_W_args_dict)$tasktiming) %>%
-  mutate(timepoint = 1:n())%>%
-  ggplot(aes(timepoint, stim)) +
-  geom_line()
-```
-
-```{r}
-print(paste0("Stim node is: ", big_W_args_dict$stim_nodes))
-print("Uncorrected estimates")
-round(run_ucr_glm(big_W_net_dat_debug, task_reg = big_W_args_dict$I[1,])$ucr_task_betas, 4)
-print("Corrected estimates with network activity")
-round(run_ext_glm(big_W_net_dat_debug, big_W_args_dict, task_reg = big_W_args_dict$I[1,])$ext_task_betas, 4)
-print("Corrected estimates without network activity")
-round(run_ext_glm(big_W_net_dat_debug, big_W_args_dict, task_reg = big_W_args_dict$I[1,], inc_net_act = FALSE)$ext_task_betas, 4)
-```
-
 # `s` and `g` effects on extended GLM
+
+## 3 node network
 
 What is the effect of removing network activity from the extended regression depending `s` to `g` (ie if the network is driven more or less by the network compared to self stimulation)
 
-s , g , ucr1, ucr2, ucr3, ext1, ext2, ext3, ext_nonet1, ext_nonet2, ext_nonet3, ext_noself1, ext_noself2, ext_noself3
-
-4 Heatmaps per node
-x axis = s
-y axis = g
-color by divergence from true task coefficient
-
 ```{r}
-sweep_vals = c(seq(0.001, .1 ,.01), seq(1, 5, .5))
+# sweep_vals = c(seq(0.001, .1 ,.01), seq(1, 5, .5))
+sweep_vals = c(seq(0,1.5,.1), seq(1, 5, .5))
 
 copy_dict = cur_args_dict
 stim_node = 1
@@ -338,7 +308,6 @@ for(cur_s in 1:length(sweep_vals)){
     cur_row = c(sweep_vals[cur_s], sweep_vals[cur_g], cur_ucr, cur_ext, cur_ext_nonet, cur_ext_noself)
     out[row_count,] = cur_row
     row_count = row_count+1
-    print(row_count)
   }
 }
 names(out) = c("s", "g" , "ucr1", "ucr2", "ucr3", "ext1", "ext2", "ext3", "ext_nonet1", "ext_nonet2", "ext_nonet3", "ext_noself1", "ext_noself2", "ext_noself3")

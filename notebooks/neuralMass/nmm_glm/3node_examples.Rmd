@@ -332,7 +332,7 @@ The effect on `s_phi_ave` is harder to visualize so it is shown below. For a non
 
 ```{r  fig.asp=.3, fig.height=10}
 tmp_df = run_ext_glm(longon_net_dat_debug, longon_args_dict, task_reg = longon_args_dict$I[2,])$ext_mods[[1]]
-resids_df = check_net_resids(1, longon_net_dat_debug, longon_args_dict, verbose= TRUE)
+resids_df = check_net_resids(1, longon_net_dat_debug, longon_args_dict, inc_comps= TRUE)
 
 p1 = data.frame(network = resids_df$s_phi_ave, regression = tmp_df$s_phi_ave) %>%
   mutate(time = 1: n()) %>%
@@ -356,7 +356,7 @@ Why don't we observe the same problem when the stimulation is short? Because the
 
 ```{r fig.asp=.3, fig.height=10}
 tmp_df = run_ext_glm(hub_net_dat_debug, hub_args_dict, task_reg = hub_args_dict$I[2,])$ext_mods[[1]]
-resids_df = check_net_resids(1, hub_net_dat_debug, hub_args_dict, verbose= TRUE)
+resids_df = check_net_resids(1, hub_net_dat_debug, hub_args_dict, inc_comps= TRUE)
 
 p1 = data.frame(network = resids_df$s_phi_ave, regression = tmp_df$s_phi_ave) %>%
   mutate(time = 1: n()) %>%
@@ -413,160 +413,3 @@ cat("\n")
 round(run_ext_glm(loop_short_net_dat_debug, loop_short_args_dict, task_reg = loop_short_args_dict$I[2,])$ext_task_betas, 4)
 ```
 
-## Larger network
-
-Does the extended GLM framework work for a larger network with a topdown block task?
-
-```{r}
-big_W_args_dict = default_args_dict
-
-#Change network such that most of the activity is driven by network compared to self stimulation
-big_W_args_dict$s = .7
-big_W_args_dict$g = .4
-
-big_G = generateStructuralNetwork(big_W_args_dict)
-big_W_args_dict$W = generateSynapticNetwork(big_G$W, showplot=big_W_args_dict$showplot)$G
-big_W_args_dict$stim_nodes = c(1:10)
-
-big_W_args_dict$tasktiming = c(rep(0, 99), rep(1, 100), rep(0, 301))
-
-big_W_args_dict$I = make_stimtimes(big_W_args_dict$stim_nodes, big_W_args_dict)$stimtimes
-big_W_net_dat = networkModel(big_W_args_dict$W, big_W_args_dict)
-```
-
-Suppose we have a network of 105 nodes with 3 communities of 35 nodes each. This network has one hub and two local communities. The hub community is more likely to be connected to the local community nodes, while local communities only have high connectivity within their own networks.
-
-```{r}
-plot_adj_mat(big_W_args_dict$W)$p
-```
-
-First check network structure. Confirm that the number of total connections to stim nodes and the sum of weights from stim nodes is larger for non-stim hub nodes than they are for non stim local nodes.
-
-```{r}
-#from in columns; to in rows
-dist_mat = igraph::distances(igraph::graph_from_adjacency_matrix(big_W_args_dict$W, weighted=T), algorithm = 'johnson')
-
-tmp = data.frame(sum_stim_node_cons = rowSums(big_G$W[11:105, 1:10]), 
-           sum_stim_node_weights = rowSums(big_W_args_dict$W[11:105, 1:10]),
-           mean_distance = rowMeans(dist_mat[11:105 , 1:10])) %>%
-  mutate(node = 1:n(),
-         node = node+10,
-         comm = ifelse(node<36, 1, ifelse(node>35 & node<71, 2, 3)))
-
-
-tmp %>%
-  gather(key, value, -node, -comm) %>%
-  ggplot(aes(node, value))+
-  geom_line()+
-  geom_vline(aes(xintercept = 35), linetype="dashed")+
-  geom_vline(aes(xintercept = 70), linetype="dashed")+
-  facet_grid(key~., scales='free_y', switch = 'both')+
-  scale_y_continuous(position="right")+
-  ylab("")
-```
-
-The block task comes on first after 100 time points and then after every 400 time points for 100 time points. It is top-down, meaning it only stimulates some (10) nodes in the hub network directly.
-
-```{r}
-data.frame(stim = make_stimtimes(big_W_args_dict$stim_nodes, big_W_args_dict)$tasktiming) %>%
-  mutate(timepoint = 1:n())%>%
-  ggplot(aes(timepoint, stim)) +
-  geom_line()
-```
-
-Activity propagates in this network based on the following self and network stimulation parameters
-
-```{r}
-cat(paste0("Self stimulation parameter s is: ", big_W_args_dict$s))
-cat("\n")
-cat(paste0("Network stimulation parameter g is: ", big_W_args_dict$g))
-```
-
-What does the activity look like in the network?
-
-```{r}
-data.frame(big_W_net_dat) %>%
-  mutate(node = 1:n())  %>%
-  gather(time, value, -node) %>%
-  mutate(time = gsub("X", "", time),
-         time = as.numeric(time),
-         comm = ifelse(node<11, "1_stim", ifelse(node>10 & node<36, "1_nonstim", ifelse(node>35 & node<71, "2_nonstim", "3_nonstim")))) %>%
-  ggplot(aes(time, value, col=comm, shape=comm))+
-  geom_point()+
-  theme(legend.title = element_blank())
-```
-
-When does activity turn off?
-
-```{r}
-sweep_vals = seq(0,1.5,.1)
-
-sweep_W_args_dict = default_args_dict
-sweep_G = generateStructuralNetwork(sweep_W_args_dict)
-sweep_W_args_dict$W = generateSynapticNetwork(sweep_G$W, showplot=sweep_W_args_dict$showplot)$G
-sweep_W_args_dict$stim_nodes = c(1:10)
-sweep_W_args_dict$tasktiming = c(rep(0, 99), rep(1, 100), rep(0, 301))
-sweep_W_args_dict$I = make_stimtimes(sweep_W_args_dict$stim_nodes, sweep_W_args_dict)$stimtimes
-
-out = data.frame(s=rep(NA,length(sweep_vals)^2), g=rep(NA,length(sweep_vals)^2), min_val=rep(NA,length(sweep_vals)^2))
-cur_row=1
-for(i in 1:length(sweep_vals)){
-  for(j in 1:length(sweep_vals)){
-    cur_s = sweep_vals[i]
-    cur_g = sweep_vals[j]
-    sweep_W_args_dict$s = cur_s
-    sweep_W_args_dict$g = cur_g
-    sweep_W_net_dat = networkModel(sweep_W_args_dict$W, sweep_W_args_dict)
-    cur_min_val = min(sweep_W_net_dat[,dim(sweep_W_net_dat)[2]])
-    out[cur_row,] = c(cur_s, cur_g, cur_min_val)
-    cur_row = cur_row+1
-  }
-}
-```
-
-```{r}
-out %>%
-  mutate(s=as.factor(s),
-         g=as.factor(g))%>%
-  ggplot(aes(s, g, fill=min_val))+
-  geom_tile()
-```
-
-```{r}
-print(paste0("Stim node is: ", big_W_args_dict$stim_nodes))
-cat("\n")
-cat("Uncorrected estimates")
-cat("\n")
-round(run_ucr_glm(big_W_net_dat_debug, task_reg = big_W_args_dict$I[1,])$ucr_task_betas, 4)
-cat("\n")
-cat("Corrected estimates with network activity")
-cat("\n")
-round(run_ext_glm(big_W_net_dat_debug, big_W_args_dict, task_reg = big_W_args_dict$I[1,])$ext_task_betas, 4)
-cat("\n")
-cat("Corrected estimates without network activity")
-cat("\n")
-round(run_ext_glm(big_W_net_dat_debug, big_W_args_dict, task_reg = big_W_args_dict$I[1,], inc_net_act = FALSE)$ext_task_betas, 4)
-```
-
-Plotting as I did before to visually detect if there is any "bleeding" to non-stim hub nodes. 
-
-```{r}
-data.frame(ucr_betas = run_ucr_glm(big_W_net_dat_debug, task_reg = big_W_args_dict$I[1,])$ucr_task_betas,
-           ext_betas = run_ext_glm(big_W_net_dat_debug, big_W_args_dict, task_reg = big_W_args_dict$I[1,])$ext_task_betas) %>%
-  mutate(node = 1:n()) %>%
-  gather(key, beta, -node) %>%
-  ggplot(aes(node, beta, col=key))+
-  geom_line()+
-  theme(legend.title = element_blank())+
-  geom_vline(aes(xintercept = 35), linetype="dashed")+
-  geom_vline(aes(xintercept = 70), linetype="dashed")
-```
-
-Plot overestimation by distance from stim/hub node?
-
-x = distance (average distance from stimulated nodes)
-y = overestimation (ucr - ext)
-
-```{r}
-
-```
