@@ -238,14 +238,14 @@ Heatmaps of deviance from the correct task estimate for the extended GLM model r
 
 ```{r}
 out %>%
-  select(s, g, ext_nonet1, ext_noself1, ext_nonet2, ext_noself2, ext_nonet3, ext_noself3) %>%
+  select(-ext1, -ext2, -ext3) %>%
   gather(key, value, -s, -g) %>%
   separate(key, into = c("key", "node"), "(?<=[a-z])(?=[0-9])") %>%
   mutate(dev = ifelse(node == "1", value-.25, value), #
          s = as.factor(round(s, 2)),
          g = as.factor(round(g, 2)),
-         key = factor(key,levels = c("ext_nonet", "ext_noself"),
-                      labels = c("W/out network activity", "W/out self stimulation")),
+         key = factor(key,levels = c("ucr","ext_nonet", "ext_noself"),
+                      labels = c("Uncorrected","W/out network activity", "W/out self stimulation")),
          node = factor(node, levels=c(1,2,3),
                        labels = c("Non-hub stim", "Hub non-stim", "Non-hub non-stim"))) %>%
   ggplot(aes(s, g, fill=dev))+
@@ -253,7 +253,7 @@ out %>%
   facet_grid(node~key)+
   theme(panel.grid=element_blank(),
         axis.text.x = element_text(angle=90))+
-  scale_fill_gradient2(low = "red", mid="white", high = "blue", midpoint=0,  limits=c(-1,1),
+  scale_fill_gradient2(low = "red", mid="white", high = "blue", midpoint=0,
                        name="Over/under \nestimation")
 ```
 
