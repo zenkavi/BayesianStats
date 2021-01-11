@@ -1,35 +1,35 @@
 
 functions{
-  vector dy_dx(real t,
-              vector state) {
+  vector da_dt(real t,
+              vector a_t, 
+              real ke) {
                 
-    vector[2] dydx;
-    dydx[1] = 1; 
-    dydx[2] = 1; //derivative of y
-    return dydx;
+    vector[1] dadt;
+    dadt = -ke * a_t;
+    return dadt;
   }
 }
 
 data {
-  int T; //nrow states-1
-  vector[2] state0; // initial state y(0)=1
-  vector[2] states[T]; //states[1] = x(t); states[2] = y(t)
-  real ts[T]; // time points
-  real t0; // first time point 0
+  int N;
+  real ts[N];
+  vector[1] a[N];
 }
 
 parameters {
+  vector[1] a0;
+  real ke;
   real sigma;
 }
 
-transformed parameters{
-  vector[2] z[T] = ode_rk45(dy_dx, state0, t0, ts);
-}
-
 model {
+  vector[1] a_mu[N] = ode_rk45(da_dt, a0, 0, ts, ke);
   
-  for (i in 1:2){
-    states[,i] ~ normal(z[,i], sigma); 
+  for(n in 1:N){
+   a[n] ~ normal(a_mu[n], sigma); 
   }
-  sigma ~ lognormal(-1, 1);
+  
+  a0 ~ normal(15, 5);
+  ke ~ beta(1, 1);
+  sigma ~ lognormal(-1,1);
 }

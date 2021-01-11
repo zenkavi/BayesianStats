@@ -1,25 +1,14 @@
-library(cmdstanr)
-set.seed(1302589023)
 
-# Compare stan model fitting time using ODE vs no ODE for a function with an analytical solution
 
-# y(0) = 1
-# dy/dx = 1
-# y = x+1
-make_states = function(n=500, mu=0, sigma=3){
-  x = c(0, rnorm(n-1, mu, sigma))
-  y = x+1
-  states = cbind(x, y)
-  return(states)
-}
+# Compare Stan model fitting time using ODE vs no ODE for a function with an analytical solution
+
+
 
 testStates = make_states()
 
-testData = list(T = nrow(testStates)-1,
-                state0 = testStates[1,],
-                states = testStates[-1,],
-                ts = 1:(nrow(testStates)-1),
-                t0 = 0)
+testData = list(N = length(testStates$a),
+                ts = testStates$ts,
+                as = testStates$a)
 
 test_model = function(dat, model_path, output_path){
   

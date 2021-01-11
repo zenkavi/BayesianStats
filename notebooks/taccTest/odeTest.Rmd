@@ -4,19 +4,57 @@ output: html_notebook
 ---
 
 ```{r}
-source("odeTest.R")
+library(cmdstanr)
+set.seed(1302589023)
 ```
 
-Post processing ODE test results
+# Generate fake data
 
 ```{r}
-if(!exists("ode_fit1")){
-  ode_fit1 = readRDS("./stanModels/fit_odeTest1.RDS")
-}
-if(!exists("ode_fit2")){
-  ode_fit2 = readRDS("./stanModels/fit_odeTest2.RDS")
+make_states = function(n=500, tmin = 1E-3, tmax=48, a0=10, ke=0.2, noise_mean = 0, noise_scale=.1){
+  ts = seq(tmin, tmax, length=n)
+  noise = rnorm(n, noise_mean, noise_scale)
+  a = a0 * exp(-ke*ts) + noise
+  out = data.frame(ts=ts, a=a, noise=noise)
+  return(out)
 }
 ```
+
+View fake data
+
+```{r}
+dat = make_states()
+dat %>%
+  ggplot(aes(ts, a))+
+  geom_point()
+```
+
+# Fit models
+
+Fit ODE model
+
+```{r}
+mod = cmdstan_model('./stanModels/odeTest2.stan')
+```
+
+```{r}
+mod_dat = list(N = length(dat$a),
+                ts = dat$ts,
+                a = matrix(dat$a, ncol=1))
+```
+
+```{r}
+fit = mod$sample(data = mod_dat)
+fit$save_object(file = './stanModels/fit_odeTest2.RDS')
+```
+
+Fit analytical model
+
+```{r}
+
+```
+
+#Examine output
 
 True versus estimated y's for analytical solution:
 
@@ -43,31 +81,5 @@ est_y %>%
 True versus estimated states for ODE solver:
 
 ```{r}
-est_z = data.frame(ode_fit2$summary("z"))
-est_z
-```
 
-True versus estimated y's look very strange. I need to understand how this ode solver works...
-
-```{r}
-est_z %>% 
-  select(variable, mean) %>%
-  separate(variable, sep=",", into = c("time", "var")) %>%
-  mutate(time = gsub("z\\[", "", time),
-         time = as.numeric(time),
-         var = gsub("\\]", "", var),
-         var = ifelse(var == 1, "est_x", "est_y")) %>%
-  rename(key = var, value=mean) %>%
-  arrange(time) %>%
-  rbind(data.frame(testStates) %>% 
-          slice(-1)%>%
-          mutate(time = 1:n()) %>% 
-          rename(true_x = x, true_y = y) %>%
-          gather(key, value, -time)) %>%
-  separate(key, sep="_", into=c("type","var")) %>%
-  spread(type, value) %>%
-  ggplot(aes(est, true))+
-  geom_point()+
-  facet_wrap(~var)+
-  geom_abline(aes(intercept=0, slope=1))
 ```
