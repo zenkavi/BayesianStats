@@ -5,6 +5,7 @@ output: html_notebook
 
 ```{r}
 library(cmdstanr)
+library(posterior)
 set.seed(1302589023)
 ```
 
@@ -74,8 +75,52 @@ fit1
 fit2
 ```
 
-True versus estimated states for ODE solver:
+## Posterior predictive check comparison
 
 ```{r}
+ppc_df1 = fit1$summary("a_gen") %>%
+  select(variable, mean)
 
+ppc_df2 = fit2$summary("a_gen") %>%
+  select(variable, mean)
+```
+
+```{r}
+ppc_df1 %>%
+  left_join(ppc_df2, by = "variable") %>%
+  mutate(true=dat$a) %>%
+  select(-variable) %>%
+  rename(analytical=mean.x, ode_solver=mean.y) %>%
+  gather(key, value, -true) %>%
+  ggplot(aes(true, value))+
+  geom_point()+
+  facet_wrap(~key)+
+  geom_abline(aes(intercept=0, slope=1))
+```
+
+# Model run time
+
+## Analytical solution
+
+```{r}
+fit1$time()$total
+```
+
+## ODE solver
+
+```{r}
+fit2$time()$total
+```
+
+# Examine chains
+
+Difference between `.draw` and `.iteration`: the former ranges from 1-4000 with 1000 values for each chain sequentially whereas the latter ranges from 1-1000 for each chain.
+
+```{r}
+as_draws_df(fit1$draws()) %>%
+  select(ke, .iteration, .draw, .chain) %>%
+  gather(key, value, -ke, -.chain) %>%
+  ggplot(aes(value, ke))+
+  geom_line()+
+  facet_grid(.chain~key, scales='free_x')
 ```
