@@ -28,14 +28,7 @@ dat %>%
   ggplot(aes(ts, a))+
   geom_point()
 ```
-
-# Fit models
-
-Fit ODE model
-
-```{r}
-mod = cmdstan_model('./stanModels/odeTest2.stan')
-```
+Set up data for Stan models
 
 ```{r}
 mod_dat = list(N = length(dat$a),
@@ -43,39 +36,42 @@ mod_dat = list(N = length(dat$a),
                 a = matrix(dat$a, ncol=1))
 ```
 
-```{r}
-fit = mod$sample(data = mod_dat)
-fit$save_object(file = './stanModels/fit_odeTest2.RDS')
-```
+# Fit models
 
 Fit analytical model
 
 ```{r}
-
+mod1 = cmdstan_model('./stanModels/odeTest1.stan')
 ```
 
-#Examine output
+```{r}
+fit1 = mod1$sample(data = mod_dat)
+fit1$save_object(file = './stanModels/fit_odeTest1.RDS')
+```
 
-True versus estimated y's for analytical solution:
+Fit ODE model
 
 ```{r}
-est_y = data.frame(ode_fit1$summary("states_rep"))
+mod2 = cmdstan_model('./stanModels/odeTest2.stan')
+```
 
-est_y %>%
-  select(mean) %>%
-  mutate(time = 1:n(),
-         key = "est_y") %>%
-  rename(value = mean) %>%
-  rbind(data.frame(testStates) %>%
-          select(y) %>%
-          slice(-1) %>%
-          mutate(time = 1:n(), 
-                 key = "true_y") %>%
-          rename(value = y)) %>%
-  spread(key, value) %>%
-  ggplot(aes(est_y, true_y))+
-  geom_point()+
-  geom_abline(aes(intercept=0, slope=1))
+```{r}
+fit2 = mod2$sample(data = mod_dat)
+fit2$save_object(file = './stanModels/fit_odeTest2.RDS')
+```
+
+# Examine output
+
+## Analytical solution
+
+```{r}
+fit1
+```
+
+## ODE solver
+
+```{r}
+fit2
 ```
 
 True versus estimated states for ODE solver:
