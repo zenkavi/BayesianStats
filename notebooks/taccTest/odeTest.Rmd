@@ -41,6 +41,8 @@ mod_dat = list(N = length(dat$a),
 
 Fit analytical model
 
+$a(t) = a_0e^(k_et)$
+
 ```{r}
 mod1 = cmdstan_model('./stanModels/odeTest1.stan')
 ```
@@ -51,6 +53,8 @@ fit1$save_object(file = './stanModels/fit_odeTest1.RDS')
 ```
 
 Fit ODE model
+
+$\frac{da}{dt} = -k_e * a(t)$
 
 ```{r}
 mod2 = cmdstan_model('./stanModels/odeTest2.stan')
@@ -118,9 +122,13 @@ Difference between `.draw` and `.iteration`: the former ranges from 1-4000 with 
 
 ```{r}
 as_draws_df(fit1$draws()) %>%
-  select(ke, .iteration, .draw, .chain) %>%
-  gather(key, value, -ke, -.chain) %>%
-  ggplot(aes(value, ke))+
+  select(ke, .iteration, .chain) %>%
+  mutate(key='analytical') %>%
+  rbind(as_draws_df(fit2$draws()) %>%
+          select(ke, .iteration, .chain) %>%
+          mutate(key='ode_solver')) %>%
+  ggplot(aes(.iteration, ke))+
   geom_line()+
-  facet_grid(.chain~key, scales='free_x')
+  facet_grid(.chain~key)+
+  xlab("iteration")
 ```
