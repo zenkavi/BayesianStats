@@ -57,37 +57,25 @@ W
 plot_adj_mat(W)$p
 ```
 
-Suppose we have a task that looks like:
-
-```{r}
-task = data.frame(stim = c(c(0,0,0,1),rep(0,97)))
-task$time = rep(1:nrow(task))
-task %>%
-  ggplot(aes(x=time, y=stim))+
-  geom_line()+
-  xlab("")+
-  ylab("")+
-  scale_y_continuous(breaks = c(0,1))
-```
+Suppose we have resting state data (i.e. no task).
 
 Activity in each node at each time point would look like:
 
 ```{r}
 cur_args_dict = list('dt'=.5,  
-                 'g'=1, 
-                 'noise'= NULL,
+                 'noise'= TRUE,
                  'noise_loc'= 0, 
-                 'noise_scale'= 0,
-                 's'=.7,
+                 'noise_scale'= 0.1,
+                 's'=.3,
+                 'g'=.7,
                  'stim_mag'=.5,
                  'taskdata'=NULL,
-                 'tasktiming'=task$stim,
                  'tau'=1, 
-                 'Tmax'=max(task$time),
+                 'Tmax'=100,
                  'W'= W)
 
-cur_args_dict$stim_node = 1
-cur_args_dict$I = make_stimtimes(cur_args_dict$stim_node, cur_args_dict)$stimtimes
+# cur_args_dict$stim_node = 1
+# cur_args_dict$I = make_stimtimes(cur_args_dict$stim_node, cur_args_dict)$stimtimes
 
 net_dat = networkModel(W, cur_args_dict)
 
@@ -104,41 +92,53 @@ data.frame(net_dat) %>%
 # Bayesian parameter recovery
 
 ```{r}
+cat(paste0("True s is: ", cur_args_dict$s))
+cat('\n')
+cat(paste0("True g is: ", cur_args_dict$g))
+cat('\n')
+cat(paste0("True tau is: ", cur_args_dict$tau))
+```
+
+```{r}
 nmm_data = list(N_TS = dim(net_dat)[2],
                 N = dim(net_dat)[1],
                 ts = 1:dim(net_dat)[2],
                 y_init = net_dat[,1],
                 y = t(net_dat),
-                W = cur_args_dict$W,
-                I = cur_args_dict$I[1,],
-                t0 = 0)
+                W = cur_args_dict$W)
 ```
 
 ```{r}
 mod = cmdstan_model("stanModels/nmm_ode.stan")
 ```
 
+```{r}
+fit = mod$variational(data=nmm_data)
+```
+
+```{r}
+fit
+```
+
+```{r}
+fit$draws()
+```
+
 This is insanely slow. 
 
-```{r eval=FALSE}
-fit <- mod$sample(
+```{r}
+fit_mcmc <- mod$sample(
   data = nmm_data,
   seed = 123
 )
 ```
 
-```{r eval=FALSE}
-fit$save_object(file = "fit_nmm_ode.RDS")
+```{r}
+fit_mcmc
 ```
 
 ```{r}
-fit <- readRDS("fit_nmm_ode.RDS")
-```
-
-Estimates don't look entirely ridiculous considering how clueless I am...
-
-```{r}
-fit$summary()
+fit
 ```
 
 
