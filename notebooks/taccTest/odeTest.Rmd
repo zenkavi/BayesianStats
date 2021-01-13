@@ -67,6 +67,8 @@ fit2$save_object(file = './stanModels/fit_odeTest2.RDS')
 
 # Examine output
 
+Same result of parameter estimates regardless of how the model is written (good).
+
 ## Analytical solution
 
 ```{r}
@@ -102,20 +104,6 @@ ppc_df1 %>%
   geom_abline(aes(intercept=0, slope=1))
 ```
 
-# Model run time
-
-## Analytical solution
-
-```{r}
-fit1$time()$total
-```
-
-## ODE solver
-
-```{r}
-fit2$time()$total
-```
-
 # Examine chains
 
 Difference between `.draw` and `.iteration`: the former ranges from 1-4000 with 1000 values for each chain sequentially whereas the latter ranges from 1-1000 for each chain.
@@ -131,4 +119,51 @@ as_draws_df(fit1$draws()) %>%
   geom_line()+
   facet_grid(.chain~key)+
   xlab("iteration")
+```
+
+# Model run time
+
+## Analytical solution
+
+```{r}
+fit1$time()$total
+```
+
+## ODE solver
+
+```{r}
+fit2$time()$total
+```
+
+Is the ODE solver faster with VB? Yes!
+
+```{r}
+fit2_vb = mod2$variational(data = mod_dat)
+```
+
+```{r}
+fit2_vb$save_object(file = './stanModels/fit_odeTest2_vb.RDS')
+fit2_vb
+```
+
+```{r}
+ppc_df2_vb = fit2_vb$summary("a_gen") %>%
+  select(variable, mean)
+```
+
+```{r}
+ppc_df2_vb %>%
+  left_join(ppc_df2, by = "variable") %>%
+  mutate(true=dat$a) %>%
+  select(-variable) %>%
+  rename(ode_solver_vb=mean.x, ode_solver_mcmc=mean.y) %>%
+  gather(key, value, -true) %>%
+  ggplot(aes(true, value))+
+  geom_point()+
+  facet_wrap(~key)+
+  geom_abline(aes(intercept=0, slope=1))
+```
+
+```{r}
+fit2_vb$time()$total
 ```

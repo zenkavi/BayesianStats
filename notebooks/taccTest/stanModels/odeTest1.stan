@@ -8,8 +8,8 @@ data {
 
 parameters {
   vector[1] a0;
-  real ke;
-  real sigma;
+  real<lower=0,upper=1> ke;
+  real<lower=1E-10> sigma;
 }
 
 model {
