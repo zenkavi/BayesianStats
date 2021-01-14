@@ -71,7 +71,7 @@ cur_args_dict = list('dt'=.5,
                  'stim_mag'=.5,
                  'taskdata'=NULL,
                  'tau'=1, 
-                 'Tmax'=100,
+                 'Tmax'=1000,
                  'W'= W)
 
 # cur_args_dict$stim_node = 1
@@ -119,12 +119,63 @@ fit = mod$variational(data=nmm_data)
 ```{r}
 fit
 ```
+Overlay priors on this graph of posteriors
+
+s ~ beta(1, 1);
+g ~ beta(1, 1);
+tau ~ normal(1, 0.5);
+sigma ~ lognormal(-1, 1);
 
 ```{r}
-fit$draws()
+as_draws_df(fit$draws()) %>%
+  select(s, g, tau, sigma) %>%
+  gather(key, value) %>%
+  mutate(type="posterior") %>%
+  ggplot()+
+  geom_density(aes(value))+
+  facet_wrap(~key, scales='free')
 ```
 
-This is insanely slow. 
+```{r}
+min_max_df = as_draws_df(fit$draws()) %>%
+  select(s, g, tau, sigma) %>%
+  gather(key, value) %>%
+  group_by(key) %>%
+  summarise(min_val = min(value),
+            max_val = max(value))
+
+prior_df = data.frame(par=rep(NA, 4000), vals = rep(NA, 4000), dens = rep(NA, 4000))
+
+for(i in 1:4){
+
+  prior_df$par[1+(1000*(i-1)):i*1000] = min_max_df$key[i]
+  prior_df$par[1+(1000*(i-1)):i*1000]
+  
+  if(min_max_df$key[i]=='s'){
+    prior_df$s = seq(min_max_df$min_val[i], min_max_df$max_val[i], length=1000)
+    prior_df$d_s = dunif(prior_df$s)
+  }
+  if(min_max_df$key[i]=='g'){
+    prior_df$g = seq(min_max_df$min_val[i], min_max_df$max_val[i], length=1000)
+    prior_df$d_g = dunif(prior_df$g)
+  }
+  if(min_max_df$key[i]=='sigma'){
+    prior_df$sigma = seq(min_max_df$min_val[i], min_max_df$max_val[i], length=1000)
+    prior_df$d_sigma = dlnorm(prior_df$sigma, -1, 1)
+  }
+  if(min_max_df$key[i]=='tau'){
+    prior_df$tau = seq(min_max_df$min_val[i], min_max_df$max_val[i], length=1000)
+    prior_df$d_tau = dnorm(prior_df$tau, 1, .5)
+  }
+}
+
+prior_df %>%
+  gather(key, value, -type) %>%
+   ggplot()+
+  facet_wrap(~key, scales='free')
+```
+
+MCMC is still insanely slow. 
 
 ```{r}
 fit_mcmc <- mod$sample(
