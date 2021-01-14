@@ -68,14 +68,10 @@ cur_args_dict = list('dt'=.5,
                  'noise_scale'= 0.1,
                  's'=.3,
                  'g'=.7,
-                 'stim_mag'=.5,
                  'taskdata'=NULL,
                  'tau'=1, 
                  'Tmax'=1000,
                  'W'= W)
-
-# cur_args_dict$stim_node = 1
-# cur_args_dict$I = make_stimtimes(cur_args_dict$stim_node, cur_args_dict)$stimtimes
 
 net_dat = networkModel(W, cur_args_dict)
 
@@ -97,6 +93,12 @@ cat('\n')
 cat(paste0("True g is: ", cur_args_dict$g))
 cat('\n')
 cat(paste0("True tau is: ", cur_args_dict$tau))
+cat('\n')
+cat(paste0("True sigma is: ", cur_args_dict$noise_scale))
+```
+
+```{r}
+t(net_dat) %*% t(cur_args_dict$W)
 ```
 
 ```{r}
@@ -105,11 +107,14 @@ nmm_data = list(N_TS = dim(net_dat)[2],
                 ts = 1:dim(net_dat)[2],
                 y_init = net_dat[,1],
                 y = t(net_dat),
-                W = cur_args_dict$W)
+                W = cur_args_dict$W,
+                N_t = ...,
+                g = cur_args_dict$g,
+                tau = cur_args_dict$tau)
 ```
 
 ```{r}
-mod = cmdstan_model("stanModels/nmm_ode.stan")
+mod = cmdstan_model("stanModels/recover_s.stan")
 ```
 
 ```{r}
@@ -187,11 +192,6 @@ fit_mcmc <- mod$sample(
 ```{r}
 fit_mcmc
 ```
-
-```{r}
-fit
-```
-
 
 ------
 

@@ -55,11 +55,9 @@ functions {
               vector x,     // system state {1 x N - network activity for each time point}
               int N,
               vector[] N_t, //vector array
-              vector I,
               vector ts,
               real s,
               real g,
-              real b, 
               real tau) {
     
     vector[N] res;
@@ -72,7 +70,7 @@ functions {
     }
     
     for (i in 1:N){
-      res[i] = (-x[i] + s * phi(x[i]) + g * N_t[d, i] + b * I[d])/tau;
+      res[i] = (-x[i] + s * phi(x[i]) + g * N_t[d, i])/tau;
     }
     
     // returns change for one time point for all nodes
@@ -84,10 +82,8 @@ functions {
 data {
   int<lower = 0> N_TS;          // number of measurement times
   int<lower = 0> N;             // number of nodes
-  real t0;
   vector[N] y_init;             // initial measured activity level
   matrix[N, N] W;               // adjacency matrix
-  vector[N_TS] I;               // task stimulation
 
   // Arrays are declared by enclosing the dimensions in square brackets following the name of the variable.
   // this is an array of length N_TS consisting of (column) vectors of length N
@@ -95,42 +91,24 @@ data {
   
   real ts[N_TS];                 // measurement times > 0
   vector[N] y[N_TS];             // measured activity level with nodes in cols and timepoints in rows
-  
-}
+  vector[N] N_t[N_TS];           // network gain for each time point (W . y(t))
+  real g;
+  real tau;
 
-transformed data{
-  vector[N] N_t[N_TS];
-
-  for(i in 1:N){
-    for(t in 1:N_TS){
-      //row of incoming connections to node i of length n (W[i,] - 1xn)
-      //multiplied with activity (column) vector of length n for all nodes at time t (y[t] - nx1)
-      N_t[t, i] = dot_product(W[i,], y[t]);
-    }
-  }
 }
 
 parameters {
-  real<lower = 0> s;   // self coupling
-  real<lower = 0> g;  // global coupling
-  real<lower = 0> b;  // task modulation
-  real<lower = 0> tau; // time constant
-  real<lower = 0> sigma;   // measurement error
-  // vector[N] x_init;
+  real<lower=0,upper=1> s;   // self coupling
+  real<lower = 1E-10> sigma;   // measurement error
 }
 
 model {
-  s ~ lognormal(-1, 1);
-  g ~ lognormal(-1, 1);
-  b ~ lognormal(-1, 1);
-  tau ~ normal(1, 0.5);
+  s ~ beta(1, 1);
   sigma ~ lognormal(-1, 1);
   
-  vector[N] x[N_TS] = ode_rk45(dx_dt, y_init, t0, ts, N, N_t, I, to_vector(ts), s, g, b, tau);
+  vector[N] x[N_TS] = ode_rk45(dx_dt, y_init, 0, ts, N, N_t, to_vector(ts), s, g, tau);
 
   for (k in 1:N) {
-    // y_init[k] ~ lognormal(log(x_init[k]), sigma);
-    // y[ , k] ~ lognormal(log(x[, k]), sigma);
     y[ , k] ~ normal(x[, k], sigma);
 
   }
