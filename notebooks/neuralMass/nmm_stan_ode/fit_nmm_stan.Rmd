@@ -98,17 +98,13 @@ cat(paste0("True sigma is: ", cur_args_dict$noise_scale))
 ```
 
 ```{r}
-t(net_dat) %*% t(cur_args_dict$W)
-```
-
-```{r}
 nmm_data = list(N_TS = dim(net_dat)[2],
                 N = dim(net_dat)[1],
                 ts = 1:dim(net_dat)[2],
                 y_init = net_dat[,1],
                 y = t(net_dat),
                 W = cur_args_dict$W,
-                N_t = ...,
+                N_t = t(net_dat) %*% t(cur_args_dict$W),
                 g = cur_args_dict$g,
                 tau = cur_args_dict$tau)
 ```
@@ -121,9 +117,12 @@ mod = cmdstan_model("stanModels/recover_s.stan")
 fit = mod$variational(data=nmm_data)
 ```
 
+Is sigma in the stan model what it is in the noise added to each node at each time point
+
 ```{r}
 fit
 ```
+
 Overlay priors on this graph of posteriors
 
 s ~ beta(1, 1);
@@ -132,8 +131,8 @@ tau ~ normal(1, 0.5);
 sigma ~ lognormal(-1, 1);
 
 ```{r}
-as_draws_df(fit$draws()) %>%
-  select(s, g, tau, sigma) %>%
+posterior::as_draws_df(fit$draws()) %>%
+  select(s, sigma) %>%
   gather(key, value) %>%
   mutate(type="posterior") %>%
   ggplot()+
