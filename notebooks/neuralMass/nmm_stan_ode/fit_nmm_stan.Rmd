@@ -131,48 +131,47 @@ posterior::as_draws_df(fit$draws()) %>%
   gather(key, value) %>%
   mutate(type="posterior") %>%
   ggplot()+
-  geom_density(aes(value))+
+  geom_histogram(aes(value))+
   facet_wrap(~key, scales='free')
+```
+
+Posterior predictive checks
+
+```{r}
+ppc_df = fit$summary("y_gen")
 ```
 
 ```{r}
-min_max_df = as_draws_df(fit$draws()) %>%
-  select(s, g, tau, sigma) %>%
-  gather(key, value) %>%
-  group_by(key) %>%
-  summarise(min_val = min(value),
-            max_val = max(value))
-
-prior_df = data.frame(par=rep(NA, 4000), vals = rep(NA, 4000), dens = rep(NA, 4000))
-
-for(i in 1:4){
-
-  prior_df$par[1+(1000*(i-1)):i*1000] = min_max_df$key[i]
-  prior_df$par[1+(1000*(i-1)):i*1000]
-  
-  if(min_max_df$key[i]=='s'){
-    prior_df$s = seq(min_max_df$min_val[i], min_max_df$max_val[i], length=1000)
-    prior_df$d_s = dunif(prior_df$s)
-  }
-  if(min_max_df$key[i]=='g'){
-    prior_df$g = seq(min_max_df$min_val[i], min_max_df$max_val[i], length=1000)
-    prior_df$d_g = dunif(prior_df$g)
-  }
-  if(min_max_df$key[i]=='sigma'){
-    prior_df$sigma = seq(min_max_df$min_val[i], min_max_df$max_val[i], length=1000)
-    prior_df$d_sigma = dlnorm(prior_df$sigma, -1, 1)
-  }
-  if(min_max_df$key[i]=='tau'){
-    prior_df$tau = seq(min_max_df$min_val[i], min_max_df$max_val[i], length=1000)
-    prior_df$d_tau = dnorm(prior_df$tau, 1, .5)
-  }
-}
-
-prior_df %>%
-  gather(key, value, -type) %>%
-   ggplot()+
-  facet_wrap(~key, scales='free')
+ppc_df = ppc_df %>%
+  select(variable, mean) %>%
+  separate(variable, sep = "\\[", into=c("var", "tmp")) %>%
+  separate(tmp, sep = ",", into=c("time", "node")) %>%
+  mutate(node = gsub("]", "", node),
+         time = as.numeric(time)) 
 ```
+
+```{r}
+ppc_df %>%
+  mutate(key = "Est data") %>%
+  select(-var) %>%
+  rbind(data.frame(net_dat) %>%
+  mutate(node = c(1,2,3)) %>%
+  gather(time, mean, -node) %>%
+  mutate(time = gsub("X", "", time),
+         time = as.numeric(time),
+         node = as.factor(node),
+         key = "True data")) %>%
+  ggplot(aes(time, mean))+
+  geom_line(aes(color=node))+
+  facet_wrap(~key)
+
+
+```
+
+
+
+
+------
 
 MCMC is still insanely slow. 
 
@@ -183,9 +182,6 @@ fit_mcmc <- mod$sample(
 )
 ```
 
-```{r}
-fit_mcmc
-```
 
 ------
 
