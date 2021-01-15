@@ -138,7 +138,7 @@ posterior::as_draws_df(fit$draws()) %>%
 Posterior predictive checks
 
 ```{r}
-ppc_df = fit$summary("y_gen")
+ppc_df = fit$summary("y_gen_noisy")
 ```
 
 ```{r}
@@ -150,30 +150,44 @@ ppc_df = ppc_df %>%
          time = as.numeric(time)) 
 ```
 
+Estimated data has a lot less variability.
+
 ```{r}
 ppc_df %>%
   mutate(key = "Est data") %>%
   select(-var) %>%
   rbind(data.frame(net_dat) %>%
-  mutate(node = c(1,2,3)) %>%
-  gather(time, mean, -node) %>%
-  mutate(time = gsub("X", "", time),
-         time = as.numeric(time),
-         node = as.factor(node),
-         key = "True data")) %>%
+          mutate(node = c(1,2,3)) %>%
+          gather(time, mean, -node) %>%
+          mutate(time = gsub("X", "", time),
+                 time = as.numeric(time),
+                 node = as.factor(node),
+                 key = "True data")) %>%
   ggplot(aes(time, mean))+
   geom_line(aes(color=node))+
-  facet_wrap(~key)
+  facet_grid(node~key)+
+  theme(legend.position = "none")
 
 
 ```
 
 
-
+```{r}
+data.frame(net_dat) %>%
+  mutate(node = c(1,2,3)) %>%
+  gather(time, value, -node) %>%
+  mutate(time = gsub("X", "", time),
+         time = as.numeric(time),
+         node = as.factor(node),
+         key = "True data") %>%
+  group_by(node) %>%
+  summarise(mean_ts = mean(value),
+            sd_ts = sd(value))
+```
 
 ------
 
-MCMC is still insanely slow. 
+MCMC is still very slow. 
 
 ```{r}
 fit_mcmc <- mod$sample(
