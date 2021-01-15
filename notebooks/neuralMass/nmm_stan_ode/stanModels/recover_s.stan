@@ -113,3 +113,13 @@ model {
 
   }
 }
+
+generated quantities {
+  vector[N] x_gen[N_TS] = ode_rk45(dx_dt, y_init, 0, ts, N, N_t, to_vector(ts), s, g, tau);
+  vector[N] y_gen[N_TS];
+  
+  for(k in 1:N){
+    for(n in 1:N_TS)
+    y_gen[n, k] = normal_rng(x_gen[n, k], sigma); 
+  }
+}

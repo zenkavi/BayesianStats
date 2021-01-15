@@ -125,11 +125,6 @@ fit
 
 Overlay priors on this graph of posteriors
 
-s ~ beta(1, 1);
-g ~ beta(1, 1);
-tau ~ normal(1, 0.5);
-sigma ~ lognormal(-1, 1);
-
 ```{r}
 posterior::as_draws_df(fit$draws()) %>%
   select(s, sigma) %>%
