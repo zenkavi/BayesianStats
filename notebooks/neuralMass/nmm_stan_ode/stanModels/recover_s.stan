@@ -52,13 +52,14 @@ functions {
   }
   
   vector dx_dt(real t,       // time
-              vector x,     // system state {1 x N - network activity for each time point}
-              int N,
-              vector[] N_t, //vector array
-              vector ts,
-              real s,
-              real g,
-              real tau) {
+  vector x,     // system state {1 x N - network activity for each time point}
+  int N,
+  vector[] N_t, //vector array
+  vector[] tsn,
+  vector ts,
+  real s,
+  real g,
+  real tau) {
     
     vector[N] res;
     
@@ -70,7 +71,7 @@ functions {
     }
     
     for (i in 1:N){
-      res[i] = (-x[i] + s * phi(x[i]) + g * N_t[d, i])/tau;
+      res[i] = (-x[i] + s * phi(x[i]) + g * N_t[d, i])/tau + tsn[d, i];
     }
     
     // returns change for one time point for all nodes
@@ -84,7 +85,7 @@ data {
   int<lower = 0> N;             // number of nodes
   vector[N] y_init;             // initial measured activity level
   matrix[N, N] W;               // adjacency matrix
-
+  
   // Arrays are declared by enclosing the dimensions in square brackets following the name of the variable.
   // this is an array of length N_TS consisting of (column) vectors of length N
   // Each array element is like a row
@@ -94,34 +95,40 @@ data {
   vector[N] N_t[N_TS];           // network gain for each time point (W . y(t))
   real g;
   real tau;
-
+  
 }
 
 parameters {
   real<lower=0,upper=1> s;   // self coupling
-  real<lower = 1E-10> sigma;   // measurement error
+  real<lower = 1E-10> sigma; // time series error
+  real<lower = 1E-10> mes_err;   // measurement error
 }
 
 model {
   s ~ beta(1, 1);
+  mes_err ~ lognormal(-1, 1);
   sigma ~ lognormal(-1, 1);
   
-  vector[N] x[N_TS] = ode_rk45(dx_dt, y_init, 0, ts, N, N_t, to_vector(ts), s, g, tau);
-
+  vector[N] tsn[N_TS]; // time series noise
+  
   for (k in 1:N) {
-    y[ , k] ~ normal(x[, k], sigma);
-
+    tsn[ , k] ~ normal(0, sigma);
+  }
+  
+  vector[N] x[N_TS] = ode_rk45(dx_dt, y_init, 0, ts, N, N_t, tsn, to_vector(ts), s, g, tau);
+  
+  for (k in 1:N) {
+    y[ , k] ~ normal(x[, k], mes_err);
+    
   }
 }
 
 generated quantities {
-  vector[N] x_gen[N_TS] = ode_rk45(dx_dt, y_init, 0, ts, N, N_t, to_vector(ts), s, g, tau);
-  // vector[N] y_gen[N_TS];
-  vector[N] y_gen_noisy[N_TS];
+  vector[N] x_gen[N_TS] = ode_rk45(dx_dt, y_init, 0, ts, N, N_t, tsn, to_vector(ts), s, g, tau);
+  vector[N] y_gen[N_TS];
   
   for(k in 1:N){
     for(n in 1:N_TS)
-    // y_gen[n, k] = normal_rng(x_gen[n, k], sigma); 
-    y_gen_noisy[n, k] = normal_rng(x_gen[n, k], .1); 
+    y_gen[n, k] = normal_rng(x_gen[n, k], mes_err);
   }
 }

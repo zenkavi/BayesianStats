@@ -171,6 +171,7 @@ ppc_df %>%
 
 ```
 
+The model is estimating the SD of the timeseries!
 
 ```{r}
 data.frame(net_dat) %>%
