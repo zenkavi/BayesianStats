@@ -189,6 +189,8 @@ data.frame(net_dat) %>%
 
 MCMC is still very slow. 
 
+Read [this](https://github.com/generable/stan-ode-workshop/blob/master/ODEs-in-Stan.pdf) more carefully for parallelization later 
+
 ```{r}
 fit_mcmc <- mod$sample(
   data = nmm_data,

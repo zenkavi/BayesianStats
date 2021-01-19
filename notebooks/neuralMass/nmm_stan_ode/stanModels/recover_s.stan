@@ -60,7 +60,7 @@ functions {
   real s,
   real g,
   real tau,
-  vector[] spont_act) {
+  real spont_act) {
     
     vector[N] res;
     
@@ -111,27 +111,39 @@ transformed data{
 parameters {
   real<lower=0,upper=1> s;   // self coupling
   real<lower = 1E-10> sigma; // time series error
+  real<lower = 1E-10> m_err; // measurement error
+  real spont_act_std[N, N_TS];
 }
 
 transformed parameters{
-  vector[N] x[N_TS] = ode_rk45(dx_dt, y_init, 0, ts, N, N_t, to_vector(ts), s, g, tau);
+  real spont_act[N, N_TS];
+  
+  for(k in 1:N){
+    for(i in 1:N_TS){
+      spont_act[i,k] = spont_act_std[i,k]*sigma;
+    }
+  }
+  
+  vector[N] x[N_TS] = ode_rk45(dx_dt, y_init, 0, ts, N, N_t, to_vector(ts), s, g, tau, spont_act);
 }
 
 model {
   s ~ beta(1, 1);
   sigma ~ lognormal(-1, 1);
+  m_err ~ lognormal(-1, 1);
+  spont_act_std ~ std_normal();
   
   for(k in 1:N){
-    y[, k] ~ normal(x[, k], sigma); 
+    y[, k] ~ normal(x[, k], m_err); 
   }
 }
 
-generated quantities {
-  vector[N] y_gen[N_TS]; 
-  
-  for(k in 1:N){
-    for(i in 1:N_TS){
-      y_gen[i, k] = normal_rng(x[i, k], sigma); 
-    }
-  }
-}
+// generated quantities {
+  //   vector[N] y_gen[N_TS]; 
+  //   
+  //   for(k in 1:N){
+    //     for(i in 1:N_TS){
+      //       y_gen[i, k] = normal_rng(x[i, k], sigma); 
+      //     }
+      //   }
+      // }
