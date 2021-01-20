@@ -60,7 +60,7 @@ functions {
   real s,
   real g,
   real tau,
-  real spont_act) {
+  vector spont_act) {
     
     vector[N] res;
     
@@ -72,7 +72,7 @@ functions {
     }
     
     for (i in 1:N){
-      res[i] = (-x[i] + s * phi(x[i]) + g * N_t[d, i] + spont_act[d, i])/tau;
+      res[i] = (-x[i] + s * phi(x[i]) + g * N_t[d, i] + spont_act[(d-1)*N+i])/tau;
     }
     
     // returns change for one time point for all nodes
@@ -90,7 +90,7 @@ data {
   matrix[N, N] W;               // adjacency matrix
   
   // Arrays are declared by enclosing the dimensions in square brackets following the name of the variable.
-  // this is an array of length N_TS consisting of (column) vectors of length N
+  // this is an array of length N_TS (rows) consisting of (column) vectors of length N
   // Each array element is like a row
   
   real ts[N_TS];                 // array of measurement times > 0
@@ -112,17 +112,15 @@ parameters {
   real<lower=0,upper=1> s;   // self coupling
   real<lower = 1E-10> sigma; // time series error
   real<lower = 1E-10> m_err; // measurement error
-  real spont_act_std[N, N_TS];
+  vector [N*N_TS] spont_act_std;
 }
 
 transformed parameters{
-  real spont_act[N, N_TS];
+  vector[N*N_TS] spont_act;
   
-  for(k in 1:N){
-    for(i in 1:N_TS){
-      spont_act[i,k] = spont_act_std[i,k]*sigma;
+  for(i in 1:N*N_TS){
+      spont_act[i] = spont_act_std[i]*sigma;
     }
-  }
   
   vector[N] x[N_TS] = ode_rk45(dx_dt, y_init, 0, ts, N, N_t, to_vector(ts), s, g, tau, spont_act);
 }
