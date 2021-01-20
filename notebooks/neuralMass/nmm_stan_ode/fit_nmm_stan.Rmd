@@ -70,7 +70,7 @@ cur_args_dict = list('dt'=.5,
                  'g'=.7,
                  'taskdata'=NULL,
                  'tau'=1, 
-                 'Tmax'=1000,
+                 'Tmax'=100,
                  'W'= W)
 
 net_dat = networkModel(W, cur_args_dict)

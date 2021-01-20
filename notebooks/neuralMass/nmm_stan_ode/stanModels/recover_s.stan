@@ -118,9 +118,7 @@ parameters {
 transformed parameters{
   vector[N*N_TS] spont_act;
   
-  for(i in 1:N*N_TS){
-      spont_act[i] = spont_act_std[i]*sigma;
-    }
+  spont_act = spont_act_std*sigma;
   
   vector[N] x[N_TS] = ode_rk45(dx_dt, y_init, 0, ts, N, N_t, to_vector(ts), s, g, tau, spont_act);
 }
@@ -136,12 +134,12 @@ model {
   }
 }
 
-// generated quantities {
-  //   vector[N] y_gen[N_TS]; 
-  //   
-  //   for(k in 1:N){
-    //     for(i in 1:N_TS){
-      //       y_gen[i, k] = normal_rng(x[i, k], sigma); 
-      //     }
-      //   }
-      // }
+generated quantities {
+  vector[N] y_gen[N_TS];
+
+  for(k in 1:N){
+    for(i in 1:N_TS){
+      y_gen[i, k] = normal_rng(x[i, k], sigma);
+    }
+  }
+}

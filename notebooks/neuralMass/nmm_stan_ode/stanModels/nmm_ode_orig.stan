@@ -95,7 +95,8 @@ data {
   
   real ts[N_TS];                 // measurement times > 0
   vector[N] y[N_TS];             // measured activity level with nodes in cols and timepoints in rows
-  
+  real g;
+  real tau;
 }
 
 transformed data{
@@ -112,25 +113,36 @@ transformed data{
 
 parameters {
   real<lower=0,upper=1> s;   // self coupling
-  real<lower=0,upper=1> g;  // global coupling
+  // real<lower=0,upper=1> g;  // global coupling
   // real<lower = 0> b;  // task modulation
-  real<lower = 0> tau; // time constant
+  // real<lower = 0> tau; // time constant
   real<lower = 1E-10> sigma;   // measurement error
-  // vector[N] x_init;
+}
+
+transformed parameters {
+  // vector[N] x[N_TS] = ode_rk45(dx_dt, y_init, 0, ts, N, N_t, I, to_vector(ts), s, g, b, tau);
+  vector[N] x[N_TS] = ode_rk45(dx_dt, y_init, 0, ts, N, N_t, to_vector(ts), s, g, tau);
 }
 
 model {
   s ~ beta(1, 1);
-  g ~ beta(1, 1);
+  // g ~ beta(1, 1);
   // b ~ lognormal(-1, 1);
-  tau ~ normal(1, 0.5);
+  // tau ~ normal(1, 0.5);
   sigma ~ lognormal(-1, 1);
-  
-  // vector[N] x[N_TS] = ode_rk45(dx_dt, y_init, 0, ts, N, N_t, I, to_vector(ts), s, g, b, tau);
-  vector[N] x[N_TS] = ode_rk45(dx_dt, y_init, 0, ts, N, N_t, to_vector(ts), s, g, tau);
 
   for (k in 1:N) {
     y[ , k] ~ normal(x[, k], sigma);
 
+  }
+}
+
+generated quantities {
+  vector[N] y_gen[N_TS];
+
+  for(k in 1:N){
+    for(i in 1:N_TS){
+      y_gen[i, k] = normal_rng(x[i, k], sigma);
+    }
   }
 }
