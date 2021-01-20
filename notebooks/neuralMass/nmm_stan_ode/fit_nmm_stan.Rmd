@@ -108,21 +108,19 @@ nmm_data = list(N_TS = dim(net_dat)[2],
                 tau = cur_args_dict$tau)
 ```
 
+### Model without spont act in ODE
+
 ```{r}
-mod = cmdstan_model("stanModels/recover_s.stan")
+mod_orig = cmdstan_model("stanModels/nmm_ode_orig.stan")
 ```
 
 ```{r}
-fit = mod$variational(data=nmm_data)
+fit_orig = mod_orig$variational(data=nmm_data)
 ```
-
-Is sigma in the stan model what it is in the noise added to each node at each time point
 
 ```{r}
 fit
 ```
-
-Overlay priors on this graph of posteriors
 
 ```{r}
 posterior::as_draws_df(fit$draws()) %>%
@@ -166,8 +164,6 @@ ppc_df %>%
   geom_line(aes(color=node))+
   facet_grid(node~key)+
   theme(legend.position = "none")
-
-
 ```
 
 The model is estimating the SD of the timeseries!
@@ -185,13 +181,73 @@ data.frame(net_dat) %>%
             sd_ts = sd(value))
 ```
 
+### Model WITH spont act in ODE
+
+```{r}
+mod = cmdstan_model("stanModels/recover_s.stan")
+```
+
+```{r}
+fit = mod$variational(data=nmm_data)
+```
+
+Is sigma in the stan model what it is in the noise added to each node at each time point
+
+```{r}
+fit
+```
+
+```{r}
+posterior::as_draws_df(fit$draws()) %>%
+  select(s, sigma) %>%
+  gather(key, value) %>%
+  mutate(type="posterior") %>%
+  ggplot()+
+  geom_histogram(aes(value))+
+  facet_wrap(~key, scales='free')
+```
+
+Posterior predictive checks
+
+```{r}
+ppc_df = fit$summary("y_gen")
+```
+
+```{r}
+ppc_df = ppc_df %>%
+  select(variable, mean) %>%
+  separate(variable, sep = "\\[", into=c("var", "tmp")) %>%
+  separate(tmp, sep = ",", into=c("time", "node")) %>%
+  mutate(node = gsub("]", "", node),
+         time = as.numeric(time)) 
+```
+
+Estimated data now has more similar variability.
+
+```{r}
+ppc_df %>%
+  mutate(key = "Est data") %>%
+  select(-var) %>%
+  rbind(data.frame(net_dat) %>%
+          mutate(node = c(1,2,3)) %>%
+          gather(time, mean, -node) %>%
+          mutate(time = gsub("X", "", time),
+                 time = as.numeric(time),
+                 node = as.factor(node),
+                 key = "True data")) %>%
+  ggplot(aes(time, mean))+
+  geom_line(aes(color=node))+
+  facet_grid(node~key)+
+  theme(legend.position = "none")
+```
+
 ------
 
 MCMC is still very slow. 
 
 Read [this](https://github.com/generable/stan-ode-workshop/blob/master/ODEs-in-Stan.pdf) more carefully for parallelization later 
 
-```{r}
+```{r eval=FALSE}
 fit_mcmc <- mod$sample(
   data = nmm_data,
   seed = 123
