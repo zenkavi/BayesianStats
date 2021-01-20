@@ -241,6 +241,10 @@ ppc_df %>%
   theme(legend.position = "none")
 ```
 
+```{r}
+networkModelOde
+```
+
 ------
 
 MCMC is still very slow. 
