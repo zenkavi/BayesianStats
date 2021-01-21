@@ -119,11 +119,11 @@ fit_orig = mod_orig$variational(data=nmm_data)
 ```
 
 ```{r}
-fit
+fit_orig
 ```
 
 ```{r}
-posterior::as_draws_df(fit$draws()) %>%
+posterior::as_draws_df(fit_orig$draws()) %>%
   select(s, sigma) %>%
   gather(key, value) %>%
   mutate(type="posterior") %>%
@@ -135,7 +135,7 @@ posterior::as_draws_df(fit$draws()) %>%
 Posterior predictive checks
 
 ```{r}
-ppc_df = fit$summary("y_gen")
+ppc_df = fit_orig$summary("y_gen")
 ```
 
 ```{r}
@@ -176,7 +176,7 @@ data.frame(net_dat) %>%
          time = as.numeric(time),
          node = as.factor(node),
          key = "True data") %>%
-  group_by(node) %>%
+  group_by(node) %>% 
   summarise(mean_ts = mean(value),
             sd_ts = sd(value))
 ```
@@ -190,8 +190,6 @@ mod = cmdstan_model("stanModels/recover_s.stan")
 ```{r}
 fit = mod$variational(data=nmm_data)
 ```
-
-Is sigma in the stan model what it is in the noise added to each node at each time point
 
 ```{r}
 fit
@@ -239,10 +237,6 @@ ppc_df %>%
   geom_line(aes(color=node))+
   facet_grid(node~key)+
   theme(legend.position = "none")
-```
-
-```{r}
-networkModelOde
 ```
 
 ------

@@ -139,7 +139,7 @@ generated quantities {
 
   for(k in 1:N){
     for(i in 1:N_TS){
-      y_gen[i, k] = normal_rng(x[i, k], sigma);
+      y_gen[i, k] = normal_rng(x[i, k], m_err);
     }
   }
 }
