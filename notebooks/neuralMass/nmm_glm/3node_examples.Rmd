@@ -123,11 +123,33 @@ data.frame(net_dat) %>%
 Testing `deSolve` ODE solver for data generation
 
 ```{r}
+rain <- read.csv("https://kingaa.github.io/thid/data/dacca_rainfall.csv")
+rain$time <- with(rain,year+(month-1)/12)
+interpol <- with(rain,approxfun(time,rainfall,rule=2,method='constant'))
+rain
+```
+```{r}
+interpol(1921.45)
+```
+
+```{r}
 times = seq(0, cur_args_dict$Tmax, by = cur_args_dict$dt)
 state0 = rep(0, dim(cur_args_dict$W)[1])
 
 
+params = cur_args_dict
+params$I[1,]
+interpol <- approxfun(x=seq(1, params$Tmax, params$dt), y=params$I[1,], ties=max)
+interpol(7)
+params$I[1,]
+
 net_dat_ode =  ode(y = state0, times = times, func = dx_dt, parms = cur_args_dict, method="rk4")
+
+data.frame(net_dat_ode) %>%
+  gather(node, value, -time) %>%
+  mutate(node = gsub("X", "", node)) %>%
+  ggplot(aes(time, value, col=node))+
+  geom_line()
 ```
 
 ## Hub stimulation
