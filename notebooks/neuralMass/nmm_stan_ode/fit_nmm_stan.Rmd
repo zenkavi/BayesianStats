@@ -197,12 +197,13 @@ fit
 
 ```{r}
 posterior::as_draws_df(fit$draws()) %>%
-  select(s, sigma) %>%
+  select(s, sigma, m_err) %>%
   gather(key, value) %>%
-  mutate(type="posterior") %>%
+  mutate(key = factor(key, levels =c("s", "sigma", "m_err"))) %>%
   ggplot()+
-  geom_histogram(aes(value))+
-  facet_wrap(~key, scales='free')
+  geom_histogram(aes(value), bins=20)+
+  facet_wrap(~key, scales='free')+
+  xlab("")
 ```
 
 Posterior predictive checks
