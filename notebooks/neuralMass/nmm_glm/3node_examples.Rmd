@@ -125,7 +125,7 @@ Testing `deSolve` ODE solver for data generation
 ```{r}
 state0 = rep(0, dim(cur_args_dict$W)[1])
 times = seq(0, cur_args_dict$Tmax, by = cur_args_dict$dt)
-
+cur_args_dict$noise_scale = .01
 net_dat_ode =  ode(y = state0, times = times, func = dx_dt, parms = cur_args_dict, method="rk4")
 ```
 
