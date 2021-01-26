@@ -10,7 +10,6 @@ library(gridExtra)
 
 ```{r}
 helpers_path = '~/Dropbox/RangelLab/NetworkGLM/helpers/r_helpers/'
-source(paste0(helpers_path,'networkModel.R'))
 source(paste0(helpers_path,'networkModelODE.R'))
 source(paste0(helpers_path,'make_stimtimes.R'))
 source(paste0(helpers_path,'generateStructuralNetwork.R'))
@@ -108,29 +107,14 @@ cat(paste0('Network stimulation parameter g is: ', cur_args_dict$g))
 Activity in each node at each time point would look like:
 
 ```{r}
-net_dat = networkModel(W, cur_args_dict)
-
-data.frame(net_dat) %>%
-  mutate(node = c(1,2,3)) %>%
-  gather(sampling, value, -node) %>%
-  mutate(sampling = gsub("X", "", sampling),
-         sampling = as.numeric(sampling),
-         node = as.factor(node)) %>%
-  ggplot(aes(x=sampling, y=value, color = node))+
-  geom_line()
-```
-
-Testing `deSolve` ODE solver for data generation
-
-```{r}
 state0 = rep(0, dim(cur_args_dict$W)[1])
 times = seq(0, cur_args_dict$Tmax, by = cur_args_dict$dt)
-cur_args_dict$noise_scale = .01
-net_dat_ode =  ode(y = state0, times = times, func = dx_dt, parms = cur_args_dict, method="rk4")
+# cur_args_dict$noise_scale = .01
+net_dat =  ode(y = state0, times = times, func = dx_dt, parms = cur_args_dict, method="rk4")
 ```
 
 ```{r}
-data.frame(net_dat_ode) %>%
+data.frame(net_dat) %>%
   gather(node, value, -time) %>%
   mutate(node = gsub("X", "", node)) %>%
   ggplot(aes(time, value, col=node))+
@@ -147,15 +131,14 @@ hub_args_dict = cur_args_dict
 hub_args_dict$stim_node = 2
 hub_args_dict$I = make_stimtimes(hub_args_dict$stim_node, hub_args_dict)$stimtimes
 
-hub_net_dat = networkModel(W, hub_args_dict)
+state0 = rep(0, dim(hub_args_dict$W)[1])
+times = seq(0, hub_args_dict$Tmax, by = hub_args_dict$dt)
+hub_net_dat =  ode(y = state0, times = times, func = dx_dt, parms = hub_args_dict, method="rk4")
 
 data.frame(hub_net_dat) %>%
-  mutate(node = c(1,2,3)) %>%
-  gather(sampling, value, -node) %>%
-  mutate(sampling = gsub("X", "", sampling),
-         sampling = as.numeric(sampling),
-         node = as.factor(node)) %>%
-  ggplot(aes(x=sampling, y=value, color = node))+
+  gather(node, value, -time) %>%
+  mutate(node = gsub("X", "", node)) %>%
+  ggplot(aes(time, value, col=node))+
   geom_line()
 ```
 
@@ -181,15 +164,14 @@ longon_args_dict$Tmax = max(longon_task$time)
 longon_args_dict$stim_node = 2
 longon_args_dict$I = make_stimtimes(longon_args_dict$stim_node, longon_args_dict)$stimtimes
 
-longon_net_dat = networkModel(W, longon_args_dict)
+state0 = rep(0, dim(longon_args_dict$W)[1])
+times = seq(0, longon_args_dict$Tmax, by = longon_args_dict$dt)
+longon_net_dat =  ode(y = state0, times = times, func = dx_dt, parms = longon_args_dict, method="rk4")
 
 data.frame(longon_net_dat) %>%
-  mutate(node = c(1,2,3)) %>%
-  gather(sampling, value, -node) %>%
-  mutate(sampling = gsub("X", "", sampling),
-         sampling = as.numeric(sampling),
-         node = as.factor(node)) %>%
-  ggplot(aes(x=sampling, y=value, color = node))+
+  gather(node, value, -time) %>%
+  mutate(node = gsub("X", "", node)) %>%
+  ggplot(aes(time, value, col=node))+
   geom_line()
 ```
 
@@ -216,15 +198,14 @@ Then activity does not turn off down to 0 but settles at an intermediate value.
 loop_args_dict = longon_args_dict
 loop_args_dict$W = loop_W
 
-loop_net_dat = networkModel(loop_W, loop_args_dict)
+state0 = rep(0, dim(loop_args_dict$W)[1])
+times = seq(0, loop_args_dict$Tmax, by = loop_args_dict$dt)
+loop_net_dat =  ode(y = state0, times = times, func = dx_dt, parms = loop_args_dict, method="rk4")
 
 data.frame(loop_net_dat) %>%
-  mutate(node = c(1,2,3)) %>%
-  gather(sampling, value, -node) %>%
-  mutate(sampling = gsub("X", "", sampling),
-         sampling = as.numeric(sampling),
-         node = as.factor(node)) %>%
-  ggplot(aes(x=sampling, y=value, color = node))+
+  gather(node, value, -time) %>%
+  mutate(node = gsub("X", "", node)) %>%
+  ggplot(aes(time, value, col=node))+
   geom_line()
 ```
 
@@ -238,15 +219,14 @@ loop_short_args_dict$tasktiming = task$stim
 loop_short_args_dict$Tmax = max(task$time)
 loop_short_args_dict$I = make_stimtimes(loop_short_args_dict$stim_node, loop_short_args_dict)$stimtimes
 
-loop_short_net_dat = networkModel(loop_W, loop_short_args_dict)
+state0 = rep(0, dim(loop_short_args_dict$W)[1])
+times = seq(0, loop_short_args_dict$Tmax, by = loop_short_args_dict$dt)
+loop_short_net_dat =  ode(y = state0, times = times, func = dx_dt, parms = loop_short_args_dict, method="rk4")
 
 data.frame(loop_short_net_dat) %>%
-  mutate(node = c(1,2,3)) %>%
-  gather(sampling, value, -node) %>%
-  mutate(sampling = gsub("X", "", sampling),
-         sampling = as.numeric(sampling),
-         node = as.factor(node)) %>%
-  ggplot(aes(x=sampling, y=value, color = node))+
+  gather(node, value, -time) %>%
+  mutate(node = gsub("X", "", node)) %>%
+  ggplot(aes(time, value, col=node))+
   geom_line()
 ```
 
@@ -278,10 +258,6 @@ and 0 for non-stimulated nodes.
 
 ### Non-hub stimulation
 
-```{r}
-net_dat_debug = networkModel(W, cur_args_dict, debug=T)
-```
-
 "Uncorrected" GLM overestimates task parameter. Task betas for each node:
 
 ```{r}
@@ -289,7 +265,7 @@ cat(paste0("Stim node is: ", cur_args_dict$stim_node))
 cat("\n")
 cat("Uncorrected estimates for each node:")
 cat("\n")
-round(run_ucr_glm(net_dat_debug, task_reg = cur_args_dict$I[1,])$ucr_task_betas, 4)
+round(run_ucr_glm(net_dat, task_reg = cur_args_dict$I[1,])$ucr_task_betas, 4)
 ```
 
 "Extended" GLM recovers correct task parameter.
