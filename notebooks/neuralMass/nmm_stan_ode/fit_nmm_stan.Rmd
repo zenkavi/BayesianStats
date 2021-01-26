@@ -11,7 +11,7 @@ library(cmdstanr)
 
 ```{r}
 helpers_path = '~/Dropbox/RangelLab/NetworkGLM/helpers/r_helpers/'
-source(paste0(helpers_path,'networkModel.R'))
+source(paste0(helpers_path,'networkModelODE.R'))
 source(paste0(helpers_path,'make_stimtimes.R'))
 source(paste0(helpers_path,'plot_adj_mat.R'))
 ```
@@ -65,7 +65,7 @@ Activity in each node at each time point would look like:
 cur_args_dict = list('dt'=.5,  
                  'noise'= TRUE,
                  'noise_loc'= 0, 
-                 'noise_scale'= 0.1,
+                 'noise_scale'= 0.05,
                  's'=.3,
                  'g'=.7,
                  'taskdata'=NULL,
@@ -73,15 +73,14 @@ cur_args_dict = list('dt'=.5,
                  'Tmax'=100,
                  'W'= W)
 
-net_dat = networkModel(W, cur_args_dict)
+state0 = rep(0, dim(cur_args_dict$W)[1])
+times = seq(0, cur_args_dict$Tmax, by = cur_args_dict$dt)
+net_dat =  ode(y = state0, times = times, func = dx_dt, parms = cur_args_dict, method="rk4")
 
 data.frame(net_dat) %>%
-  mutate(node = c(1,2,3)) %>%
-  gather(sampling, value, -node) %>%
-  mutate(sampling = gsub("X", "", sampling),
-         sampling = as.numeric(sampling),
-         node = as.factor(node)) %>%
-  ggplot(aes(x=sampling, y=value, color = node))+
+  gather(node, value, -time) %>%
+  mutate(node = gsub("X", "", node)) %>%
+  ggplot(aes(time, value, col=node))+
   geom_line()
 ```
 
