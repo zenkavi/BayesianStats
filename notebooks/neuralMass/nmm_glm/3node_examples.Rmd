@@ -256,6 +256,8 @@ cur_args_dict$dt / (2*cur_args_dict$tau)
 
 and 0 for non-stimulated nodes.
 
+**THIS WAS TRUE FOR SECOND ORDER RUNGE-KUTTE. NOW THAT DATA GENERATION HAS BEEN CHANGED TO FOURTH ORDER THE INVERSION BELOW SHOULD NO LONGER WORK EXACTLY!**
+
 ### Non-hub stimulation
 
 "Uncorrected" GLM overestimates task parameter. Task betas for each node:
@@ -275,7 +277,7 @@ cat(paste0("Stim node is: ", cur_args_dict$stim_node))
 cat("\n")
 cat("Corrected estimates for each node:")
 cat("\n")
-round(run_ext_glm(net_dat_debug, cur_args_dict, task_reg = cur_args_dict$I[1,])$ext_task_betas, 4)
+round(run_ext_glm(net_dat, cur_args_dict, task_reg = cur_args_dict$I[1,])$ext_task_betas, 4)
 ```
 
 ### Hub stimulation
