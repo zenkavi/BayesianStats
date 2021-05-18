@@ -5,7 +5,7 @@ title: "RL simulation and parameter recovery with Stan II: More data"
 **Can we get better group level parameter estimates if we had more data?**
 
 ```{r}
-source('/Users/zeynepenkavi/Dropbox/RangelLab/BayesianStats/helpers/demo_QlearningSimulation.R')
+source('/Users/zeynepenkavi/Dropbox/RangelLab/IntroToStan/helpers/demo_QlearningSimulation.R')
 ```
 
 ## More trials per subject
