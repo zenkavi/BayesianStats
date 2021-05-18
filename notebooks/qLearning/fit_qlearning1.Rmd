@@ -5,7 +5,7 @@ title: "RL simulation and parameter recovery with Stan I: Single subject paramet
 Translating Deanizeau et al. (2014) Q-learning example
 
 ```{r}
-source('/Users/zeynepenkavi/Dropbox/RangelLab/BayesianStats/helpers/demo_QlearningSimulation.R')
+source('/Users/zeynepenkavi/Dropbox/RangelLab/IntroToStan//helpers/demo_QlearningSimulation.R')
 ```
 
 ## Example 1: Nice true parameter values

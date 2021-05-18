@@ -1,5 +1,5 @@
-files.sources = list.files('/Users/zeynepenkavi/Dropbox/RangelLab/BayesianStats/helpers', full.names = T)
-files.sources = files.sources[files.sources != '/Users/zeynepenkavi/Dropbox/RangelLab/BayesianStats/helpers/demo_QlearningSimulation.R']
+files.sources = list.files('/Users/zeynepenkavi/Dropbox/RangelLab/IntroToStan//helpers', full.names = T)
+files.sources = files.sources[files.sources != '/Users/zeynepenkavi/Dropbox/RangelLab/IntroToStan//helpers/demo_QlearningSimulation.R']
 sapply(files.sources, source)
 
 make_QlearningTask = function(probRewardGood = .75, blockSize = 25, numBlocks = 6){
