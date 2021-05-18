@@ -136,6 +136,7 @@ data.frame(extract(fit_nuts, c('alpha', 'beta', 'log_lik'))) %>%
   mutate(true_alpha = true_alpha, true_beta = true_beta)%>%
   ggplot()+
   geom_point(aes(x=alpha, y=beta, color=log_lik)) +
+  scale_colour_gradient()+
   geom_point(aes(x=true_alpha, y = true_beta), color="red", shape = 13, size=6)+
   geom_point(aes(x=est_alpha, y = est_beta), color =  "black", shape=4, size=6)+
   facet_grid(~alg)+
